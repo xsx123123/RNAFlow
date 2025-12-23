@@ -1,0 +1,3 @@
+software:
+  json_md5_verifier: ./scripts/release/json_md5_verifier_x86_64/release/json_md5_verifier
+  seq_preprocessor: ./scripts/release/seq_preprocessor_x86_64/release/seq_preprocessor

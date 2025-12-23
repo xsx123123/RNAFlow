@@ -1,0 +1,13 @@
+*.RDS
+*.rds
+*.RData
+*.h5ad
+*.fa
+*.fasta
+*.fq
+*.fastq
+*.gz
+./build
+./examples
+./deps
+./incremental
