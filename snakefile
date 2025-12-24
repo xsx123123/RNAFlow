@@ -20,6 +20,7 @@ include: 'rules/04.short_read_qc.smk'
 include: 'rules/05.Contamination_check.smk'
 include: 'rules/06.short_read_clean.smk'
 include: 'rules/07.mapping.smk'
+include: 'rules/08.rsem.smk'
 # --------- target rule --------- #
 rule all:
     input:

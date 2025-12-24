@@ -1,3 +1,5 @@
+#!/usr/bin/snakemake
+# -*- coding: utf-8 -*-
 import os
 from loguru import logger
 
