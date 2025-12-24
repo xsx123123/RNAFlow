@@ -1,3 +1,58 @@
+# softeware path
 software:
-  json_md5_verifier: ./scripts/release/json_md5_verifier_x86_64/release/json_md5_verifier
-  seq_preprocessor: ./scripts/release/seq_preprocessor_x86_64/release/seq_preprocessor
+  json_md5_verifier: /home/jzhang/pipeline/RNAFlow/src/src/md5/Compile_release/json_md5_verifier_x86_64/release/json_md5_verifier
+  seq_preprocessor: /home/jzhang/pipeline/RNAFlow/src/src/md5/Compile_release/seq_preprocessor_x86_64/release/seq_preprocessor
+# md5
+raw_data:
+  md5: 'md5.txt'
+# software parameter
+parameter:
+  star_index:
+    Lsat_Salinas_v11:
+      index: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/Lsat_Salinas_v11
+      genome_fa: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/Lsat_Salinas_v11.genome.fasta
+      genome_gtf: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/Lsat_Salinas_v11.genome.fasta
+    Lsat_Salinas_v8:
+      index: /data/jzhang/reference/Lactuca_sativa_V8/STAR_Lactuca_sativa_V8_index/Lsat_Salinas_v8
+      genome_fa: /data/jzhang/reference/Lactuca_sativa_V8/STAR_Lactuca_sativa_V8_index/Lactuca_sativa_V8A.fasta
+      genome_gtf: /data/jzhang/reference/Lactuca_sativa_V8/STAR_Lactuca_sativa_V8_index/Lactuca_sativa_V8A.gtf
+  threads:
+    json_md5_verifier: 40
+    fastqc: 1
+    fastp: 8
+    multiqc: 1
+    fastq_screen: 10
+    STAR_INDEX: 40
+    samtools: 10
+    samtools_flagstat: 10
+    samtools_stats: 10
+    qualimap: 10
+  fastq_screen:
+    run: true
+    path: /home/jzhang/software/FastQ-Screen-0.16.0/fastq_screen
+    conf: /home/jzhang/software/FastQ-Screen-0.16.0/fastq_screen.conf
+    subset: 100000
+    aligner: Bowtie2
+  STAR:
+    PL: ILUMINA
+  qualimap:
+    genome_gff: /data/jzhang/reference/Lactuca_sativa_V11/Lsat_Salinas_v11.genome.gff
+    format: HTML
+    mem: 20000M
+  trim:
+    length_required: 75
+    quality_threshold: 25
+    adapter_fasta: "../data/Universal_Adapter.fa"
+
+can_use_genome_version:
+  - Lsat_Salinas_v11
+  - Lsat_Salinas_v8
+# Other parameter
+print_target: true
+log_level: INFO
+bam_remove: true
+convert_md5: 'link_dir'
+r1_suffix: _R1.fq.gz
+r2_suffix: _R2.fq.gz
+md5: MD5.txt
+print_sample: false

@@ -1,0 +1,61 @@
+name: fastq-screen
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - _libgcc_mutex=0.1=conda_forge
+  - _openmp_mutex=4.5=2_gnu
+  - bowtie=1.0.0=1
+  - bowtie2=2.5.4=he96a11b_6
+  - bzip2=1.0.8=hda65f42_8
+  - ca-certificates=2025.10.5=hbd8a1cb_0
+  - fastq-screen=0.16.0=pl5321hdfd78af_0
+  - font-ttf-dejavu-sans-mono=2.37=hab24e00_0
+  - font-ttf-inconsolata=3.000=h77eed37_0
+  - font-ttf-source-code-pro=2.038=h77eed37_0
+  - font-ttf-ubuntu=0.83=h77eed37_3
+  - fontconfig=2.15.0=h7e30c49_1
+  - fonts-conda-ecosystem=1=0
+  - fonts-conda-forge=1=0
+  - freetype=2.14.1=ha770c72_0
+  - icu=75.1=he02047a_0
+  - ld_impl_linux-64=2.44=h1aa0949_4
+  - lerc=4.0.0=h0aef613_1
+  - libdeflate=1.24=h86f0d12_0
+  - libexpat=2.7.1=hecca717_0
+  - libffi=3.5.2=h9ec8514_0
+  - libfreetype=2.14.1=ha770c72_0
+  - libfreetype6=2.14.1=h73754d4_0
+  - libgcc=15.2.0=h767d61c_7
+  - libgcc-ng=15.2.0=h69a702a_7
+  - libgd=2.3.3=h6f5c62b_11
+  - libgomp=15.2.0=h767d61c_7
+  - libjpeg-turbo=3.1.0=hb9d3cd8_0
+  - liblzma=5.8.1=hb9d3cd8_2
+  - libmpdec=4.0.0=hb9d3cd8_0
+  - libpng=1.6.50=h421ea60_1
+  - libsqlite=3.50.4=h0c1763c_0
+  - libstdcxx=15.2.0=h8f9b012_7
+  - libstdcxx-ng=15.2.0=h4852527_7
+  - libtiff=4.7.1=h8261f1e_0
+  - libuuid=2.41.2=he9a06e4_0
+  - libwebp-base=1.6.0=hd42ef1d_0
+  - libxcrypt=4.4.36=hd590300_1
+  - libzlib=1.3.1=hb9d3cd8_2
+  - ncurses=6.5=h2d0b736_3
+  - openssl=3.5.4=h26f9b46_0
+  - perl=5.32.1=7_hd590300_perl5
+  - perl-gd=2.83=pl5321hc25ab4d_0
+  - perl-gdgraph=1.56=pl5321hdfd78af_0
+  - perl-gdtextutil=0.86=pl5321h7b50bb2_9
+  - perl-test-nowarnings=1.06=pl5321ha770c72_0
+  - pip=25.2=pyh145f28c_0
+  - python=3.14.0=h32b2ec7_102_cp314
+  - python_abi=3.14=8_cp314
+  - readline=8.2=h8c095d6_2
+  - tk=8.6.13=noxft_hd72426e_102
+  - tzdata=2025b=h78e105d_0
+  - zlib=1.3.1=hb9d3cd8_2
+  - zstd=1.5.7=hb8e6e7a_2
+
+prefix: "/home/jzhang/.local/share/mamba/envs/fastq-screen"
