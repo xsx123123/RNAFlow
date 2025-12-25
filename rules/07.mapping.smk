@@ -41,9 +41,9 @@ rule STAR_mapping:
         r1 = "01.qc/short_read_trim/{sample}.R1.trimed.fq.gz",
         r2 = "01.qc/short_read_trim/{sample}.R2.trimed.fq.gz",
     output:
-        Aligned_bam = '02.mapping/STAR/temp/{sample}.Aligned.sortedByCoord.out.bam',
-        Transcriptome_bam = '02.mapping/STAR/temp/{sample}.Aligned.toTranscriptome.out.bam',
-        log_final = '02.mapping/STAR/temp/{sample}.Log.final.out',
+        Aligned_bam = '02.mapping/STAR/{sample}/{sample}.Aligned.sortedByCoord.out.bam',
+        Transcriptome_bam = '02.mapping/STAR/{sample}/{sample}.Aligned.toTranscriptome.out.bam',
+        log_final = '02.mapping/STAR/{sample}/{sample}.Log.final.out',
     conda:
         workflow.source_path("../envs/star.yml"),
     log:
@@ -53,7 +53,7 @@ rule STAR_mapping:
     benchmark:
         "benchmarks/{sample}_STAR_benchmark.txt",
     params:
-        Prefix = '02.mapping/STAR/temp/{sample}.',
+        Prefix = '02.mapping/STAR/{sample}/{sample}.',
         platform = config['parameter']["STAR"]["PL"],
         sample = '{sample}',
     threads:
@@ -95,7 +95,7 @@ rule STAR_mapping:
             --alignSJDBoverhangMin 3  \
             --alignSJstitchMismatchNmax 5 -1 5 5  \
             --limitBAMsortRAM 40000000000 \
-            --limitIObufferSize 500000000 \
+            --limitIObufferSize 500000000 500000000 \
             --chimOutType Junctions  \
             --chimOutJunctionFormat 1  \
             --chimSegmentMin 12  \
@@ -111,8 +111,8 @@ rule STAR_mapping:
 
 rule sort_index:
     input:
-        Aligned_bam = '02.mapping/STAR/temp/{sample}.Aligned.sortedByCoord.out.bam',
-        Transcriptome_bam = '02.mapping/STAR/temp/{sample}.Aligned.toTranscriptome.out.bam',
+        Aligned_bam = '02.mapping/STAR/{sample}/{sample}.Aligned.sortedByCoord.out.bam',
+        Transcriptome_bam = '02.mapping/STAR/{sample}/{sample}.Aligned.toTranscriptome.out.bam',
     output:
         rename_bam = '02.mapping/STAR/sort_index/{sample}.bam',
         sort_bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
@@ -212,5 +212,37 @@ rule samtools_stats:
                  -@ {threads} \
                  --reference {params.reference} \
                  {input.bam} > {output.samtools_stats} 2>{log}
+        """
+
+rule bamCoverage:
+    input:
+        bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
+        bai = '02.mapping/STAR/sort_index/{sample}.sort.bam.bai'
+    output:
+        bw = f"02.mapping/bamCoverage/{{sample}}_{config['parameter']['bamCoverage']['normalizeUsing']}.bw"
+    conda:
+        workflow.source_path("../envs/deeptools.yaml"),
+    message:
+        "Running bamCoverage (bigwig generation) for {input.bam}"
+    log:
+        "logs/02.mapping/bamCoverage_{sample}.log",
+    benchmark:
+        "benchmarks/{sample}_bamCoverage_benchmark.txt",
+    threads:
+        config['parameter']['threads']['bamCoverage'],
+    params:
+        binSize = config['parameter']['bamCoverage']['binSize'],
+        smoothLength = config['parameter']['bamCoverage']['smoothLength'],
+        normalizeUsing = config['parameter']['bamCoverage']['normalizeUsing'],
+    shell:
+        """
+        bamCoverage -p {threads} \
+                    --bam {input.bam} \
+                    --binSize {params.binSize} \
+                    --centerReads \
+                    --smoothLength {params.smoothLength} \
+                    --normalizeUsing {params.normalizeUsing} \
+                    -o {output.bw} \
+                    2> {log}
         """
 # ----- rule ----- #

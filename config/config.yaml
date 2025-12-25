@@ -11,7 +11,7 @@ parameter:
     Lsat_Salinas_v11:
       index: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/Lsat_Salinas_v11
       genome_fa: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/Lsat_Salinas_v11.genome.fasta
-      genome_gtf: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/Lsat_Salinas_v11.genome.fasta
+      genome_gtf: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/Lsat_Salinas_v11.genome.gtf
       rsem_index: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/RSEM_Lsat_Salinas_v11/Lsat_Salinas_v11
     Lsat_Salinas_v8:
       index: /data/jzhang/reference/Lactuca_sativa_V8/STAR_Lactuca_sativa_V8_index/Lsat_Salinas_v8
@@ -31,6 +31,7 @@ parameter:
     qualimap: 10
     RSEM_INDEX: 20
     rsem-calculate: 20
+    bamCoverage: 20
   fastq_screen:
     run: true
     path: /home/jzhang/software/FastQ-Screen-0.16.0/fastq_screen
@@ -43,6 +44,10 @@ parameter:
     genome_gff: /data/jzhang/reference/Lactuca_sativa_V11/Lsat_Salinas_v11.genome.gff
     format: HTML
     mem: 20000M
+  bamCoverage:
+    binSize: 10
+    smoothLength: 14
+    normalizeUsing: RPKM # RPKM,CPM,BPM,RPGC
   trim:
     length_required: 75
     quality_threshold: 25

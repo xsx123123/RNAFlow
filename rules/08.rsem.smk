@@ -36,7 +36,7 @@ rule RSEM:
         grp = config["parameter"]['star_index'][config['Genome_Version']]['rsem_index'] + '.grp',
         idx_fa = config["parameter"]['star_index'][config['Genome_Version']]['rsem_index'] + '.idx.fa',
         n2g_idx_fa = config["parameter"]['star_index'][config['Genome_Version']]['rsem_index'] + '.n2g.idx.fa',
-        Transcriptome_bam = '02.mapping/STAR/temp/{sample}.Aligned.toTranscriptome.out.bam',
+        Transcriptome_bam = '02.mapping/STAR/{sample}/{sample}.Aligned.toTranscriptome.out.bam',
     output:
         qualimap_report_html = '03.count/rsem/{sample}.genes.results',
         qualimap_report_txt = '03.count/rsem/{sample}.isoforms.results',
