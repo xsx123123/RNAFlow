@@ -22,6 +22,7 @@ include: 'rules/06.short_read_clean.smk'
 include: 'rules/07.mapping.smk'
 include: 'rules/08.rsem.smk'
 include: 'rules/09.call_variant.smk'
+include: 'rules/10.Assembly.smk'
 # --------- target rule --------- #
 rule all:
     input:

@@ -12,12 +12,14 @@ parameter:
       index: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/Lsat_Salinas_v11
       genome_fa: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/Lsat_Salinas_v11.genome.fasta
       genome_gtf: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/Lsat_Salinas_v11.genome.gtf
+      genome_gff: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/Lsat_Salinas_v11.genome.gff
       rsem_index: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/RSEM_Lsat_Salinas_v11/Lsat_Salinas_v11
       ploidy: 2
     Lsat_Salinas_v8:
       index: /data/jzhang/reference/Lactuca_sativa_V8/STAR_Lactuca_sativa_V8_index/Lsat_Salinas_v8
       genome_fa: /data/jzhang/reference/Lactuca_sativa_V8/STAR_Lactuca_sativa_V8_index/Lactuca_sativa_V8A.fasta
       genome_gtf: /data/jzhang/reference/Lactuca_sativa_V8/STAR_Lactuca_sativa_V8_index/Lactuca_sativa_V8A.gtf
+      genome_gff: /data/jzhang/reference/Lactuca_sativa_V8/STAR_Lactuca_sativa_V8_index/Lactuca_sativa_V8A.gff3
       rsem_index: /data/jzhang/reference/Lactuca_sativa_V8/STAR_Lactuca_sativa_V8_index/Lsat_Salinas_v8/Lsat_Salinas_v8
       ploidy: 2
   threads:
@@ -35,6 +37,7 @@ parameter:
     RSEM_INDEX: 20
     rsem-calculate: 20
     bamCoverage: 20
+    stringtie: 16
     gatk: 1
   fastq_screen:
     run: true
@@ -42,6 +45,10 @@ parameter:
     conf: /home/jzhang/software/FastQ-Screen-0.16.0/fastq_screen.conf
     subset: 100000
     aligner: Bowtie2
+  stringtie:
+    min_length: 200      # 最小转录本长度 (植物lncRNA通常>200)
+    min_cov: 5           # 最小覆盖度
+    min_fpkm: 1.0        # 最小 FPKM (过滤低表达噪音)
   STAR:
     PL: ILUMINA
   qualimap:

@@ -11,3 +11,5 @@ workflow: /data/jzhang/project/RNAFlow_Analysis_pipeline/01.workflow
 data_deliver: /data/jzhang/project/RNAFlow_Analysis_pipeline/02.data_deliver
 # wheather call variant for RNA-seq
 call_variant: true
+# Detech Noval Transcripts by stringtie
+noval_Transcripts: true

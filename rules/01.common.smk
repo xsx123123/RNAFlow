@@ -65,7 +65,11 @@ def DataDeliver(config:dict = None) -> list:
                                           sample=samples.keys()))
         data_deliver.append('04.variant/multiqc_gatk_bcftools_stats_raw/multiqc_gatk_bcftools_stats_raw.html')
         data_deliver.append('04.variant/multiqc_gatk_bcftools_stats_pass/multiqc_gatk_bcftools_stats_pass.html')
-                                                         
+
+    if config['noval_Transcripts']:
+        data_deliver.append("05.assembly/filter/novel_transcripts.gtf")
+        data_deliver.append("05.assembly/filter/final_all.gtf")
+
     if config['print_target']:
        rich_print(data_deliver)
     return  data_deliver
