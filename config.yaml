@@ -9,3 +9,5 @@ sample_csv: /data/jzhang/project/RNAFlow_Analysis_pipeline/01.workflow/sample.cs
 workflow: /data/jzhang/project/RNAFlow_Analysis_pipeline/01.workflow
 # RNAflow Output file
 data_deliver: /data/jzhang/project/RNAFlow_Analysis_pipeline/02.data_deliver
+# wheather call variant for RNA-seq
+call_variant: true

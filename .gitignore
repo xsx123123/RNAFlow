@@ -11,3 +11,14 @@
 ./examples
 ./deps
 ./incremental
+./Compile_release
+.snakemake
+*.log
+*.csv
+.gitignore
+.nextflow.log*
+.nextflow
+work
+results
+data-deliver
+*_trace.txt%

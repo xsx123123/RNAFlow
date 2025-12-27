@@ -57,10 +57,10 @@ rule STAR_mapping:
         platform = config['parameter']["STAR"]["PL"],
         sample = '{sample}',
     threads:
-        config['parameter']['threads']['STAR_INDEX'],
+        config['parameter']['threads']['STAR_MAPPING'],
     shell:
         """
-        STAR --runMode alignReads \
+        ulimit -n 65535 && STAR --runMode alignReads \
             --genomeDir {input.idx_dir} \
             --genomeLoad NoSharedMemory  \
             --runThreadN {threads} \
@@ -78,6 +78,9 @@ rule STAR_mapping:
             --outSAMattrRGline ID:{params.sample} SM:{params.sample} PL:{params.platform} \
             --outSAMmapqUnique 255  \
             --outSAMstrandField intronMotif \
+            --outWigType bedGraph \
+            --outWigStrand Stranded \
+            --outWigNorm RPM \
             --outStd  Log  \
             --outFilterType BySJout \
             --outFilterMismatchNmax 999 \
@@ -94,8 +97,6 @@ rule STAR_mapping:
             --alignSJoverhangMin 5  \
             --alignSJDBoverhangMin 3  \
             --alignSJstitchMismatchNmax 5 -1 5 5  \
-            --limitBAMsortRAM 40000000000 \
-            --limitIObufferSize 500000000 500000000 \
             --chimOutType Junctions  \
             --chimOutJunctionFormat 1  \
             --chimSegmentMin 12  \
@@ -106,7 +107,7 @@ rule STAR_mapping:
             --chimScoreMin 0 \
             --chimScoreDropMax 20 \
             --chimScoreSeparation 10 \
-            --chimScoreJunctionNonGTAG -1 2>{log}
+            --chimScoreJunctionNonGTAG -1  &> {log}
         """
 
 rule sort_index:
@@ -130,13 +131,14 @@ rule sort_index:
     shell:
         """
         (mv {input.Aligned_bam} {output.rename_bam} &&
-        samtools sort -@ {threads} -o {output.sort_bam} {input.Aligned_bam} &&
-        samtools index -@ {threads} {output.sort_bam}) 2>{log}
+        samtools sort -@ {threads} -o {output.sort_bam} {output.rename_bam} &&
+        samtools index -@ {threads} {output.sort_bam})  &>{log}
         """
 
 rule qualimap_qc:
     input:
         bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
+        bai = '02.mapping/STAR/sort_index/{sample}.sort.bam.bai'
     output:
         qualimap_report_html = '02.mapping/qualimap_report/{sample}/qualimapReport.html',
         qualimap_report_txt = '02.mapping/qualimap_report/{sample}/genome_results.txt',
@@ -163,12 +165,13 @@ rule qualimap_qc:
                  -gff {params.genome_gff} \
                  -outdir {params.prefix_dir} \
                  -outformat {params.outformat} \
-                 --java-mem-size=16G &>{log}
+                 --java-mem-size=16G &> {log}
         """
 
 rule samtools_flagst:
     input:
         bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
+        bai = '02.mapping/STAR/sort_index/{sample}.sort.bam.bai'
     output:
         samtools_flagstat = '02.mapping/samtools_flagstat/{sample}_bam_flagstat.tsv',
     conda:
@@ -192,6 +195,7 @@ rule samtools_flagst:
 rule samtools_stats:
     input:
         bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
+        bai = '02.mapping/STAR/sort_index/{sample}.sort.bam.bai'
     output:
         samtools_stats = '02.mapping/samtools_stats/{sample}_bam_stats.tsv',
     conda:
@@ -211,7 +215,7 @@ rule samtools_stats:
         samtools stats \
                  -@ {threads} \
                  --reference {params.reference} \
-                 {input.bam} > {output.samtools_stats} 2>{log}
+                 {input.bam} > {output.samtools_stats}  2>{log}
         """
 
 rule bamCoverage:
@@ -243,6 +247,6 @@ rule bamCoverage:
                     --smoothLength {params.smoothLength} \
                     --normalizeUsing {params.normalizeUsing} \
                     -o {output.bw} \
-                    2> {log}
+                    &> {log}
         """
 # ----- rule ----- #

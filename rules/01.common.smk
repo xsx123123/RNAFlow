@@ -53,7 +53,19 @@ def DataDeliver(config:dict = None) -> list:
                                           sample=samples.keys()))
     data_deliver.extend(expand("03.count/rsem/{sample}.isoforms.results",
                                           sample=samples.keys()))
-    
+
+    if config['call_variant']:
+        data_deliver.extend(expand("04.variant/gatk/{sample}/{sample}.final.pass.vcf",
+                                          sample=samples.keys()))
+        data_deliver.extend(expand("04.variant/gatk/{sample}/{sample}.final.pass.vcf.idx",
+                                          sample=samples.keys()))
+        data_deliver.extend(expand("04.variant/gatk_bcftools_stats_raw/{sample}.raw_variants.stats",
+                                          sample=samples.keys()))
+        data_deliver.extend(expand("04.variant/gatk_bcftools_stats_pass/{sample}.final.pass.stats",
+                                          sample=samples.keys()))
+        data_deliver.append('04.variant/multiqc_gatk_bcftools_stats_raw/multiqc_gatk_bcftools_stats_raw.html')
+        data_deliver.append('04.variant/multiqc_gatk_bcftools_stats_pass/multiqc_gatk_bcftools_stats_pass.html')
+                                                         
     if config['print_target']:
        rich_print(data_deliver)
     return  data_deliver

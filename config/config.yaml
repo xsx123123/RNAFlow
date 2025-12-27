@@ -13,11 +13,13 @@ parameter:
       genome_fa: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/Lsat_Salinas_v11.genome.fasta
       genome_gtf: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/Lsat_Salinas_v11.genome.gtf
       rsem_index: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/RSEM_Lsat_Salinas_v11/Lsat_Salinas_v11
+      ploidy: 2
     Lsat_Salinas_v8:
       index: /data/jzhang/reference/Lactuca_sativa_V8/STAR_Lactuca_sativa_V8_index/Lsat_Salinas_v8
       genome_fa: /data/jzhang/reference/Lactuca_sativa_V8/STAR_Lactuca_sativa_V8_index/Lactuca_sativa_V8A.fasta
       genome_gtf: /data/jzhang/reference/Lactuca_sativa_V8/STAR_Lactuca_sativa_V8_index/Lactuca_sativa_V8A.gtf
       rsem_index: /data/jzhang/reference/Lactuca_sativa_V8/STAR_Lactuca_sativa_V8_index/Lsat_Salinas_v8/Lsat_Salinas_v8
+      ploidy: 2
   threads:
     json_md5_verifier: 40
     fastqc: 1
@@ -25,6 +27,7 @@ parameter:
     multiqc: 1
     fastq_screen: 10
     STAR_INDEX: 40
+    STAR_MAPPING: 16
     samtools: 10
     samtools_flagstat: 10
     samtools_stats: 10
@@ -32,6 +35,7 @@ parameter:
     RSEM_INDEX: 20
     rsem-calculate: 20
     bamCoverage: 20
+    gatk: 1
   fastq_screen:
     run: true
     path: /home/jzhang/software/FastQ-Screen-0.16.0/fastq_screen
@@ -48,6 +52,13 @@ parameter:
     binSize: 10
     smoothLength: 14
     normalizeUsing: RPKM # RPKM,CPM,BPM,RPGC
+  gatk:
+    filter:
+      rna_seq:
+        window_size: 35        # 窗口大小
+        cluster_size: 3        # 集群数量阈值
+        fs_threshold: 30.0     # Fisher Strand 阈值 (RNA建议30, DNA建议60)
+        qd_threshold: 2.0      # Quality by Depth 阈值
   trim:
     length_required: 75
     quality_threshold: 25
@@ -58,10 +69,10 @@ can_use_genome_version:
   - Lsat_Salinas_v8
 # Other parameter
 print_target: true
+print_sample: false
 log_level: INFO
 bam_remove: true
 convert_md5: 'link_dir'
-r1_suffix: _R1.fq.gz
+r1_suffix: _R1.fq.g【z
 r2_suffix: _R2.fq.gz
 md5: MD5.txt
-print_sample: false
