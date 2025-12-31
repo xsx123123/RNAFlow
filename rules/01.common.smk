@@ -181,4 +181,25 @@ def judge_star_index(config: dict, Genome_Version: str) -> bool:
     
     return False
 
+def check_gene_version(config: dict, logger) -> None:
+    """
+    Check if the gene version in config matches allowed list.
+    """
+    try:
+        version = config['Genome_Version']
+        allowed = config['can_use_genome_version']
+        
+        if version not in allowed:
+            logger.error(f"Version mismatch! '{version}' is not in {allowed}")
+            raise ValueError(f"Unsupported genome version: {version}")
+            
+        logger.info(f"Config check passed: Genome_Version '{version}' is supported.")
+
+    except KeyError as e:
+        logger.error(f"Config structure error: Missing key {e}")
+        raise 
+    except TypeError:
+        logger.error("Config must be a valid dictionary.")
+        raise
+        
 # --------------------- #

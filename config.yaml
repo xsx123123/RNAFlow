@@ -1,5 +1,5 @@
 project_name: 'RNAflow'
-Genome_Version: "Lsat_Salinas_v11" # Lsat_Salinas_v8,Lsat_Salinas_v11
+Genome_Version: "Lsat_Salinas_v11" # Lsat_Salinas_v8,Lsat_Salinas_v11,ITAG4.1,TAIR10.1
 # short read raw-data
 raw_data_path:
   - /data/jzhang/project/RNAFlow_Analysis_pipeline/00.raw_data
