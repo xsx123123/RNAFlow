@@ -181,7 +181,7 @@ def judge_star_index(config: dict, Genome_Version: str) -> bool:
     
     return False
 
-def check_gene_version(config: dict, logger) -> None:
+def check_gene_version(config: dict = None, logger = None) -> None:
     """
     Check if the gene version in config matches allowed list.
     """

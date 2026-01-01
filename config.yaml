@@ -1,14 +1,14 @@
-project_name: 'RNAflow'
-Genome_Version: "Lsat_Salinas_v11" # Lsat_Salinas_v8,Lsat_Salinas_v11,ITAG4.1,TAIR10.1
+project_name: 'PRJNA1006186'
+Genome_Version: "ITAG4.1" # Lsat_Salinas_v8,Lsat_Salinas_v11,ITAG4.1,TAIR10.1
 # short read raw-data
 raw_data_path:
-  - /data/jzhang/project/RNAFlow_Analysis_pipeline/00.raw_data
+  - /data/jzhang/project/test/PRJNA1006186_RNAseq/raw_data
 # short read samples info
-sample_csv: /data/jzhang/project/RNAFlow_Analysis_pipeline/01.workflow/sample.csv
+sample_csv: /data/jzhang/project/test/PRJNA1006186_RNAseq/01.workflow/sample.csv
 # workflow
-workflow: /data/jzhang/project/RNAFlow_Analysis_pipeline/01.workflow
+workflow: /data/jzhang/project/test/PRJNA1006186_RNAseq/01.workflow
 # RNAflow Output file
-data_deliver: /data/jzhang/project/RNAFlow_Analysis_pipeline/02.data_deliver
+data_deliver: /data/jzhang/project/test/PRJNA1006186_RNAseq/02.data_deliver
 # wheather call variant for RNA-seq
 call_variant: true
 # Detech Noval Transcripts by stringtie
