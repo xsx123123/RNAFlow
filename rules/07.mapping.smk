@@ -249,4 +249,39 @@ rule bamCoverage:
                     -o {output.bw} \
                     &> {log}
         """
+
+rule mapping_report:
+    input:
+        Aligned_bam =  expand('02.mapping/STAR/{sample}/{sample}.Aligned.sortedByCoord.out.bam',sample=samples.keys()),
+        Transcriptome_bam = expand('02.mapping/STAR/{sample}/{sample}.Aligned.toTranscriptome.out.bam',sample=samples.keys()),
+        log_final = expand('02.mapping/STAR/{sample}/{sample}.Log.final.out',sample=samples.keys()),
+        qualimap_report_html = expand('02.mapping/qualimap_report/{sample}/qualimapReport.html',sample=samples.keys()),
+        qualimap_report_txt = expand('02.mapping/qualimap_report/{sample}/genome_results.txt',sample=samples.keys()),
+        samtools_flagstat = expand('02.mapping/samtools_flagstat/{sample}_bam_flagstat.tsv',sample=samples.keys()),
+        samtools_stats = expand('02.mapping/samtools_stats/{sample}_bam_stats.tsv',sample=samples.keys()),
+    output:
+        report = os.path.join(config['data_deliver'],'02.mapping_report','multiqc_mapping_report.html'),
+    conda:
+        workflow.source_path("../envs/multiqc.yaml"),
+    message:
+        "Running MultiQC to aggregate mapping reports",
+    params:
+        fastqc_reports = "02.mapping/",
+        report_dir = os.path.join(config['data_deliver'],'02.mapping_report'),
+        report = "multiqc_mapping_report.html",
+        title = "mapping report",
+    log:
+        "logs/02.mapping/multiqc_mapping_report.log",
+    benchmark:
+        "benchmarks/multiqc_mapping_report_benchmark.txt",
+    threads:
+        config['parameter']['threads']['multiqc'],
+    shell:
+        """
+        multiqc {params.fastqc_reports} \
+                --force \
+                --outdir {params.report_dir} \
+                -i {params.title} \
+                -n {params.report} &> {log}
+        """
 # ----- rule ----- #

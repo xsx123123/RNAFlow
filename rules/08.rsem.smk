@@ -40,6 +40,9 @@ rule RSEM:
     output:
         genes_result = '03.count/rsem/{sample}.genes.results',
         isoforms_result = '03.count/rsem/{sample}.isoforms.results',
+        cnt = '03.count/rsem/{sample}.stat/{sample}.cnt',
+        model = '03.count/rsem/{sample}.stat/{sample}.model',
+        theta = '03.count/rsem/{sample}.stat/{sample}.theta',
     conda:
         workflow.source_path("../envs/rsem.yaml"),
     message:
@@ -66,4 +69,34 @@ rule RSEM:
                                 {input.Transcriptome_bam} \
                                 {params.rsem_index} \
                                 {params.output_prefix} 2>{log}
+        """
+
+rule rsem_multiqc:
+    input:
+        fastqc_files_r1 = expand("03.count/rsem/{sample}.stat/{sample}.cnt",\
+                                  sample=samples.keys()),
+    output:
+        report = "03.count/multiqc_rsem_report.html",
+    conda:
+        workflow.source_path("../envs/multiqc.yaml"),
+    message:
+        "Running MultiQC to aggregate rsem reports",
+    params:
+        fastqc_reports = "03.count/rsem/",
+        report_dir = "03.count/",
+        report = "multiqc_rsem_report.html",
+        title = "rsem_report",
+    log:
+        "logs/03.count/rsem_report.log",
+    benchmark:
+        "benchmarks/rsem_report_benchmark.txt",
+    threads:
+        config['parameter']['threads']['multiqc'],
+    shell:
+        """
+        multiqc {params.fastqc_reports} \
+                --force \
+                --outdir {params.report_dir} \
+                -i {params.title} \
+                -n {params.report} &> {log}
         """
