@@ -38,8 +38,8 @@ rule RSEM:
         n2g_idx_fa = config["parameter"]['star_index'][config['Genome_Version']]['rsem_index'] + '.n2g.idx.fa',
         Transcriptome_bam = '02.mapping/STAR/{sample}/{sample}.Aligned.toTranscriptome.out.bam',
     output:
-        genes_result = '03.count/rsem/{sample_name}.genes.results',  # 用实际样本名
-        isoforms_result = '03.count/rsem/{sample_name}.isoforms.results',
+        genes_result = '03.count/rsem/{sample}.genes.results',
+        isoforms_result = '03.count/rsem/{sample}.isoforms.results',
     conda:
         workflow.source_path("../envs/rsem.yaml"),
     message:
@@ -51,7 +51,7 @@ rule RSEM:
     params:
         sample_name = lambda wildcards: samples[wildcards.sample]["sample_name"],
         rsem_index = config["parameter"]['star_index'][config['Genome_Version']]['rsem_index'],
-        output_prefix = lambda wildcards: os.path.join("03.count/rsem", samples[wildcards.sample]["sample_name"]),
+        output_prefix = "03.count/rsem/{sample}",
     threads: 
         config['parameter']["threads"]["rsem-calculate"],
     shell:
