@@ -68,7 +68,7 @@ rule RSEM:
                                 --paired-end \
                                 {input.Transcriptome_bam} \
                                 {params.rsem_index} \
-                                {params.output_prefix} 2>{log}
+                                {params.output_prefix} &>{log}
         """
 
 rule rsem_multiqc:
@@ -99,4 +99,37 @@ rule rsem_multiqc:
                 --outdir {params.report_dir} \
                 -i {params.title} \
                 -n {params.report} &> {log}
+        """
+
+rule merge_rsem:
+    input:
+        genes_result = expand('03.count/rsem/{sample}.genes.results',
+                                sample=samples.keys()),
+        isoforms_result = expand('03.count/rsem/{sample}.isoforms.results',
+                                sample=samples.keys()),
+    output:
+        tpm = "03.count/merge_rsem_tpm.tsv",
+        counts = "03.count/merge_rsem_counts.tsv",
+        fpkm = "03.count/merge_rsem_fpkm.tsv",
+        sample_csv = config['sample_csv'],
+    conda:
+        workflow.source_path("../envs/python3.yaml"),
+    message:
+        "Running MultiQC to aggregate rsem reports",
+    params:
+        extension = config["parameter"]['merge_rsem']['extension'],
+        merge_rsem = config["parameter"]['merge_rsem']['path'],
+    log:
+        "logs/03.count/merge_rsem.log",
+    benchmark:
+        "benchmarks/merge_rsem_benchmark.txt",
+    threads: 1
+    shell:
+        """
+        {params.merge_rsem}  merge-from-dir \
+                       --input-dir  /home/zj/analysis/RNAFlow_Analysis_pipeline_count \
+                       --tpm /home/zj/analysis/RNAFlow_Analysis_pipeline_count/merge_tpm.tsv \
+                       --counts /home/zj/analysis/RNAFlow_Analysis_pipeline_count/merge_count.tsv \
+                       --fpkm /home/zj/analysis/RNAFlow_Analysis_pipeline_count/merge_fpkm.tsv  \
+                       --extension {params.extension} &> {log}
         """

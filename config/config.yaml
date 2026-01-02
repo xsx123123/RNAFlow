@@ -59,6 +59,9 @@ parameter:
     conf: /home/jzhang/software/FastQ-Screen-0.16.0/fastq_screen.conf
     subset: 100000
     aligner: Bowtie2
+  merge_rsem:
+    path: /home/jzhang/pipeline/RNAFlow/src/src/gene_matrix/merge_rsem.py
+    extension: .genes.results
   stringtie:
     min_length: 200      # 最小转录本长度 (植物lncRNA通常>200)
     min_cov: 5           # 最小覆盖度
