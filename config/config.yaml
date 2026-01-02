@@ -37,7 +37,7 @@ parameter:
       rsem_index: /data/jzhang/reference/Arabidopsis_Thaliana/RSEM_TAIR10.1/TAIR10.1_index
       ploidy: 2
   threads:
-    json_md5_verifier: 40
+    json_md5_verifier: 40   
     fastqc: 1
     fastp: 8
     multiqc: 1

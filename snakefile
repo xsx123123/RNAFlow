@@ -23,6 +23,8 @@ include: 'rules/07.mapping.smk'
 include: 'rules/08.rsem.smk'
 include: 'rules/09.call_variant.smk'
 include: 'rules/10.Assembly.smk'
+# ----   input sample info   ---- #
+samples = load_samples(config["sample_csv"],required_cols = ["sample", "sample_name", "group"])
 # ---- check genome version  ---- #
 check_gene_version(config = config,logger = logger)
 # --------- target rule --------- #
