@@ -111,13 +111,14 @@ rule merge_rsem:
         tpm = "03.count/merge_rsem_tpm.tsv",
         counts = "03.count/merge_rsem_counts.tsv",
         fpkm = "03.count/merge_rsem_fpkm.tsv",
-        sample_csv = config['sample_csv'],
     conda:
         workflow.source_path("../envs/python3.yaml"),
     message:
         "Running MultiQC to aggregate rsem reports",
     params:
         extension = config["parameter"]['merge_rsem']['extension'],
+        input_dir = '03.count/rsem/',
+        sample_csv = config['sample_csv'],
         merge_rsem = config["parameter"]['merge_rsem']['path'],
     log:
         "logs/03.count/merge_rsem.log",
@@ -127,9 +128,10 @@ rule merge_rsem:
     shell:
         """
         {params.merge_rsem}  merge-from-dir \
-                       --input-dir  /home/zj/analysis/RNAFlow_Analysis_pipeline_count \
-                       --tpm /home/zj/analysis/RNAFlow_Analysis_pipeline_count/merge_tpm.tsv \
-                       --counts /home/zj/analysis/RNAFlow_Analysis_pipeline_count/merge_count.tsv \
-                       --fpkm /home/zj/analysis/RNAFlow_Analysis_pipeline_count/merge_fpkm.tsv  \
+                       --input-dir  {params.input_dir} \
+                       --tpm {output.tpm} \
+                       --counts {output.counts} \
+                       --fpkm {output.fpkm}  \
+                       --map {params.sample_csv} \
                        --extension {params.extension} &> {log}
         """

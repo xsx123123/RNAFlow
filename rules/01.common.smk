@@ -53,6 +53,10 @@ def DataDeliver(config:dict = None) -> list:
     data_deliver.extend(expand("03.count/rsem/{sample}.isoforms.results",
                                           sample=samples.keys()))           
     data_deliver.append("03.count/multiqc_rsem_report.html")
+    data_deliver.append("03.count/merge_rsem_tpm.tsv")
+    data_deliver.append("03.count/merge_rsem_counts.tsv")
+    data_deliver.append("03.count/merge_rsem_fpkm.tsv")
+
     if config['call_variant']:
         data_deliver.extend(expand("04.variant/gatk/{sample}/{sample}.final.pass.vcf",
                                           sample=samples.keys()))
