@@ -135,3 +135,29 @@ rule merge_rsem:
                        --map {params.sample_csv} \
                        --extension {params.extension} &> {log}
         """
+
+rule ultimate:
+    input:
+        tpm = "03.count/merge_rsem_tpm.tsv",
+        counts = "03.count/merge_rsem_counts.tsv",
+        fpkm = "03.count/merge_rsem_fpkm.tsv",
+    output:
+        ultimate = directory("03.count/rsem_ultimate/")
+    conda:
+        workflow.source_path("../envs/rsem_ultimate.yaml"),
+    message:
+        "Running rsem_ultimate",
+    params:
+        extension = config["parameter"]['qc_rsem_ultimate']['path'],
+    log:
+        "logs/03.count/qc_rsem_ultimate.log",
+    benchmark:
+        "benchmarks/qc_rsem_ultimate_benchmark.txt",
+    threads: 1
+    shell:
+        """
+        {params.qc_rsem_ultimate}  --tpm {input.tpm} \
+                            --fpkm {input.fpkm} \
+                            --counts {input.counts} \
+                            --out_dir {output.ultimate} &> {log}
+        """

@@ -87,6 +87,14 @@ parameter:
     PATH: /home/jzhang/pipeline/RNAFlow/src/src/DEG/run_deseq2.r
     LFC: 1
     PVAL: 0.05
+  qc_rsem_ultimate:
+    path: /home/jzhang/pipeline/RNAFlow/src/src/gene_matrix/qc_rsem_ultimate.py
+  Distribution:
+    path: /home/jzhang/pipeline/RNAFlow/src/src/DEG/run_dist.r
+    width: 10
+    height: 11
+  Heatmap:
+    path: /home/jzhang/pipeline/RNAFlow/src/src/DEG/run_pheatmap.r
   trim:
     length_required: 75
     quality_threshold: 25

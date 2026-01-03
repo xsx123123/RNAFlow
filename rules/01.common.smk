@@ -56,9 +56,17 @@ def DataDeliver(config:dict = None) -> list:
     data_deliver.append("03.count/merge_rsem_tpm.tsv")
     data_deliver.append("03.count/merge_rsem_counts.tsv")
     data_deliver.append("03.count/merge_rsem_fpkm.tsv")
-
+    data_deliver.append("03.count/rsem_ultimate/")
     # DEG 
     data_deliver.append("06.DEG/DESEQ2")
+    # Gene_Expression_Distribution
+    data_deliver.append('06.DEG/Gene_Expression/Gene_Expression_Distribution.pdf')
+    data_deliver.append('06.DEG/Gene_Expression/Gene_Expression_Distribution.png')
+    # heatmap
+    data_deliver.append('06.DEG/Heatmap_tpm/Heatmap_TopVar.pdf')
+    data_deliver.append('06.DEG/Heatmap_tpm/Heatmap_TopVar.png')
+    data_deliver.append('06.DEG/Heatmap_fpkm/Heatmap_TopVar.pdf')
+    data_deliver.append('06.DEG/Heatmap_fpkm/Heatmap_TopVar.png')
     # call_variant
     if config['call_variant']:
         data_deliver.extend(expand("04.variant/gatk/{sample}/{sample}.final.pass.vcf",
