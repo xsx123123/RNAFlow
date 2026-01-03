@@ -7,6 +7,7 @@ dependencies:
   - _openmp_mutex=5.1=1_gnu
   - bzip2=1.0.8=h5eee18b_6
   - ca-certificates=2025.7.15=h06a4308_0
+  - click=8.3.1=pyh8f84b5b_1
   - colorama=0.4.6=pyhd8ed1ab_1
   - dill=0.4.0=pyhd8ed1ab_0
   - ld_impl_linux-64=2.40=h12ee557_0
@@ -28,6 +29,8 @@ dependencies:
   - libuuid=2.38.1=h0b41bf4_0
   - libzlib=1.3.1=hb25bd0a_0
   - loguru=0.7.3=pyh707e725_0
+  - markdown-it-py=4.0.0=pyhd8ed1ab_0
+  - mdurl=0.1.2=pyhd8ed1ab_1
   - ncurses=6.5=h7934f7d_0
   - numpy=2.3.2=py313hf6604e3_2
   - openssl=3.5.2=h26f9b46_0
@@ -35,21 +38,24 @@ dependencies:
   - pandas=2.3.2=py313h08cd8bf_0
   - pip=25.2=pyhc872135_0
   - psutil=7.1.0=py313h07c4f96_0
+  - pygments=2.19.2=pyhd8ed1ab_0
   - python=3.13.7=h2b335a9_100_cp313
   - python-dateutil=2.9.0post0=py313h06a4308_2
   - python-tzdata=2025.2=pyhd3eb1b0_0
   - python_abi=3.13=1_cp313
   - pytz=2025.2=py313h06a4308_0
   - readline=8.3=hc2a1206_0
+  - rich=14.2.0=pyhcf101f3_0
+  - rich-click=1.9.5=pyhd8ed1ab_0
   - setuptools=78.1.1=py313h06a4308_0
   - six=1.17.0=py313h06a4308_0
   - tk=8.6.13=noxft_hd72426e_102
   - tqdm=4.67.1=pyhd8ed1ab_1
+  - typing_extensions=4.15.0=pyhcf101f3_0
   - tzdata=2025b=h04d1e81_0
   - wheel=0.45.1=py313h06a4308_0
   - pip:
     - PyYAML==6.0.3
-    - Pygments==2.19.2
     - appdirs==1.4.4
     - certifi==2025.8.3
     - charset-normalizer==3.4.3
@@ -57,11 +63,8 @@ dependencies:
     - docker==7.1.0
     - idna==3.10
     - importlib_metadata==8.7.0
-    - markdown-it-py==4.0.0
-    - mdurl==0.1.2
     - pybiolib==1.2.1240
     - requests==2.32.5
-    - rich==14.1.0
     - urllib3==2.5.0
     - zipp==3.23.0
 

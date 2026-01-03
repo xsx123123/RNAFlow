@@ -5,6 +5,7 @@ raw_data_path:
   - /data/jzhang/project/test/PRJNA1006186_RNAseq/raw_data
 # short read samples info
 sample_csv: /data/jzhang/project/test/PRJNA1006186_RNAseq/01.workflow/sample.csv
+paired_csv: /data/jzhang/project/test/PRJNA1006186_RNAseq/01.workflow/contrasts.csv
 # workflow
 workflow: /data/jzhang/project/test/PRJNA1006186_RNAseq/01.workflow
 # RNAflow Output file

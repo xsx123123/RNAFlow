@@ -21,4 +21,5 @@
 work
 results
 data-deliver
+__pycache__
 *_trace.txt%

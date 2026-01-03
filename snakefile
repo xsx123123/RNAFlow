@@ -25,6 +25,7 @@ include: 'rules/07.mapping.smk'
 include: 'rules/08.rsem.smk'
 include: 'rules/09.call_variant.smk'
 include: 'rules/10.Assembly.smk'
+include: 'rules/11.DEG.smk'
 # ---- check genome version  ---- #
 check_gene_version(config = config,logger = logger)
 # --------- target rule --------- #

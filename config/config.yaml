@@ -83,6 +83,10 @@ parameter:
         cluster_size: 3        # 集群数量阈值
         fs_threshold: 30.0     # Fisher Strand 阈值 (RNA建议30, DNA建议60)
         qd_threshold: 2.0      # Quality by Depth 阈值
+  DEG:
+    PATH: /home/jzhang/pipeline/RNAFlow/src/src/DEG/run_deseq2.r
+    LFC: 1
+    PVAL: 0.05
   trim:
     length_required: 75
     quality_threshold: 25

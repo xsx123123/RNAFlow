@@ -57,6 +57,9 @@ def DataDeliver(config:dict = None) -> list:
     data_deliver.append("03.count/merge_rsem_counts.tsv")
     data_deliver.append("03.count/merge_rsem_fpkm.tsv")
 
+    # DEG 
+    data_deliver.append("06.DEG/DESEQ2")
+    # call_variant
     if config['call_variant']:
         data_deliver.extend(expand("04.variant/gatk/{sample}/{sample}.final.pass.vcf",
                                           sample=samples.keys()))
@@ -68,7 +71,7 @@ def DataDeliver(config:dict = None) -> list:
                                           sample=samples.keys()))
         data_deliver.append('04.variant/multiqc_gatk_bcftools_stats_raw/multiqc_gatk_bcftools_stats_raw.html')
         data_deliver.append('04.variant/multiqc_gatk_bcftools_stats_pass/multiqc_gatk_bcftools_stats_pass.html')
-
+    # noval Transcripts
     if config['noval_Transcripts']:
         data_deliver.append("05.assembly/filter/novel_transcripts.gtf")
         data_deliver.append("05.assembly/filter/final_all.gtf")
