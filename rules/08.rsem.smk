@@ -156,7 +156,7 @@ rule ultimate:
     threads: 1
     shell:
         """
-        {params.qc_rsem_ultimate}  --tpm {input.tpm} \
+        {params.extension}  --tpm {input.tpm} \
                             --fpkm {input.fpkm} \
                             --counts {input.counts} \
                             --out_dir {output.ultimate} &> {log}

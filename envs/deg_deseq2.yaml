@@ -346,6 +346,7 @@ dependencies:
   - r-patchwork=1.3.2=r44hc72bb7e_1
   - r-pbdzmq=0.3_14=r44hded8526_1
   - r-pbkrtest=0.5.5=r44hc72bb7e_1
+  - r-pheatmap=1.0.13=r44hc72bb7e_1
   - r-pillar=1.11.1=r44hc72bb7e_0
   - r-pkgconfig=2.0.3=r44hc72bb7e_5
   - r-plyr=1.8.9=r44h3697838_3
