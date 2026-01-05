@@ -12,7 +12,7 @@ rule gene_dist:
     message:
         "Running Gene Expression Distribution",
     params:
-        extension = config["parameter"]['Distribution']['path'],
+        extension = workflow.source_path(config["parameter"]['Distribution']['path']),
         width = config["parameter"]['Distribution']['width'],
         height = config["parameter"]['Distribution']['height'],
         output = '06.DEG/Gene_Expression/',
@@ -24,6 +24,7 @@ rule gene_dist:
     threads: 1
     shell:
         """
+        chmod +x {params.extension} && \
         {params.extension}  -t {input.tpm} \
                             -f {input.fpkm} \
                             -m {params.samples} \
@@ -44,7 +45,7 @@ rule gene_heatmap_tpm:
     message:
         "Running Gene Heatmap",
     params:
-        extension = config["parameter"]['Heatmap']['path'],
+        extension = workflow.source_path(config["parameter"]['Heatmap']['path']),
         output = '06.DEG/Heatmap_tpm/',
         samples = config['sample_csv'],
     log:
@@ -54,6 +55,7 @@ rule gene_heatmap_tpm:
     threads: 1
     shell:
         """
+        chmod +x {params.extension} && \
         {params.extension}  -i {input.tpm} \
                             -m {params.samples} \
                             -o {params.output}  &> {log}
@@ -71,7 +73,7 @@ rule gene_heatmap_fpkm:
     message:
         "Running Gene Heatmap",
     params:
-        extension = config["parameter"]['Heatmap']['path'],
+        extension = workflow.source_path(config["parameter"]['Heatmap']['path']),
         output = '06.DEG/Heatmap_fpkm/',
         samples = config['sample_csv'],
     log:
@@ -81,6 +83,7 @@ rule gene_heatmap_fpkm:
     threads: 1
     shell:
         """
+        chmod +x {params.extension} && \
         {params.extension}  -i {input.fpkm} \
                             -m {params.samples} \
                             -o {params.output}  &> {log}
@@ -100,13 +103,14 @@ rule DEG:
     params:
         samples = config['sample_csv'],
         paired = config['paired_csv'],
-        PATH = config['parameter']['DEG']['PATH'],
+        PATH = workflow.source_path(config['parameter']['DEG']['PATH']),
         LFC = config['parameter']['DEG']['LFC'],
         PVAL = config['parameter']['DEG']['PVAL'],
     threads: 
         1
     shell:
         """
+        chmod +x {params.PATH} && \
         Rscript {params.PATH} -c {input.counts} \
                 -m {params.samples} \
                 -p {params.paired} \
@@ -114,3 +118,4 @@ rule DEG:
                 --lfc={params.LFC} \
                 --pval={params.PVAL} &> {log}
         """
+# ------- rule ------- #

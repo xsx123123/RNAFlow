@@ -1,7 +1,7 @@
 # softeware path
 software:
-  json_md5_verifier: /home/jzhang/pipeline/RNAFlow/src/src/md5/Compile_release/json_md5_verifier_x86_64/release/json_md5_verifier
-  seq_preprocessor: /home/jzhang/pipeline/RNAFlow/src/src/md5/Compile_release/seq_preprocessor_x86_64/release/seq_preprocessor
+  json_md5_verifier: ../src/src/md5/Compile_release/json_md5_verifier_x86_64/release/json_md5_verifier
+  seq_preprocessor: ../src/src/md5/Compile_release/seq_preprocessor_x86_64/release/seq_preprocessor
 # md5
 raw_data:
   md5: 'md5.txt'
@@ -60,7 +60,7 @@ parameter:
     subset: 100000
     aligner: Bowtie2
   merge_rsem:
-    path: /home/jzhang/pipeline/RNAFlow/src/src/gene_matrix/merge_rsem.py
+    path: ../src/src/gene_matrix/merge_rsem.py
     extension: .genes.results
   stringtie:
     min_length: 200      # 最小转录本长度 (植物lncRNA通常>200)
@@ -69,7 +69,6 @@ parameter:
   STAR:
     PL: ILUMINA
   qualimap:
-    genome_gff: /data/jzhang/reference/Lactuca_sativa_V11/Lsat_Salinas_v11.genome.gff
     format: HTML
     mem: 20000M
   bamCoverage:
@@ -84,17 +83,17 @@ parameter:
         fs_threshold: 30.0     # Fisher Strand 阈值 (RNA建议30, DNA建议60)
         qd_threshold: 2.0      # Quality by Depth 阈值
   DEG:
-    PATH: /home/jzhang/pipeline/RNAFlow/src/src/DEG/run_deseq2.r
+    PATH: ../src/src/DEG/run_deseq2.r
     LFC: 1
     PVAL: 0.05
   qc_rsem_ultimate:
-    path: /home/jzhang/pipeline/RNAFlow/src/src/gene_matrix/qc_rsem_ultimate.py
+    path: ../src/src/gene_matrix/qc_rsem_ultimate.py
   Distribution:
-    path: /home/jzhang/pipeline/RNAFlow/src/src/DEG/run_dist.r
+    path:  ../src/src/DEG/run_dist.r
     width: 10
     height: 11
   Heatmap:
-    path: /home/jzhang/pipeline/RNAFlow/src/src/DEG/run_pheatmap.r
+    path:  ../src/src/DEG/run_pheatmap.r
   trim:
     length_required: 75
     quality_threshold: 25

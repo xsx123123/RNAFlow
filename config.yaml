@@ -10,6 +10,8 @@ paired_csv: /data/jzhang/project/test/PRJNA1006186_RNAseq/01.workflow/contrasts.
 workflow: /data/jzhang/project/test/PRJNA1006186_RNAseq/01.workflow
 # RNAflow Output file
 data_deliver: /data/jzhang/project/test/PRJNA1006186_RNAseq/02.data_deliver
+# Fragment Library Types
+Library_Types: NULL # ISR,ISF,IU,NULL
 # wheather call variant for RNA-seq
 call_variant: false
 # Detech Noval Transcripts by stringtie

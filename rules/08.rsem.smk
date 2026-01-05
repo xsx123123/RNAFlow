@@ -119,7 +119,7 @@ rule merge_rsem:
         extension = config["parameter"]['merge_rsem']['extension'],
         input_dir = '03.count/rsem/',
         sample_csv = config['sample_csv'],
-        merge_rsem = config["parameter"]['merge_rsem']['path'],
+        merge_rsem = workflow.source_path(config["parameter"]['merge_rsem']['path']),
     log:
         "logs/03.count/merge_rsem.log",
     benchmark:
@@ -127,6 +127,7 @@ rule merge_rsem:
     threads: 1
     shell:
         """
+        chmod +x {params.merge_rsem} && \
         {params.merge_rsem}  merge-from-dir \
                        --input-dir  {params.input_dir} \
                        --tpm {output.tpm} \
@@ -148,7 +149,7 @@ rule ultimate:
     message:
         "Running rsem_ultimate",
     params:
-        extension = config["parameter"]['qc_rsem_ultimate']['path'],
+        extension = workflow.source_path(config["parameter"]['qc_rsem_ultimate']['path']),
     log:
         "logs/03.count/qc_rsem_ultimate.log",
     benchmark:
@@ -156,8 +157,10 @@ rule ultimate:
     threads: 1
     shell:
         """
+        chmod +x {params.extension} && \
         {params.extension}  --tpm {input.tpm} \
                             --fpkm {input.fpkm} \
                             --counts {input.counts} \
                             --out_dir {output.ultimate} &> {log}
         """
+# ------- rule ------- #

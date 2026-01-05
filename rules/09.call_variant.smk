@@ -319,3 +319,4 @@ rule multiqc_bcftools_stats_pass:
                 -i {params.title} \
                 -n {params.report} &> {log}
         """
+# ------- rule ------- #

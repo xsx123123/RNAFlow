@@ -23,12 +23,13 @@ rule seq_preprocessor:
     params:
         raw_data_path = config['raw_data_path'],
         md5 = config['raw_data']['md5'],
-        seq_preprocessor =  config['software']['seq_preprocessor'],
+        seq_preprocessor =  workflow.source_path(config['software']['seq_preprocessor']),
     log:
         "logs/01.qc/seq_preprocessor.txt",
     threads: 1
     shell:
         """
+        chmod +x {params.seq_preprocessor} && \
         {params.seq_preprocessor} -i  {params.raw_data_path} \
                                   -o {output.md5_check} \
                                   --md5-name {params.md5} \
@@ -57,11 +58,12 @@ rule check_md5:
     params:
         md5_check = os.path.join('00.raw_data',config['convert_md5']),
         log_file = "logs/01.qc/md5_check.log",
-        json_md5_verifier = config['software']['json_md5_verifier'],
+        json_md5_verifier =  workflow.source_path(config['software']['json_md5_verifier']),
     threads: 
         config['parameter']['threads']['json_md5_verifier'],
     shell:
         """
+        chmod +x {params.json_md5_verifier} && \
         {params.json_md5_verifier} -t  {threads} \
                 -i {input.md5_check_json} \
                 -b {params.md5_check} \

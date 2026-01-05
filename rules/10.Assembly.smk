@@ -99,3 +99,4 @@ rule Filter_Novel_Transcripts:
         (awk '$0 ~ /class_code "[ujxi]"/ {{print $0}}' {input.annotated_gtf} > {output.novel_gtf} && \
         cp {input.annotated_gtf} {output.final_gtf}) 2> {log}
         """
+# ------- rule ------- #
