@@ -54,7 +54,7 @@ rule rmats_run:
 rule rmats_single_run:
     input:
         bam = "02.mapping/STAR/sort_index/{sample}.sort.bam",
-        gtf = "05.assembly/filter/final_Novel_Isoforms.gtf"
+        gtf = config['parameter']['star_index'][config['Genome_Version']]['genome_gtf'],
     output:
         se = "07.AS/rmats_single/{sample}/SE.MATS.JC.txt",
         mx = "07.AS/rmats_single/{sample}/MXE.MATS.JC.txt",

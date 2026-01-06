@@ -14,6 +14,7 @@ parameter:
       genome_gtf: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/Lsat_Salinas_v11.genome.gtf
       genome_gff: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/Lsat_Salinas_v11.genome.gff
       rsem_index: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/RSEM_Lsat_Salinas_v11/Lsat_Salinas_v11
+      rsem_index_dir: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/RSEM_Lsat_Salinas_v11/
       ploidy: 2
     Lsat_Salinas_v8:
       index: /data/jzhang/reference/Lactuca_sativa_V8/STAR_Lactuca_sativa_V8_index/Lsat_Salinas_v8
@@ -21,6 +22,7 @@ parameter:
       genome_gtf: /data/jzhang/reference/Lactuca_sativa_V8/STAR_Lactuca_sativa_V8_index/Lactuca_sativa_V8A.gtf
       genome_gff: /data/jzhang/reference/Lactuca_sativa_V8/STAR_Lactuca_sativa_V8_index/Lactuca_sativa_V8A.gff3
       rsem_index: /data/jzhang/reference/Lactuca_sativa_V8/STAR_Lactuca_sativa_V8_index/Lsat_Salinas_v8/Lsat_Salinas_v8
+      rsem_index_dir: /data/jzhang/reference/Lactuca_sativa_V8/STAR_Lactuca_sativa_V8_index/Lsat_Salinas_v8/
       ploidy: 2
     ITAG4.1:
       index: /data/jzhang/reference/S_lycopersicum/ITAG4.1_star_index
@@ -28,6 +30,7 @@ parameter:
       genome_gtf: /data/jzhang/reference/S_lycopersicum/ITAG4.1_gene_models.gtf
       genome_gff: /data/jzhang/reference/S_lycopersicum/ITAG4.1_gene_models.gff
       rsem_index: /data/jzhang/reference/S_lycopersicum/RSEM_ITAG4.1/ITAG4.1_index
+      rsem_index_dir: /data/jzhang/reference/S_lycopersicum/RSEM_ITAG4.1/
       ploidy: 2
     TAIR10.1:
       index: /data/jzhang/reference/Arabidopsis_Thaliana/TAIR10.1_STAR_INDEX
@@ -35,6 +38,15 @@ parameter:
       genome_gtf: /data/jzhang/reference/Arabidopsis_Thaliana/Araport11_GTF_genes_transposons.20241001.gtf
       genome_gff: /data/jzhang/reference/Arabidopsis_Thaliana/Araport11_GFF3_genes_transposons.20250813.gff
       rsem_index: /data/jzhang/reference/Arabidopsis_Thaliana/RSEM_TAIR10.1/TAIR10.1_index
+      rsem_index_dir: /data/jzhang/reference/Arabidopsis_Thaliana/RSEM_TAIR10.1/
+      ploidy: 2
+    GRCm39:
+      index: /data/jzhang/reference/GRCm39/GRCm39_STAR_INDEX
+      genome_fa: /data/jzhang/reference/GRCm39/GRCm39.genome.fa
+      genome_gtf: /data/jzhang/reference/GRCm39/gencode.vM38.annotation.gtf
+      genome_gff: /data/jzhang/reference/GRCm39/gencode.vM38.annotation.gff
+      rsem_index: /data/jzhang/reference/GRCm39/RSEM_GRCm39/GRCm39_INDEX
+      rsem_index_dir: /data/jzhang/reference/GRCm39/RSEM_GRCm39/
       ploidy: 2
   threads:
     json_md5_verifier: 40   
@@ -53,7 +65,7 @@ parameter:
     bamCoverage: 20
     stringtie: 16
     gatk: 1
-    rmats: 16
+    rmats: 6
   fastq_screen:
     run: true
     path: /home/jzhang/software/FastQ-Screen-0.16.0/fastq_screen
@@ -107,6 +119,7 @@ can_use_genome_version:
   - Lsat_Salinas_v8
   - ITAG4.1
   - TAIR10.1
+  - GRCm39
 # Other parameter
 print_target: true
 print_sample: false
