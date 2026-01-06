@@ -11,8 +11,10 @@ workflow: /data/jzhang/project/test/PRJNA1006186_RNAseq/01.workflow
 # RNAflow Output file
 data_deliver: /data/jzhang/project/test/PRJNA1006186_RNAseq/02.data_deliver
 # Fragment Library Types
-Library_Types: NULL # ISR,ISF,IU,NULL
+Library_Types: fr-firststrand # fr-unstranded,fr-firststrand,fr-secondstrand
 # wheather call variant for RNA-seq
 call_variant: false
 # Detech Noval Transcripts by stringtie
 noval_Transcripts: false
+# rmats
+rmats: true

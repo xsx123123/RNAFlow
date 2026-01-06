@@ -4,7 +4,7 @@
 # Author : JZHANG
 # ------- snakemake version check ------- #
 from snakemake.utils import min_version
-from rules.id_convert import load_samples,_validate_df
+from rules.id_convert import load_samples,_validate_df,load_contrasts
 min_version("9.9.0")
 # --------- main snakefile --------- #
 configfile: "config/config.yaml"
@@ -13,6 +13,7 @@ configfile: "config.yaml"
 workdir: config["workflow"]
 # ----   input sample info   ---- #
 samples = load_samples(config["sample_csv"],required_cols = ["sample", "sample_name", "group"])
+ALL_CONTRASTS, CONTRAST_MAP = load_contrasts(config["paired_csv"], samples)
 # --------- snakemake rule --------- #
 # include all rules from the rules directory
 include: 'rules/00.log.smk'
@@ -26,6 +27,7 @@ include: 'rules/08.rsem.smk'
 include: 'rules/09.call_variant.smk'
 include: 'rules/10.Assembly.smk'
 include: 'rules/11.DEG.smk'
+include: 'rules/12.rMATS.smk'
 # ---- check genome version  ---- #
 check_gene_version(config = config,logger = logger)
 # --------- target rule --------- #

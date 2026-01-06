@@ -87,7 +87,7 @@ rule Filter_Novel_Transcripts:
         annotated_gtf = "05.assembly/gffcompare/stringtie.annotated.gtf",
     output:
         novel_gtf = "05.assembly/filter/novel_transcripts.gtf",
-        final_gtf = "05.assembly/filter/final_all.gtf",
+        final_gtf = "05.assembly/filter/final_Novel_Isoforms.gtf",
     log:
         "logs/05.assembly/filter/filter.log"
     benchmark:
@@ -96,7 +96,7 @@ rule Filter_Novel_Transcripts:
         1
     shell:
         """
-        (awk '$0 ~ /class_code "[ujxi]"/ {{print $0}}' {input.annotated_gtf} > {output.novel_gtf} && \
+        (awk '$0 ~ /class_code "[=j]"/ {{print $0}}' {input.annotated_gtf} > {output.final_gtf} && \
         cp {input.annotated_gtf} {output.final_gtf}) 2> {log}
         """
 # ------- rule ------- #

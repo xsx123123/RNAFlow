@@ -82,7 +82,17 @@ def DataDeliver(config:dict = None) -> list:
     # noval Transcripts
     if config['noval_Transcripts']:
         data_deliver.append("05.assembly/filter/novel_transcripts.gtf")
-        data_deliver.append("05.assembly/filter/final_all.gtf")
+        data_deliver.append("05.assembly/filter/final_Novel_Isoforms.gtf")
+
+    # rmats
+    if config['rmats']:
+        # rmats single sample
+        data_deliver.extend(expand("07.AS/rmats_single/{sample}/SE.MATS.JC.txt",sample=samples.keys()))
+        data_deliver.extend(expand("07.AS/rmats_single/{sample}/MXE.MATS.JC.txt",sample=samples.keys()))
+        data_deliver.extend(expand("07.AS/rmats_single/{sample}/summary.txt",sample=samples.keys()))
+        # rmats pair sample
+        data_deliver.extend(expand("07.AS/rmats_pair/{contrast}/summary.txt", contrast=ALL_CONTRASTS))
+        data_deliver.extend(expand("07.AS/rmats_pair/{contrast}/SE.MATS.JC.txt", contrast=ALL_CONTRASTS))
 
     if config['print_target']:
        rich_print(data_deliver)

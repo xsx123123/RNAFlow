@@ -53,6 +53,7 @@ parameter:
     bamCoverage: 20
     stringtie: 16
     gatk: 1
+    rmats: 16
   fastq_screen:
     run: true
     path: /home/jzhang/software/FastQ-Screen-0.16.0/fastq_screen
@@ -94,6 +95,8 @@ parameter:
     height: 11
   Heatmap:
     path:  ../src/src/DEG/run_pheatmap.r
+  rmats:
+    readLength: 125
   trim:
     length_required: 75
     quality_threshold: 25

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
 import sys
 import pandas as pd
 from pathlib import Path
@@ -42,69 +43,112 @@ def _validate_df(df: pd.DataFrame, required_cols: List[str], index_col: str) -> 
         logger.warning(f"⚠️ 警告: 以下样本在必填列中存在空值 (NaN/Empty): {nan_rows}")
         # 这里可以选择是报错退出还是仅警告，目前设为警告
 
-def load_samples(
-    csv_path: str, 
-    required_cols: Optional[List[str]] = None, 
-    index_col: str = "sample"
-) -> Dict:
+
+def load_samples(csv_path, required_cols=None, index_col="sample"):
     """
-    加载并清洗样本CSV文件，返回供 Snakemake 使用的字典。
-    
-    Args:
-        csv_path (str): CSV文件路径
-        required_cols (list): 必须存在的列名列表
-        index_col (str): 用作字典 Key 的列名（通常是样本ID）
-        
-    Returns:
-        dict: {sample_id: {col1: val1, col2: val2, ...}}
+    读取 CSV，并【强制】自动生成固定的 BAM 路径。
+    不会检查 BAM 文件是否存在。
     """
-    
-    # 默认必填列
+    # 1. 默认必填列 (不需要 bam，因为我们下面会自动生成)
     if required_cols is None:
-        required_cols = ["sample", "sample_name", "group"]
-    
-    # 确保 index_col 在 required_cols 里
-    if index_col not in required_cols:
-        required_cols.append(index_col)
+        required_cols = [index_col, "group"]
 
     file_path = Path(csv_path)
-    
     if not file_path.exists():
-        logger.critical(f"❌ 找不到样本文件: {file_path.absolute()}")
+        print(f"❌ Error: 找不到样本表文件: {file_path}", file=sys.stderr)
         sys.exit(1)
 
     try:
-        # 1. 读取数据
-        # dtype=str 非常重要：防止纯数字的样本名（如 "001"）被解析为整数 1
-        df = pd.read_csv(file_path, dtype=str)
-        
-        # 2. 数据清洗
-        # 去除列名的首尾空格
+        # 2. 读取并清洗数据
+        df = pd.read_csv(file_path, dtype=str, comment='#')
         df.columns = df.columns.str.strip()
-        
-        # 去除所有字符串内容的首尾空格 (防止 "group " != "group")
         df = df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
 
-        # 3. 执行校验
-        _validate_df(df, required_cols, index_col)
-        
-        # 4. 转换为字典
-        # orient="index" 结构: {'sample_A': {'sample': 'sample_A', 'group': 'Ctrl'}, ...}
-        # drop=False 保留 sample 列在 value 中，方便后续提取
-        samples_dict = df.set_index(index_col, drop=False).to_dict(orient="index")
-        
-        logger.success(f"✅ 成功加载样本表: {file_path} (共 {len(samples_dict)} 个样本)")
-        
-        # 调试模式下可以把这一行解注释
-        # rprint(samples_dict)
-        
-        return samples_dict
+        # 3. 校验必填列
+        missing = [c for c in required_cols if c not in df.columns]
+        if missing:
+            print(f"❌ Error: 样本表缺失列: {missing}", file=sys.stderr)
+            sys.exit(1)
 
-    except pd.errors.EmptyDataError:
-        logger.critical(f"❌ 样本文件为空: {file_path}")
-        sys.exit(1)
+        # 4. 校验 ID 唯一性
+        if df[index_col].duplicated().any():
+            print(f"❌ Error: 样本 ID 重复", file=sys.stderr)
+            sys.exit(1)
+
+        # =========================================================
+        # 【核心修改】 自动构建固定 BAM 路径
+        # =========================================================
+        # 这里只生成路径字符串，【绝对不检查】文件是否存在
+        # os.path.abspath 只是处理路径格式，不涉及 IO 操作，是安全的
+        df['bam'] = df[index_col].apply(
+            lambda x: f"02.mapping/STAR/sort_index/{x}.sort.bam"
+        )
+
+        # 5. 转为字典
+        return df.set_index(index_col, drop=False).to_dict(orient="index")
+
     except Exception as e:
-        logger.critical(f"❌ 解析样本表时发生未捕获异常: {e}")
+        print(f"❌ Error: load_samples 解析失败: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def load_contrasts(csv_path, samples_dict):
+    """
+    解析对比表，并根据 samples_dict 匹配对应的 BAM 文件路径。
+    """
+    file_path = Path(csv_path)
+    if not file_path.exists():
+        print(f"❌ Error: 找不到对比表文件: {file_path}", file=sys.stderr)
+        sys.exit(1)
+
+    try:
+        # 1. 读取并清洗
+        df = pd.read_csv(file_path, dtype=str, comment='#')
+        df.columns = df.columns.str.strip()
+        df = df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
+
+        if "Control" not in df.columns or "Treat" not in df.columns:
+            print(f"❌ Error: contrasts.csv 必须包含 'Control' 和 'Treat' 列", file=sys.stderr)
+            sys.exit(1)
+
+        all_contrasts = []
+        contrast_map = {}
+
+        # 2. 遍历每一行对比
+        for _, row in df.iterrows():
+            ctrl_grp = row['Control']
+            treat_grp = row['Treat']
+            c_name = f"{ctrl_grp}_vs_{treat_grp}"
+            
+            # 3. 从 samples_dict 中筛选 BAM
+            # 因为 load_samples 已经保证了每行都有 'bam' 键，这里可以直接取
+            bams_ctrl = [
+                info['bam'] for info in samples_dict.values() 
+                if info['group'] == ctrl_grp
+            ]
+            bams_treat = [
+                info['bam'] for info in samples_dict.values() 
+                if info['group'] == treat_grp
+            ]
+
+            # 4. 仅检查是否找到了样本（逻辑检查），不检查文件物理存在
+            if not bams_ctrl:
+                print(f"⚠️ Warning: 组别 '{ctrl_grp}' 没有任何样本，跳过 {c_name}", file=sys.stderr)
+                continue
+            if not bams_treat:
+                print(f"⚠️ Warning: 组别 '{treat_grp}' 没有任何样本，跳过 {c_name}", file=sys.stderr)
+                continue
+
+            all_contrasts.append(c_name)
+            contrast_map[c_name] = {
+                "b1": bams_ctrl,
+                "b2": bams_treat
+            }
+            
+        return all_contrasts, contrast_map
+
+    except Exception as e:
+        print(f"❌ Error: load_contrasts 解析失败: {e}", file=sys.stderr)
         sys.exit(1)
 
 # 测试代码 (只有直接运行此脚本时才会执行)
