@@ -1,15 +1,15 @@
-project_name: 'PRJNA1006186'
-Genome_Version: "ITAG4.1" # Lsat_Salinas_v8,Lsat_Salinas_v11,ITAG4.1,TAIR10.1
+project_name: 'HYXM-251215018'
+Genome_Version: "GRCm39" # Lsat_Salinas_v8,Lsat_Salinas_v11,ITAG4.1,TAIR10.1,GRCm39
 # short read raw-data
 raw_data_path:
-  - /data/jzhang/project/test/PRJNA1006186_RNAseq/raw_data
+  - /data/jzhang/project/Temp/HYXM-251215018/00.raw_data/HYXM-251215018-SEQ/Fastq
 # short read samples info
-sample_csv: /data/jzhang/project/test/PRJNA1006186_RNAseq/01.workflow/sample.csv
-paired_csv: /data/jzhang/project/test/PRJNA1006186_RNAseq/01.workflow/contrasts.csv
+sample_csv: /data/jzhang/project/Temp/HYXM-251215018/01.workflow/sample.csv
+paired_csv: /data/jzhang/project/Temp/HYXM-251215018/01.workflow/contrasts.csv
 # workflow
-workflow: /data/jzhang/project/test/PRJNA1006186_RNAseq/01.workflow
+workflow: /data/jzhang/project/Temp/HYXM-251215018/01.workflow
 # RNAflow Output file
-data_deliver: /data/jzhang/project/test/PRJNA1006186_RNAseq/02.data_deliver
+data_deliver: /data/jzhang/project/Temp/HYXM-251215018/02.data_deliver
 # Fragment Library Types
 Library_Types: fr-firststrand # fr-unstranded,fr-firststrand,fr-secondstrand
 # wheather call variant for RNA-seq

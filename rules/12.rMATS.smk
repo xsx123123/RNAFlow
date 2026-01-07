@@ -8,18 +8,72 @@ def get_contrast_bams(wildcards):
         raise ValueError(f"Unknown contrast: {wildcards.contrast}")
     return CONTRAST_MAP[wildcards.contrast]
 
+rule gtf2bed12:
+    input:
+        gtf = config['parameter']['star_index'][config['Genome_Version']]['genome_gtf'],
+    output:
+        bed12 = config['parameter']['star_index'][config['Genome_Version']]['bed12'],
+    threads: 
+        1
+    conda:
+        workflow.source_path("../envs/rseqc.yaml"),
+    log:
+        "logs/07.AS/rseqc/gtt2bed12.log"
+    benchmark:
+        "benchmarks/gtt2bed12.txt"
+    shell:
+        """
+        gtfToGenePred {input.gtf} \
+                      /dev/stdout | genePredToBed \
+                      {output.bed12} > {log} 2>&1
+        """
+
+rule infer_experiment:
+    input:
+        bed12 = config['parameter']['star_index'][config['Genome_Version']]['bed12'],
+        bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
+    output:
+        library = "07.AS/qc/strandness/{sample}.summary.txt",
+    threads: 
+        1
+    conda:
+        workflow.source_path("../envs/rseqc.yaml"),
+    log:
+        "logs/07.rmats/rseqc/infer_experiment_{sample}.log",
+    benchmark:
+        "benchmarks/infer_experiment_{sample}.txt",
+    shell:
+        """
+        infer_experiment.py -r {input.bed12} -i {input.bam} > {output.library} 2> {log}
+        """
+
+rule merge_strandness_results:
+    input:
+        expand("07.AS/qc/strandness/{sample}.summary.txt", sample=samples.keys()),
+    output:
+        "07.AS/qc/all_samples_strandness.txt",
+    threads: 
+        1
+    shell:
+        """
+        grep -H "" {input} > {output}
+        """
+
 rule rmats_run:
     input:
         unpack(get_contrast_bams),
-        gtf = config['parameter']['star_index'][config['Genome_Version']]['genome_gtf']
+        gtf = config['parameter']['star_index'][config['Genome_Version']]['genome_gtf'],
+        lib_qc = "07.AS/qc/all_samples_strandness.txt",
     output:
-        "07.AS/rmats_pair/{contrast}/summary.txt",
-        "07.AS/rmats_pair/{contrast}/SE.MATS.JC.txt"
+        summary = "07.AS/rmats_pair/{contrast}/summary.txt",
+        SE_MATS_JC = "07.AS/rmats_pair/{contrast}/SE.MATS.JC.txt",
+        lib_check_log = "07.AS/rmats_pair/{contrast}/libType_check.log",
     params:
         od = "07.AS/rmats_pair/{contrast}",
         tmp = "07.AS/rmats_pair/{contrast}/tmp",
         libType = config['Library_Types'],
         readLength = config['parameter']['rmats']['readLength'],
+        check_libtype = workflow.source_path(config['software']['check_libtype']),
         b1_str = lambda w, input: ",".join([os.path.abspath(f) for f in input.b1]),
         b2_str = lambda w, input: ",".join([os.path.abspath(f) for f in input.b2]),
     threads: 
@@ -32,6 +86,14 @@ rule rmats_run:
         "benchmarks/rmats_pair_{contrast}.txt"
     shell:
         """
+        # get library type
+        chmod +x {params.check_libtype} && \
+        DETECTED_LIB=$(python3 {params.check_libtype} \
+            {input.lib_qc} \
+            "{params.libType}" \
+            {output.lib_check_log})
+    
+        # run ramts
         mkdir -p {params.tmp}
         echo "{params.b1_str}" > {params.tmp}/b1.txt
         echo "{params.b2_str}" > {params.tmp}/b2.txt
@@ -45,7 +107,7 @@ rule rmats_run:
             -t paired \
             --readLength {params.readLength} \
             --variable-read-length \
-            --libType {params.libType} \
+            --libType $DETECTED_LIB \
             --task both \
             --nthread {threads} \
             > {log} 2>&1
@@ -55,14 +117,17 @@ rule rmats_single_run:
     input:
         bam = "02.mapping/STAR/sort_index/{sample}.sort.bam",
         gtf = config['parameter']['star_index'][config['Genome_Version']]['genome_gtf'],
+        lib_qc = "07.AS/qc/all_samples_strandness.txt",
     output:
         se = "07.AS/rmats_single/{sample}/SE.MATS.JC.txt",
         mx = "07.AS/rmats_single/{sample}/MXE.MATS.JC.txt",
-        summary = "07.AS/rmats_single/{sample}/summary.txt"
+        summary = "07.AS/rmats_single/{sample}/summary.txt",
+        lib_check_log = "07.AS/rmats_single/{sample}/libType_check.log",
     params:
         od = "07.AS/rmats_single/{sample}",
         tmp = "07.AS/rmats_single/{sample}/tmp",
         libType = config['Library_Types'],
+        check_libtype = workflow.source_path(config['software']['check_libtype']),
         readLength = config['parameter']['rmats']['readLength'],
         b1_abs = lambda w, input: os.path.abspath(input.bam)
     threads: 
@@ -75,6 +140,14 @@ rule rmats_single_run:
         "benchmarks/rmats_single_{sample}.txt"
     shell:
         """
+        # get library type
+        chmod +x {params.check_libtype} && \
+        DETECTED_LIB=$(python3 {params.check_libtype} \
+            {input.lib_qc} \
+            "{params.libType}" \
+            {output.lib_check_log})
+    
+        # run ramts
         mkdir -p {params.tmp}
         echo "{params.b1_abs}" > {params.tmp}/b1.txt
         rmats.py \
@@ -85,7 +158,7 @@ rule rmats_single_run:
             -t paired \
             --readLength {params.readLength} \
             --variable-read-length \
-            --libType {params.libType} \
+            --libType $DETECTED_LIB \
             --statoff \
             --nthread {threads} \
             > {log} 2>&1

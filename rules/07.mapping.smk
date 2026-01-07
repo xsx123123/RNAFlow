@@ -151,7 +151,7 @@ rule qualimap_qc:
     benchmark:
         "benchmarks/{sample}_Dup_bam_qualimap_benchmark.txt",
     params:
-        genome_gff = config["parameter"]['star_index'][config['Genome_Version']]['genome_gff'],
+        genome_gff = config["parameter"]['star_index'][config['Genome_Version']]['genome_gtf'],
         outformat = config['parameter']['qualimap']["format"],
         mem = config['parameter']['qualimap']["mem"],
         prefix_dir = '02.mapping/qualimap_report/{sample}/',
