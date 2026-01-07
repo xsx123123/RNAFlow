@@ -14,10 +14,39 @@ RNAFlow is a comprehensive Snakemake-based pipeline for RNA-seq data analysis. I
 
 ## Overview
 
-RNAFlow is designed for analyzing RNA-seq data using STAR for alignment, RSEM for quantification, and additional tools for quality control, variant calling, and transcript assembly. The pipeline separates code from analysis data, keeping the workflow definition in the pipeline directory while processing data in a separate analysis directory.
+RNAFlow is designed for analyzing RNA-seq data using STAR for alignment, RSEM for quantification, and additional tools for quality control, variant calling, transcript assembly, differential expression analysis, alternative splicing detection, and gene fusion identification. The pipeline supports multiple reference genomes including Lactuca_sativa (Lsat_Salinas_v8/v11) and GRCm39. The pipeline separates code from analysis data, keeping the workflow definition in the pipeline directory while processing data in a separate analysis directory.
 
-**Version:** RNAFlow_v0.1  
+**Version:** RNAFlow_v0.1.4
 **Author:** JZHANG
+
+## Version History
+
+### RNAFlow_v0.1.4 (2026-01-07)
+- Added rMATS analysis for alternative splicing detection
+- Added Gene Fusion detection module
+- Added Enrichment analysis capabilities
+- Added support for GRCm39 reference genome
+- Fixed and updated rMATS rule (12.rMATS.smk)
+- Fixed workflow source path issue
+
+### RNAFlow_v0.1.3 (2026-01-03)
+- Added Differential Expression Analysis (DEG) module
+- Added merge RSEM functionality
+- Updated RSEM workflow
+- Added transcript assembly (StringTie) module
+- Added variant calling (GATK) module
+- Various bug fixes and improvements
+
+### RNAFlow_v0.1.2 (2025-12-25)
+- Fixed mapping module bug (07.mapping.smk)
+
+### RNAFlow_v0.1.1 (2025-12-24)
+- Added RSEM quantification module (08.rsem.smk)
+
+### RNAFlow_v0.1 (2025-12-24)
+- Initial release
+- Basic RNA-seq analysis workflow
+- Quality control, mapping, and quantification modules
 
 ## Pipeline Workflow
 
@@ -27,11 +56,11 @@ The RNAFlow pipeline includes the following steps:
 2. **Common Setup**: Set up sample information and common parameters
 3. **ID Conversion**: Convert sample IDs as needed
 4. **File Conversion & MD5 Check**: Verify file integrity and create symbolic links
-5. **Quality Control**: 
+5. **Quality Control**:
    - Raw data quality assessment using FastQC
    - MultiQC report generation
 6. **Contamination Check**: Check for sample contamination
-7. **Data Cleaning**: 
+7. **Data Cleaning**:
    - Adapter trimming using fastp
    - Quality filtering
 8. **Read Mapping**:
@@ -39,11 +68,15 @@ The RNAFlow pipeline includes the following steps:
    - Perform alignment with STAR
    - Sort and index BAM files
    - Quality assessment with Qualimap, Samtools
-9. **Expression Quantification**: 
+9. **Expression Quantification**:
    - Build RSEM reference index
    - Quantify gene and isoform expression with RSEM
 10. **Variant Calling**: Detect variants from RNA-seq data (optional)
 11. **Transcript Assembly**: Assemble novel transcripts using StringTie (optional)
+12. **Differential Expression Analysis (DEG)**: Identify differentially expressed genes between conditions
+13. **Alternative Splicing Analysis**: Detect alternative splicing events using rMATS
+14. **Gene Fusion Detection**: Identify potential gene fusion events
+15. **Functional Enrichment Analysis**: Perform GO and pathway enrichment analysis
 
 ## Directory Structure
 
@@ -78,7 +111,10 @@ RNAFlow/
     ├── 07.mapping.smk          # Alignment with STAR
     ├── 08.rsem.smk             # Expression quantification with RSEM
     ├── 09.call_variant.smk     # Variant calling
-    └── 10.Assembly.smk         # Transcript assembly
+    ├── 10.Assembly.smk         # Transcript assembly
+    ├── 11.DEG.smk              # Differential expression analysis
+    ├── 12.rMATS.smk            # Alternative splicing analysis
+    └── 13.GeneFusion.smk       # Gene fusion detection
 ```
 
 ## Installation
@@ -167,6 +203,10 @@ RNAFlow uses several bioinformatics tools managed through conda environments:
 - **deepTools**: Analysis of deep-sequencing data (bigWig generation)
 - **GATK**: Variant calling (optional)
 - **StringTie**: Transcript assembly (optional)
+- **rMATS**: Alternative splicing analysis
+- **DESeq2**: Differential expression analysis
+- **edgeR**: Differential expression analysis
+- **limma**: Functional enrichment analysis
 
 All dependencies are defined in the `envs/` directory as conda environment YAML files.
 
@@ -196,11 +236,24 @@ The pipeline generates output in the specified data delivery directory:
 ### Transcript Assembly (if enabled)
 - `05.assembly/`: StringTie assembly results
 
+### Differential Expression Analysis (if enabled)
+- `06.deg/`: Differential expression analysis results (DESeq2, edgeR)
+
+### Alternative Splicing Analysis (if enabled)
+- `07.splicing/`: Alternative splicing analysis results (rMATS)
+
+### Gene Fusion Detection (if enabled)
+- `08.fusion/`: Gene fusion detection results
+
+### Functional Enrichment Analysis (if enabled)
+- `09.enrichment/`: GO and pathway enrichment analysis results
+
 ## Reference Genomes
 
 The pipeline supports multiple reference genome versions:
 - Lactuca_sativa V11 (Lsat_Salinas_v11)
 - Lactuca_sativa V8 (Lsat_Salinas_v8)
+- GRCm39 (Mouse reference genome)
 
 The reference genome files (FASTA, GTF, GFF) must be available at the paths specified in the configuration file.
 

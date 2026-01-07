@@ -15,12 +15,14 @@ min_version("9.9.0")
 # --------- main snakefile --------- #
 # 加载全局配置文件 (注意：config.yaml 中的参数会覆盖 config/config.yaml 中的同名参数)
 configfile: "config/config.yaml"
+configfile: "config/reference.yaml"
+configfile: "config/run_parameter.yaml"
 configfile: "config.yaml"
 
 # 1. 验证配置文件结构是否符合 Schema 定义
 # 2. 预先检查参考基因组相关文件路径是否存在 (避免跑了一半报错)
 validate(config, "schema/config.schema.yaml") 
-check_reference_paths(config["parameter"]["star_index"])
+check_reference_paths(config["STAR_index"])
 
 # --------- workspaces --------- #
 # 指定流程运行的根目录 (所有输出文件将基于此路径)

@@ -2,14 +2,14 @@
 # -*- coding: utf-8 -*-
 rule build_rsem_index:
     input:
-        genome_fa = config["parameter"]['star_index'][config['Genome_Version']]['genome_fa'],
-        genome_gtf = config["parameter"]['star_index'][config['Genome_Version']]['genome_gtf']
+        genome_fa = config['STAR_index'][config['Genome_Version']]['genome_fa'],
+        genome_gtf = config['STAR_index'][config['Genome_Version']]['genome_gtf']
     output:
-        chrlist = config["parameter"]['star_index'][config['Genome_Version']]['rsem_index'] + '.chrlist',
-        grp = config["parameter"]['star_index'][config['Genome_Version']]['rsem_index'] + '.grp',
-        idx_fa = config["parameter"]['star_index'][config['Genome_Version']]['rsem_index'] + '.idx.fa',
-        n2g_idx_fa = config["parameter"]['star_index'][config['Genome_Version']]['rsem_index'] + '.n2g.idx.fa',
-        index_dir =  config["parameter"]['star_index'][config['Genome_Version']]['rsem_index_dir'],
+        chrlist = config['STAR_index'][config['Genome_Version']]['rsem_index'] + '.chrlist',
+        grp = config['STAR_index'][config['Genome_Version']]['rsem_index'] + '.grp',
+        idx_fa = config['STAR_index'][config['Genome_Version']]['rsem_index'] + '.idx.fa',
+        n2g_idx_fa = config['STAR_index'][config['Genome_Version']]['rsem_index'] + '.n2g.idx.fa',
+        index_dir =  config['STAR_index'][config['Genome_Version']]['rsem_index_dir'],
     conda:
         workflow.source_path("../envs/rsem.yaml"),
     log:
@@ -17,7 +17,7 @@ rule build_rsem_index:
     message:
         "Building rsem index for {input.genome_gtf}"
     params:
-        rsem_index = config["parameter"]['star_index'][config['Genome_Version']]['rsem_index'],
+        rsem_index = config['STAR_index'][config['Genome_Version']]['rsem_index'],
     benchmark:
         "benchmarks/rsem_index_benchmark.txt"
     threads:
@@ -34,10 +34,10 @@ rule build_rsem_index:
 
 rule RSEM:
     input:
-        chrlist = config["parameter"]['star_index'][config['Genome_Version']]['rsem_index'] + '.chrlist',
-        grp = config["parameter"]['star_index'][config['Genome_Version']]['rsem_index'] + '.grp',
-        idx_fa = config["parameter"]['star_index'][config['Genome_Version']]['rsem_index'] + '.idx.fa',
-        n2g_idx_fa = config["parameter"]['star_index'][config['Genome_Version']]['rsem_index'] + '.n2g.idx.fa',
+        chrlist = config['STAR_index'][config['Genome_Version']]['rsem_index'] + '.chrlist',
+        grp = config['STAR_index'][config['Genome_Version']]['rsem_index'] + '.grp',
+        idx_fa = config['STAR_index'][config['Genome_Version']]['rsem_index'] + '.idx.fa',
+        n2g_idx_fa = config['STAR_index'][config['Genome_Version']]['rsem_index'] + '.n2g.idx.fa',
         Transcriptome_bam = '02.mapping/STAR/{sample}/{sample}.Aligned.toTranscriptome.out.bam',
     output:
         genes_result = '03.count/rsem/{sample}.genes.results',
@@ -55,7 +55,7 @@ rule RSEM:
         "benchmarks/{sample}_rsem-calculate.txt",
     params:
         sample_name = lambda wildcards: samples[wildcards.sample]["sample_name"],
-        rsem_index = config["parameter"]['star_index'][config['Genome_Version']]['rsem_index'],
+        rsem_index = config['STAR_index'][config['Genome_Version']]['rsem_index'],
         output_prefix = "03.count/rsem/{sample}",
     threads: 
         config['parameter']["threads"]["rsem-calculate"],

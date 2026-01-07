@@ -7,10 +7,10 @@ def get_java_opts(wildcards, input, resources):
 
 rule CreateRefIndex:
     input:
-        fasta = config['parameter']['star_index'][config['Genome_Version']]['genome_fa'],
+        fasta = config['STAR_index'][config['Genome_Version']]['genome_fa'],
     output:
-        dict = os.path.splitext(config['parameter']['star_index'][config['Genome_Version']]['genome_fa'])[0] + ".dict",
-        fai = config['parameter']['star_index'][config['Genome_Version']]['genome_fa'] + ".fai",
+        dict = os.path.splitext(config['STAR_index'][config['Genome_Version']]['genome_fa'])[0] + ".dict",
+        fai = config['STAR_index'][config['Genome_Version']]['genome_fa'] + ".fai",
     conda:
         workflow.source_path("../envs/gatk.yaml")
     log:
@@ -83,8 +83,8 @@ rule MarkDuplicates:
 rule SplitNCigarReads:
     input:
         bam = '04.variant/gatk/{sample}/{sample}.rg.dedup.bam',
-        ref_dict = os.path.splitext(config['parameter']['star_index'][config['Genome_Version']]['genome_fa'])[0] + ".dict",
-        ref_fai = config['parameter']['star_index'][config['Genome_Version']]['genome_fa'] + ".fai",
+        ref_dict = os.path.splitext(config['STAR_index'][config['Genome_Version']]['genome_fa'])[0] + ".dict",
+        ref_fai = config['STAR_index'][config['Genome_Version']]['genome_fa'] + ".fai",
     output:
         bam = '04.variant/gatk/{sample}/{sample}.rg.dedup.split.bam',
         bai = '04.variant/gatk/{sample}/{sample}.rg.dedup.split.bai',
@@ -98,7 +98,7 @@ rule SplitNCigarReads:
         mem_mb = 20480 
     threads: 4
     params:
-        fasta = config['parameter']['star_index'][config['Genome_Version']]['genome_fa'],
+        fasta = config['STAR_index'][config['Genome_Version']]['genome_fa'],
         java_opts = get_java_opts
     shell:
         """
@@ -112,8 +112,8 @@ rule HaplotypeCaller:
     input:
         bam = '04.variant/gatk/{sample}/{sample}.rg.dedup.split.bam',
         bai = '04.variant/gatk/{sample}/{sample}.rg.dedup.split.bai',
-        ref_dict = os.path.splitext(config['parameter']['star_index'][config['Genome_Version']]['genome_fa'])[0] + ".dict",
-        ref_fai = config['parameter']['star_index'][config['Genome_Version']]['genome_fa'] + ".fai",
+        ref_dict = os.path.splitext(config['STAR_index'][config['Genome_Version']]['genome_fa'])[0] + ".dict",
+        ref_fai = config['STAR_index'][config['Genome_Version']]['genome_fa'] + ".fai",
     output:
         vcf = '04.variant/gatk/{sample}/{sample}.raw_variants.vcf',
         idx = '04.variant/gatk/{sample}/{sample}.raw_variants.vcf.idx'
@@ -128,8 +128,8 @@ rule HaplotypeCaller:
     threads: 
         config['parameter']['threads']['gatk']
     params:
-        fasta = config['parameter']['star_index'][config['Genome_Version']]['genome_fa'],
-        ploidy = config['parameter']['star_index'][config['Genome_Version']]['ploidy'],
+        fasta = config['STAR_index'][config['Genome_Version']]['genome_fa'],
+        ploidy = config['STAR_index'][config['Genome_Version']]['ploidy'],
         java_opts = get_java_opts
     shell:
         """
@@ -147,8 +147,8 @@ rule VariantFiltration:
     input:
         vcf = '04.variant/gatk/{sample}/{sample}.raw_variants.vcf',
         idx = '04.variant/gatk/{sample}/{sample}.raw_variants.vcf.idx',
-        ref_dict = os.path.splitext(config['parameter']['star_index'][config['Genome_Version']]['genome_fa'])[0] + ".dict",
-        ref_fai = config['parameter']['star_index'][config['Genome_Version']]['genome_fa'] + ".fai",
+        ref_dict = os.path.splitext(config['STAR_index'][config['Genome_Version']]['genome_fa'])[0] + ".dict",
+        ref_fai = config['STAR_index'][config['Genome_Version']]['genome_fa'] + ".fai",
     output:
         vcf = '04.variant/gatk/{sample}/{sample}.filtered.vcf',
         idx = '04.variant/gatk/{sample}/{sample}.filtered.vcf.idx'
@@ -162,7 +162,7 @@ rule VariantFiltration:
         mem_mb = 8192
     threads: 1
     params:
-        fasta = config['parameter']['star_index'][config['Genome_Version']]['genome_fa'],
+        fasta = config['STAR_index'][config['Genome_Version']]['genome_fa'],
         java_opts = get_java_opts,
         win = config['parameter']['gatk']['filter']['rna_seq']['window_size'],
         clus = config['parameter']['gatk']['filter']['rna_seq']['cluster_size'],
@@ -183,8 +183,8 @@ rule VariantFiltration:
 rule SelectVariants:
     input:
         vcf = '04.variant/gatk/{sample}/{sample}.filtered.vcf',
-        ref_dict = os.path.splitext(config['parameter']['star_index'][config['Genome_Version']]['genome_fa'])[0] + ".dict",
-        ref_fai = config['parameter']['star_index'][config['Genome_Version']]['genome_fa'] + ".fai",
+        ref_dict = os.path.splitext(config['STAR_index'][config['Genome_Version']]['genome_fa'])[0] + ".dict",
+        ref_fai = config['STAR_index'][config['Genome_Version']]['genome_fa'] + ".fai",
     output:
         vcf = '04.variant/gatk/{sample}/{sample}.final.pass.vcf',
         idx = '04.variant/gatk/{sample}/{sample}.final.pass.vcf.idx'
@@ -198,7 +198,7 @@ rule SelectVariants:
         mem_mb = 8192
     threads: 1
     params:
-        fasta = config['parameter']['star_index'][config['Genome_Version']]['genome_fa'],
+        fasta = config['STAR_index'][config['Genome_Version']]['genome_fa'],
         java_opts = get_java_opts
     shell:
         """
@@ -218,7 +218,7 @@ rule bcftools_stats_raw:
     conda:
         workflow.source_path("../envs/bcftools.yaml"),
     params:
-        fasta = config['parameter']['star_index'][config['Genome_Version']]['genome_fa'],
+        fasta = config['STAR_index'][config['Genome_Version']]['genome_fa'],
     log:
         "logs/04.variant/gatk/bcftools_stats/{sample}.log"
     benchmark:
@@ -244,7 +244,7 @@ rule bcftools_stats_pass:
     conda:
         workflow.source_path("../envs/bcftools.yaml"),
     params:
-        fasta = config['parameter']['star_index'][config['Genome_Version']]['genome_fa'],
+        fasta = config['STAR_index'][config['Genome_Version']]['genome_fa'],
     log:
         "logs/04.variant/gatk/bcftools_stats/{sample}.log"
     benchmark:

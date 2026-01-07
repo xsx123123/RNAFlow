@@ -23,9 +23,8 @@ rule gtf2bed12:
         "benchmarks/gtt2bed12.txt"
     shell:
         """
-        gtfToGenePred {input.gtf} \
-                      /dev/stdout | genePredToBed \
-                      {output.bed12} > {log} 2>&1
+        gtfToGenePred {input.gtf} /dev/stdout | genePredToBed \
+                      /dev/stdin {output.bed12} > {log} 2>&1
         """
 
 rule infer_experiment:

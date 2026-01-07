@@ -1,11 +1,3 @@
-# softeware path
-software:
-  json_md5_verifier: ../src/src/md5/Compile_release/json_md5_verifier_x86_64/release/json_md5_verifier
-  seq_preprocessor: ../src/src/md5/Compile_release/seq_preprocessor_x86_64/release/seq_preprocessor
-  check_libtype: ../src/src/library_type/check_libtype.py
-# md5
-raw_data:
-  md5: 'md5.txt'
 # software parameter
 parameter:
   threads:
@@ -26,10 +18,12 @@ parameter:
     stringtie: 16
     gatk: 1
     rmats: 6
+  validate_fastq_screen:
+    path: ../src/src/fastq_screen/validate_fastq_screen.py
   fastq_screen:
     run: true
-    path: /home/jzhang/software/FastQ-Screen-0.16.0/fastq_screen
-    conf: /home/jzhang/software/FastQ-Screen-0.16.0/fastq_screen.conf
+    path: ../src/src/fastq_screen/fastq_screen
+    conf: ../src/src/fastq_screen/fastq_screen.conf
     subset: 100000
     aligner: Bowtie2
   merge_rsem:
@@ -73,12 +67,3 @@ parameter:
     length_required: 75
     quality_threshold: 25
     adapter_fasta: "../data/Universal_Adapter.fa"
-# Other parameter
-print_target: true
-print_sample: false
-log_level: INFO
-bam_remove: true
-convert_md5: 'link_dir'
-r1_suffix: _R1.fq.g【z
-r2_suffix: _R2.fq.gz
-md5: MD5.txt

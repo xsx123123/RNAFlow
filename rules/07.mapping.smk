@@ -5,10 +5,10 @@ from loguru import logger
 
 rule build_STAR_index:
     input:
-        genome_fa = config["parameter"]['star_index'][config['Genome_Version']]['genome_fa'],
-        genome_gtf = config["parameter"]['star_index'][config['Genome_Version']]['genome_gtf']
+        genome_fa = config['STAR_index'][config['Genome_Version']]['genome_fa'],
+        genome_gtf = config['STAR_index'][config['Genome_Version']]['genome_gtf']
     output:
-        idx_dir = directory(config["parameter"]['star_index'][config['Genome_Version']]['index'])
+        idx_dir = directory(config['STAR_index'][config['Genome_Version']]['index'])
     conda:
         workflow.source_path("../envs/star.yml")
     log:
@@ -18,7 +18,7 @@ rule build_STAR_index:
     benchmark:
         "benchmarks/STAR_index_benchmark.txt"
     params:
-        genomeDir = config["parameter"]['star_index'][config['Genome_Version']]['index']
+        genomeDir = config['STAR_index'][config['Genome_Version']]['index']
     threads:
         config['parameter']['threads']['STAR_INDEX']
     shell:
@@ -35,9 +35,9 @@ rule build_STAR_index:
 
 rule STAR_mapping:
     input:
-        idx_dir = config["parameter"]['star_index'][config['Genome_Version']]['index'],
-        genome_fa = config["parameter"]['star_index'][config['Genome_Version']]['genome_fa'],
-        genome_gtf = config["parameter"]['star_index'][config['Genome_Version']]['genome_gtf'],
+        idx_dir = config['STAR_index'][config['Genome_Version']]['index'],
+        genome_fa = config['STAR_index'][config['Genome_Version']]['genome_fa'],
+        genome_gtf = config['STAR_index'][config['Genome_Version']]['genome_gtf'],
         r1 = "01.qc/short_read_trim/{sample}.R1.trimed.fq.gz",
         r2 = "01.qc/short_read_trim/{sample}.R2.trimed.fq.gz",
     output:
@@ -151,7 +151,7 @@ rule qualimap_qc:
     benchmark:
         "benchmarks/{sample}_Dup_bam_qualimap_benchmark.txt",
     params:
-        genome_gff = config["parameter"]['star_index'][config['Genome_Version']]['genome_gtf'],
+        genome_gff = config['STAR_index'][config['Genome_Version']]['genome_gtf'],
         outformat = config['parameter']['qualimap']["format"],
         mem = config['parameter']['qualimap']["mem"],
         prefix_dir = '02.mapping/qualimap_report/{sample}/',
@@ -209,7 +209,7 @@ rule samtools_stats:
     threads:
         config['parameter']['threads']['samtools_stats'],
     params:
-        reference = config['parameter']['star_index'][config['Genome_Version']]['genome_fa'],
+        reference = config['STAR_index'][config['Genome_Version']]['genome_fa'],
     shell:
         """
         samtools stats \

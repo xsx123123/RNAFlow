@@ -2,9 +2,27 @@
 # -*- coding: utf-8 -*-
 import os
 # ----- rule ----- #
+rule check_fastq_screen_conf:
+    input:
+        conf = workflow.source_path(config['parameter']['fastq_screen']['conf']),
+    output:
+        log = "01.qc/fastq_screen_config_check.log",
+    params:
+        validate_fastq_screen = workflow.source_path(config['parameter']['validate_fastq_screen']['path']),
+    log:
+        "logs/fastq_screen_config_check.log",
+    threads: 
+        1
+    shell:
+        """
+        chmod +x {params.validate_fastq_screen} && \
+        {params.validate_fastq_screen} {input.conf} --log {output.log} &> {log}
+        """
+
 rule short_read_fastq_screen_r1:
     input:
         md5_check = "01.qc/md5_check.tsv",
+        log = "01.qc/fastq_screen_config_check.log",
     output:
         fastq_screen_result = "01.qc/fastq_screen_r1/{sample}_R1_screen.txt",
     log:
@@ -14,8 +32,8 @@ rule short_read_fastq_screen_r1:
         link_r1_dir = os.path.join("00.raw_data",
                                       config['convert_md5'],
                                       "{sample}/{sample}_R1.fq.gz"),
-        fastq_screen_dir = config['parameter']['fastq_screen']['path'],
-        conf = config['parameter']['fastq_screen']['conf'],
+        fastq_screen_dir = workflow.source_path(config['parameter']['fastq_screen']['path']),
+        conf = workflow.source_path(config['parameter']['fastq_screen']['conf']),
         subset = config['parameter'][ 'fastq_screen']['subset'],
         aligner = config['parameter']['fastq_screen']['aligner'],
     message:
@@ -26,6 +44,7 @@ rule short_read_fastq_screen_r1:
         config['parameter']['threads']['fastq_screen'],
     shell:
         """
+        chmod +x {params.fastq_screen_dir} && \
         {params.fastq_screen_dir} --threads  {threads} \
                      --force \
                      --subset  {params.subset} \
@@ -38,14 +57,15 @@ rule short_read_fastq_screen_r1:
 rule short_read_fastq_screen_r2:
     input:
         md5_check = "01.qc/md5_check.tsv",
+        log = "01.qc/fastq_screen_config_check.log",
     output:
         fastq_screen_result = "01.qc/fastq_screen_r2/{sample}_R2_screen.txt",
     log:
         "logs/01.short_read_qc_r2/{sample}.r2.fastq_screen.log",
     params:
         out_dir = "01.qc/fastq_screen_r2/",
-        fastq_screen_dir = config['parameter']['fastq_screen']['path'],
-        conf = config['parameter']['fastq_screen']['conf'],
+        fastq_screen_dir = workflow.source_path(config['parameter']['fastq_screen']['path']),
+        conf = workflow.source_path(config['parameter']['fastq_screen']['conf']),
         subset = config['parameter'][ 'fastq_screen']['subset'],
         aligner = config['parameter']['fastq_screen']['aligner'],
         link_r2_dir = os.path.join("00.raw_data",
@@ -59,6 +79,7 @@ rule short_read_fastq_screen_r2:
         config['parameter']['threads']['fastq_screen'],
     shell:
         """
+        chmod +x {params.fastq_screen_dir} && \
         {params.fastq_screen_dir} --threads  {threads} \
                      --force \
                      --subset  {params.subset} \
