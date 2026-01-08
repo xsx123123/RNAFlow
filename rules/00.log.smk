@@ -18,25 +18,25 @@ log_file_name = f"{log_dir}/{config.get('project_name', 'RNAFlow')}_runtime_{dat
 logger.remove()
 
 # Add file logger with clean, simple format
-logger.add(
-    log_file_name,
-    rotation="500 MB",
-    format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {message}",
-    level=config.get("log_level", "INFO"),
-    colorize=False,  # Disable colorization for file logs
-    backtrace=True,
-    diagnose=True
-)
+#logger.add(
+#    log_file_name,
+#    rotation="500 MB",
+#    format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {message}",
+#    level=config.get("log_level", "INFO"),
+#    colorize=False,  # Disable colorization for file logs
+#    backtrace=True,
+#    diagnose=True
+#)
 
 # Add stderr logger with same clean format but with colors for console
-logger.add(
-    sys.stderr,
-    format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {message}",
-    level=config.get("log_level", "INFO"),
-    colorize=True,
-    backtrace=True,
-    diagnose=True
-)
+# logger.add(
+#    sys.stderr,
+#    format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {message}",
+#    level=config.get("log_level", "INFO"),
+#    colorize=True,
+#    backtrace=True,
+#    diagnose=True
+#)
 
 # Log essential runtime information at the start
 logger.info("RNAFlow Pipeline Started")

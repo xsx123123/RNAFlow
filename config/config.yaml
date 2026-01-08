@@ -8,7 +8,7 @@ raw_data:
   md5: 'md5.txt'
 
 # Other parameter
-print_target: true
+print_target: false
 print_sample: false
 log_level: INFO
 bam_remove: true

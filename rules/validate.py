@@ -72,7 +72,9 @@ def check_reference_paths(ref_dict):
         sys.exit(1)
     else:
         # 成功提示：简洁有力
+        console.print(Align.center("#####   --------------- Validation Complete  ---------------   #####"),style="yellow")
         console.print()
         console.print(Align.center("[bold green]✔ System Check Passed[/]"), style="green")
         console.print(Align.center(f"[dim]Verified references for {len(ref_dict)} genomes[/]"))
         console.print()
+        console.print(Align.center("#####   --------------- Validation Complete  ---------------   #####"),style="yellow")
