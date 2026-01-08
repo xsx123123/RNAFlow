@@ -6,7 +6,7 @@ can_use_genome_version:
   - TAIR10.1
   - GRCm39
 # STAR Reference PATH
-STAS_index:
+STAR_index:
     Lsat_Salinas_v11:
       index: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/Lsat_Salinas_v11
       genome_fa: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/Lsat_Salinas_v11.genome.fasta

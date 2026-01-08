@@ -4,7 +4,7 @@
 rule StringTie_Assembly:
     input:
         bam = "02.mapping/STAR/sort_index/{sample}.sort.bam",
-        gtf = config['parameter']['star_index'][config['Genome_Version']]['genome_gff'],
+        gtf = config['STAR_index'][config['Genome_Version']]['genome_gff'],
     output:
         gtf = "05.assembly/stringtie/{sample}.gtf"
     conda:
@@ -28,7 +28,7 @@ rule StringTie_Merge:
     input:
         gtfs = expand("05.assembly/stringtie/{sample}.gtf",
                       sample=samples.keys()),
-        ref_gtf = config['parameter']['star_index'][config['Genome_Version']]['genome_gff'],
+        ref_gtf = config['STAR_index'][config['Genome_Version']]['genome_gff'],
     output:
         merged_gtf = "05.assembly/stringtie/merged.gtf",
         gtf_list = "05.assembly/stringtie/mergelist.txt",
@@ -60,7 +60,7 @@ rule StringTie_Merge:
 rule GffCompare:
     input:
         merged_gtf = "05.assembly/stringtie/merged.gtf",
-        ref_gtf = config['parameter']['star_index'][config['Genome_Version']]['genome_gff'],
+        ref_gtf = config['STAR_index'][config['Genome_Version']]['genome_gff'],
     output:
         annotated_gtf = "05.assembly/gffcompare/stringtie.annotated.gtf",
         stats = "05.assembly/gffcompare/stringtie.stats",

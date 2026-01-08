@@ -37,7 +37,7 @@ ALL_CONTRASTS, CONTRAST_MAP = load_contrasts(config["paired_csv"], samples)
 # --------- snakemake rule --------- #
 # 模块化导入：按分析步骤引入子规则文件
 include: 'rules/00.log.smk'               # 日志记录模块
-include: 'rules/01.common.smk'            # 通用函数与通配符约束
+include: 'rules/01.common.smk'            # 通用函数与通彩约束
 include: 'rules/03.file_convert_md5.smk'  # 格式转换与 MD5 校验
 include: 'rules/04.short_read_qc.smk'     # 原始数据质控 (QC)
 include: 'rules/05.Contamination_check.smk' # 污染筛查
@@ -48,6 +48,7 @@ include: 'rules/09.call_variant.smk'      # 变异检测流程
 include: 'rules/10.Assembly.smk'          # 转录本组装
 include: 'rules/11.DEG.smk'               # 差异表达分析
 include: 'rules/12.rMATS.smk'             # 可变剪接分析
+include: 'rules/14.Merge_qc.smk'
 
 # ---- check genome version  ---- #
 # 运行时的额外检查：确认参考基因组版本信息并记录日志

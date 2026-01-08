@@ -23,6 +23,7 @@ parameter:
   fastq_screen:
     run: true
     path: ../src/src/fastq_screen/fastq_screen
+    dir: ../src/src/fastq_screen/
     conf: ../src/src/fastq_screen/fastq_screen.conf
     subset: 100000
     aligner: Bowtie2

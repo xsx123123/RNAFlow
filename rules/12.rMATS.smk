@@ -10,9 +10,9 @@ def get_contrast_bams(wildcards):
 
 rule gtf2bed12:
     input:
-        gtf = config['parameter']['star_index'][config['Genome_Version']]['genome_gtf'],
+        gtf = config['STAR_index'][config['Genome_Version']]['genome_gtf'],
     output:
-        bed12 = config['parameter']['star_index'][config['Genome_Version']]['bed12'],
+        bed12 = config['STAR_index'][config['Genome_Version']]['bed12'],
     threads: 
         1
     conda:
@@ -29,7 +29,7 @@ rule gtf2bed12:
 
 rule infer_experiment:
     input:
-        bed12 = config['parameter']['star_index'][config['Genome_Version']]['bed12'],
+        bed12 = config['STAR_index'][config['Genome_Version']]['bed12'],
         bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
     output:
         library = "07.AS/qc/strandness/{sample}.summary.txt",
@@ -61,7 +61,7 @@ rule merge_strandness_results:
 rule rmats_run:
     input:
         unpack(get_contrast_bams),
-        gtf = config['parameter']['star_index'][config['Genome_Version']]['genome_gtf'],
+        gtf = config['STAR_index'][config['Genome_Version']]['genome_gtf'],
         lib_qc = "07.AS/qc/all_samples_strandness.txt",
     output:
         summary = "07.AS/rmats_pair/{contrast}/summary.txt",
@@ -115,7 +115,7 @@ rule rmats_run:
 rule rmats_single_run:
     input:
         bam = "02.mapping/STAR/sort_index/{sample}.sort.bam",
-        gtf = config['parameter']['star_index'][config['Genome_Version']]['genome_gtf'],
+        gtf = config['STAR_index'][config['Genome_Version']]['genome_gtf'],
         lib_qc = "07.AS/qc/all_samples_strandness.txt",
     output:
         se = "07.AS/rmats_single/{sample}/SE.MATS.JC.txt",

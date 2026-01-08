@@ -31,6 +31,8 @@ def DataDeliver(config:dict = None) -> list:
     data_deliver.append("01.qc/short_read_r2_multiqc/multiqc_r2_raw-data_report.html")        
     # short-read trim & clean result
     data_deliver.append("01.qc/multiqc_short_read_trim/multiqc_short_read_trim_report.html")
+    # merge qc
+    data_deliver.append("01.qc/multiqc_merge_qc/multiqc_merge_qc_report.html")
     # mapping
     data_deliver.extend(expand("02.mapping/STAR/sort_index/{sample}.sort.bam",
                                           sample=samples.keys()))
@@ -168,7 +170,7 @@ def judge_star_index(config: dict, Genome_Version: str) -> bool:
     """
 
     try:
-        star_config = config['parameter']['star_index'][Genome_Version]
+        star_config = config['STAR_index'][Genome_Version]
         index_dir = star_config['index']
     except KeyError:
         print(f"Error: Genome Version '{Genome_Version}' not found in config or structure incorrect.")

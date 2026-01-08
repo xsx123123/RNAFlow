@@ -5,9 +5,9 @@ rule Arriba_Run:
         # Arriba 需要包含 Chimeric reads 的 BAM 文件
         bam = "02.mapping/STAR/sort_index/{sample}.sort.bam",
         # 基因组序列 (FASTA)
-        fasta = config['parameter']['star_index'][config['Genome_Version']]['genome_fasta'],
+        fasta = config['STAR_index'][config['Genome_Version']]['genome_fasta'],
         # 基因注释 (GTF)
-        gtf = config['parameter']['star_index'][config['Genome_Version']]['genome_gtf']
+        gtf = config['STAR_index'][config['Genome_Version']]['genome_gtf']
     output:
         fusions = "06.fusion/arriba/{sample}_fusions.tsv",
         discarded = "06.fusion/arriba/{sample}_fusions.discarded.tsv",

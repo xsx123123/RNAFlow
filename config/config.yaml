@@ -6,73 +6,7 @@ software:
 # md5
 raw_data:
   md5: 'md5.txt'
-# software parameter
-parameter:
-  threads:
-    json_md5_verifier: 40   
-    fastqc: 1
-    fastp: 8
-    multiqc: 1
-    fastq_screen: 10
-    STAR_INDEX: 40
-    STAR_MAPPING: 16
-    samtools: 10
-    samtools_flagstat: 10
-    samtools_stats: 10
-    qualimap: 10
-    RSEM_INDEX: 20
-    rsem-calculate: 20
-    bamCoverage: 20
-    stringtie: 16
-    gatk: 1
-    rmats: 6
-  fastq_screen:
-    run: true
-    path: /home/jzhang/software/FastQ-Screen-0.16.0/fastq_screen
-    conf: /home/jzhang/software/FastQ-Screen-0.16.0/fastq_screen.conf
-    subset: 100000
-    aligner: Bowtie2
-  merge_rsem:
-    path: ../src/src/gene_matrix/merge_rsem.py
-    extension: .genes.results
-  stringtie:
-    min_length: 200      # 最小转录本长度 (植物lncRNA通常>200)
-    min_cov: 5           # 最小覆盖度
-    min_fpkm: 1.0        # 最小 FPKM (过滤低表达噪音)
-  STAR:
-    PL: ILUMINA
-  qualimap:
-    format: HTML
-    mem: 20000M
-  bamCoverage:
-    binSize: 10
-    smoothLength: 14
-    normalizeUsing: RPKM # RPKM,CPM,BPM,RPGC
-  gatk:
-    filter:
-      rna_seq:
-        window_size: 35        # 窗口大小
-        cluster_size: 3        # 集群数量阈值
-        fs_threshold: 30.0     # Fisher Strand 阈值 (RNA建议30, DNA建议60)
-        qd_threshold: 2.0      # Quality by Depth 阈值
-  DEG:
-    PATH: ../src/src/DEG/run_deseq2.r
-    LFC: 1
-    PVAL: 0.05
-  qc_rsem_ultimate:
-    path: ../src/src/gene_matrix/qc_rsem_ultimate.py
-  Distribution:
-    path:  ../src/src/DEG/run_dist.r
-    width: 10
-    height: 11
-  Heatmap:
-    path:  ../src/src/DEG/run_pheatmap.r
-  rmats:
-    readLength: 125
-  trim:
-    length_required: 75
-    quality_threshold: 25
-    adapter_fasta: "../data/Universal_Adapter.fa"
+
 # Other parameter
 print_target: true
 print_sample: false
