@@ -1,5 +1,5 @@
 project_name: 'HYXM-251215018'
-Genome_Version: "GRCm39" # Lsat_Salinas_v8,Lsat_Salinas_v11,ITAG4.1,TAIR10.1,GRCm39
+Genome_Version: "GRCm39" # Lsat_Salinas_v8,Lsat_Salinas_v11,ITAG4.1,TAIR10.1,GRCm39,hg38
 # short read raw-data
 raw_data_path:
   - /data/jzhang/project/Temp/HYXM-251215018/00.raw_data/HYXM-251215018-SEQ/Fastq

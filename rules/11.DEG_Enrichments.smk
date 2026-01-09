@@ -93,6 +93,7 @@ rule DEG:
     input:
         counts = "03.count/merge_rsem_counts.tsv",
     output:
+        output = '06.DEG/DESEQ2/All_Contrast_DEG_Statistics.csv',
         deg_dir = directory("06.DEG/DESEQ2"),
     conda:
         workflow.source_path("../envs/deg_deseq2.yaml"),
@@ -129,38 +130,25 @@ rule Enrichments:
     log:
         "logs/07.Enrichments/go_enrich.log",
     params:
-        PATH = workflow.source_path(config['parameter']['Enrichments']['PATH']),
         obo = config['GO']['obo'],
         go_annotation = config['STAR_index'][config['Genome_Version']]['go_annotation'],
         gene_col = config['parameter']['Enrichments']['gene_col'],
+        r_script = workflow.source_path(config['parameter']['Enrichments']['PATH']),
+        wrapper = workflow.source_path(config['parameter']['Enrichments']['PATH_py']),
         gene_regex = config['parameter']['Enrichments']['gene_regex'],
-        deg_dir = "06.DEG/DESEQ2" 
+        deg_dir = "06.DEG/DESEQ2",
+        cutoff = config['parameter']['Enrichments'].get('cutoff', 0.05)
     shell:
         """
-        chmod +x {params.PATH}
-        
-        # 1. 提取 Contrast 列表 (注意 NR>1 和 gsub)
-        # 2. 在 Snakemake shell 中使用 $$ 来表示 Shell 的变量
-        contrasts=$(awk -F',' 'NR>1 {{gsub(/"/, "", $1); print $1}}' {input.DEG_info})
-        
-        for contrast in $$contrasts; do
-            echo "--- 正在处理对照组: $$contrast ---"
-            
-            # 构建完整的文件路径
-            input_table="{params.deg_dir}/$${contrast}_DEG.csv"
-            
-            if [ -f "$$input_table" ]; then
-                Rscript {params.PATH} \
-                    -o {params.obo} \
-                    -a {params.go_annotation} \
-                    -t "$$input_table" \
-                    -n "$$contrast" \
-                    -d {output.Enrichments_dir} \
-                    --gene_col {params.gene_col} \
-                    --gene_regex "{params.gene_regex}"
-            else
-                echo "[WARN] 文件 $$input_table 不存在，跳过。"
-            fi
-        done
+        python {params.wrapper} \
+            --rscript {params.r_script} \
+            --deg_info {input.DEG_info} \
+            --deg_dir {params.deg_dir} \
+            -o {params.obo} \
+            -a {params.go_annotation} \
+            -d {output.Enrichments_dir} \
+            --gene_col {params.gene_col} \
+            --gene_regex '{params.gene_regex}' \
+            --cutoff {params.cutoff} > {log} 2>&1
         """
 # ------- rule ------- #

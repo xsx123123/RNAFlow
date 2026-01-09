@@ -56,6 +56,7 @@ parameter:
     PVAL: 0.05
   Enrichments:
     PATH: ../src/src/Enrichments/go_enricher.r
+    PATH_py: ../src/src/Enrichments/deg_enrich_wrapper.py
     gene_col: ENSEMBL
     gene_regex: gene:/
   qc_rsem_ultimate:

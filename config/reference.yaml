@@ -52,6 +52,7 @@ STAR_index:
       rsem_index: /data/jzhang/reference/GRCm39/RSEM_GRCm39/GRCm39_INDEX
       rsem_index_dir: /data/jzhang/reference/GRCm39/RSEM_GRCm39/
       bed12: /data/jzhang/reference/GRCm39/gencode.vM38.annotation.bed12
+      go_annotation: /data/jzhang/reference/GRCm39/mgigene_go_annotation.tsv
       ploidy: 2
 GO:
   obo: /data/jzhang/reference/go_database/go-basic.obo
