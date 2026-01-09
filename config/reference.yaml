@@ -33,6 +33,7 @@ STAR_index:
       rsem_index: /data/jzhang/reference/S_lycopersicum/RSEM_ITAG4.1/ITAG4.1_index
       rsem_index_dir: /data/jzhang/reference/S_lycopersicum/RSEM_ITAG4.1/
       bed12: /data/jzhang/reference/S_lycopersicum/ITAG4.1_gene_models.bed12
+      go_annotation: /data/jzhang/reference/S_lycopersicum/ITAG4.1_blast2go_annot.annot_deal
       ploidy: 2
     TAIR10.1:
       index: /data/jzhang/reference/Arabidopsis_Thaliana/TAIR10.1_STAR_INDEX
@@ -52,3 +53,5 @@ STAR_index:
       rsem_index_dir: /data/jzhang/reference/GRCm39/RSEM_GRCm39/
       bed12: /data/jzhang/reference/GRCm39/gencode.vM38.annotation.bed12
       ploidy: 2
+GO:
+  obo: /data/jzhang/reference/go_database/go-basic.obo

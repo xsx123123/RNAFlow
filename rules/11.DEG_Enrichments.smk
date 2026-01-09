@@ -118,4 +118,49 @@ rule DEG:
                 --lfc={params.LFC} \
                 --pval={params.PVAL} &> {log}
         """
+
+rule Enrichments:
+    input:
+        DEG_info = "06.DEG/DESEQ2/All_Contrast_DEG_Statistics.csv",
+    output:
+        Enrichments_dir = directory("07.Enrichments/"),
+    conda:
+        workflow.source_path("../envs/go_enrich_r.yaml"),
+    log:
+        "logs/07.Enrichments/go_enrich.log",
+    params:
+        PATH = workflow.source_path(config['parameter']['Enrichments']['PATH']),
+        obo = config['GO']['obo'],
+        go_annotation = config['STAR_index'][config['Genome_Version']]['go_annotation'],
+        gene_col = config['parameter']['Enrichments']['gene_col'],
+        gene_regex = config['parameter']['Enrichments']['gene_regex'],
+        deg_dir = "06.DEG/DESEQ2" 
+    shell:
+        """
+        chmod +x {params.PATH}
+        
+        # 1. 提取 Contrast 列表 (注意 NR>1 和 gsub)
+        # 2. 在 Snakemake shell 中使用 $$ 来表示 Shell 的变量
+        contrasts=$(awk -F',' 'NR>1 {{gsub(/"/, "", $1); print $1}}' {input.DEG_info})
+        
+        for contrast in $$contrasts; do
+            echo "--- 正在处理对照组: $$contrast ---"
+            
+            # 构建完整的文件路径
+            input_table="{params.deg_dir}/$${contrast}_DEG.csv"
+            
+            if [ -f "$$input_table" ]; then
+                Rscript {params.PATH} \
+                    -o {params.obo} \
+                    -a {params.go_annotation} \
+                    -t "$$input_table" \
+                    -n "$$contrast" \
+                    -d {output.Enrichments_dir} \
+                    --gene_col {params.gene_col} \
+                    --gene_regex "{params.gene_regex}"
+            else
+                echo "[WARN] 文件 $$input_table 不存在，跳过。"
+            fi
+        done
+        """
 # ------- rule ------- #

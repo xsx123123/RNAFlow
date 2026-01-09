@@ -96,6 +96,8 @@ def DataDeliver(config:dict = None) -> list:
         data_deliver.extend(expand("07.AS/rmats_pair/{contrast}/summary.txt", contrast=ALL_CONTRASTS))
         data_deliver.extend(expand("07.AS/rmats_pair/{contrast}/SE.MATS.JC.txt", contrast=ALL_CONTRASTS))
 
+    data_deliver.append("07.Enrichments/")
+
     if config['print_target']:
        rich_print(data_deliver)
     return  data_deliver
@@ -149,7 +151,7 @@ def get_all_input_dirs(sample_keys:str = None,
     dir_list = []
     for sample_id in sample_keys:
         dir_list.append(get_sample_data_dir(sample_id,config = config))
-    print(dir_list)
+
     return list(set(dir_list))
 
 def judge_bwa_index(config:dict = None) -> bool:

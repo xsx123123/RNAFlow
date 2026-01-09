@@ -54,6 +54,10 @@ parameter:
     PATH: ../src/src/DEG/run_deseq2.r
     LFC: 1
     PVAL: 0.05
+  Enrichments:
+    PATH: ../src/src/Enrichments/go_enricher.r
+    gene_col: ENSEMBL
+    gene_regex: gene:/
   qc_rsem_ultimate:
     path: ../src/src/gene_matrix/qc_rsem_ultimate.py
   Distribution:

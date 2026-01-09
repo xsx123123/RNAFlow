@@ -46,10 +46,9 @@ include: 'rules/07.mapping.smk'           # 序列比对 (STAR)
 include: 'rules/08.rsem.smk'              # 表达量定量 (RSEM)
 include: 'rules/09.call_variant.smk'      # 变异检测流程
 include: 'rules/10.Assembly.smk'          # 转录本组装
-include: 'rules/11.DEG.smk'               # 差异表达分析
+include: 'rules/11.DEG_Enrichments.smk'   # 差异表达分析
 include: 'rules/12.rMATS.smk'             # 可变剪接分析
 include: 'rules/14.Merge_qc.smk'
-
 # ---- check genome version  ---- #
 # 运行时的额外检查：确认参考基因组版本信息并记录日志
 check_gene_version(config=config, logger=logger)
