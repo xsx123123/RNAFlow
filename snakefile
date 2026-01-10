@@ -61,6 +61,7 @@ include: 'rules/10.Assembly.smk'
 include: 'rules/11.DEG_Enrichments.smk'
 include: 'rules/12.rMATS.smk'
 include: 'rules/14.Merge_qc.smk'
+include: 'rules/15.deliver.smk'
 
 # --------- 5. Target Rule --------- #
 rule all:
