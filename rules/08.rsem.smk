@@ -44,7 +44,7 @@ rule RSEM:
         model = '03.count/rsem/{sample}.stat/{sample}.model',
         theta = '03.count/rsem/{sample}.stat/{sample}.theta',
     resources:
-        **rule_resource(config, 'high_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'high_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/rsem.yaml"),
     message:
@@ -82,7 +82,7 @@ rule rsem_multiqc:
     conda:
         workflow.source_path("../envs/multiqc.yaml"),
     resources:
-        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
     message:
         "Running MultiQC to aggregate rsem reports",
     params:
@@ -116,7 +116,7 @@ rule merge_rsem:
         counts = "03.count/merge_rsem_counts.tsv",
         fpkm = "03.count/merge_rsem_fpkm.tsv",
     resources:
-        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/python3.yaml"),
     message:
@@ -151,7 +151,7 @@ rule ultimate:
     output:
         ultimate = directory("03.count/rsem_ultimate/")
     resources:
-        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/rsem_ultimate.yaml"),
     message:

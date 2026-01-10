@@ -8,7 +8,7 @@ rule StringTie_Assembly:
     output:
         gtf = "05.assembly/stringtie/{sample}.gtf"
     resources:
-        **rule_resource(config, 'high_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'high_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/stringtie.yaml"),
     log:
@@ -35,7 +35,7 @@ rule StringTie_Merge:
         merged_gtf = "05.assembly/stringtie/merged.gtf",
         gtf_list = "05.assembly/stringtie/mergelist.txt",
     resources:
-        **rule_resource(config, 'high_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'high_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/stringtie.yaml"),
     log:
@@ -70,7 +70,7 @@ rule GffCompare:
         stats = "05.assembly/gffcompare/stringtie.stats",
         tracking = "05.assembly/gffcompare/stringtie.tracking",
     resources:
-        **rule_resource(config, 'medium_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'medium_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/gffcompare.yaml"),
     log:
@@ -95,7 +95,7 @@ rule Filter_Novel_Transcripts:
         novel_gtf = "05.assembly/filter/novel_transcripts.gtf",
         final_gtf = "05.assembly/filter/final_Novel_Isoforms.gtf",
     resources:
-        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
     log:
         "logs/05.assembly/filter/filter.log"
     threads: 1

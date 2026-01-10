@@ -14,7 +14,7 @@ rule STAR_mapping:
         Transcriptome_bam = '02.mapping/STAR/{sample}/{sample}.Aligned.toTranscriptome.out.bam',
         log_final = '02.mapping/STAR/{sample}/{sample}.Log.final.out',
     resources:
-        **rule_resource(config, 'high_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'high_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/star.yml"),
     log:
@@ -90,7 +90,7 @@ rule sort_index:
         sort_bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
         sort_bam_bai = '02.mapping/STAR/sort_index/{sample}.sort.bam.bai',
     resources:
-        **rule_resource(config, 'high_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'high_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/bwa2.yaml"),
     message:
@@ -116,7 +116,7 @@ rule qualimap_qc:
         qualimap_report_html = '02.mapping/qualimap_report/{sample}/qualimapReport.html',
         qualimap_report_txt = '02.mapping/qualimap_report/{sample}/genome_results.txt',
     resources:
-        **rule_resource(config, 'medium_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'medium_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/qualimap.yaml"),
     message:
@@ -150,7 +150,7 @@ rule samtools_flagst:
     output:
         samtools_flagstat = '02.mapping/samtools_flagstat/{sample}_bam_flagstat.tsv',
     resources:
-        **rule_resource(config, 'medium_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'medium_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/bwa2.yaml"),
     message:
@@ -176,7 +176,7 @@ rule samtools_stats:
     output:
         samtools_stats = '02.mapping/samtools_stats/{sample}_bam_stats.tsv',
     resources:
-        **rule_resource(config, 'medium_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'medium_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/bwa2.yaml"),
     message:
@@ -204,7 +204,7 @@ rule bamCoverage:
     output:
         bw = f"02.mapping/bamCoverage/{{sample}}_{config['parameter']['bamCoverage']['normalizeUsing']}.bw"
     resources:
-        **rule_resource(config, 'high_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'high_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/deeptools.yaml"),
     message:
@@ -243,7 +243,7 @@ rule mapping_report:
     output:
         report = os.path.join(config['data_deliver'],'02.mapping_report','multiqc_mapping_report.html'),
     resources:
-        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/multiqc.yaml"),
     message:

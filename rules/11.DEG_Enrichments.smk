@@ -8,7 +8,7 @@ rule gene_dist:
         dist_pdf = '06.DEG/Gene_Expression/Gene_Expression_Distribution.pdf',
         dist_png = '06.DEG/Gene_Expression/Gene_Expression_Distribution.png',
     resources:
-        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/deg_deseq2.yaml"),
     message:
@@ -43,7 +43,7 @@ rule gene_heatmap_tpm:
         dist_pdf = '06.DEG/Heatmap_tpm/Heatmap_TopVar.pdf',
         dist_png = '06.DEG/Heatmap_tpm/Heatmap_TopVar.png',
     resources:
-        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/deg_deseq2.yaml"),
     message:
@@ -73,7 +73,7 @@ rule gene_heatmap_fpkm:
         dist_pdf = '06.DEG/Heatmap_fpkm/Heatmap_TopVar.pdf',
         dist_png = '06.DEG/Heatmap_fpkm/Heatmap_TopVar.png',
     resources:
-        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/deg_deseq2.yaml"),
     message:
@@ -102,7 +102,7 @@ rule DEG:
         output = '06.DEG/DESEQ2/All_Contrast_DEG_Statistics.csv',
         deg_dir = directory("06.DEG/DESEQ2"),
     resources:
-        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/deg_deseq2.yaml"),
     log:
@@ -134,7 +134,7 @@ rule Enrichments:
     output:
         Enrichments_dir = directory("07.Enrichments/"),
     resources:
-        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/go_enrich_r.yaml"),
     log:

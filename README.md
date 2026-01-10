@@ -203,7 +203,7 @@ snakemake --dry-run --config analysisyaml=/data/jzhang/project/Temp/PRJNA1224991
 After verifying the dry-run output, execute the pipeline with:
 
 ```bash
-snakemake --cores=60 -p --conda-frontend mamba --use-conda --rerun-triggers mtime --config analysisyaml=/data/jzhang/project/Temp/PRJNA1224991_lettcue/01.workflow/config.yaml
+snakemake --cores=70 -p --conda-frontend mamba --use-conda --rerun-triggers mtime  --logger rich-loguru --config analysisyaml=/data/jzhang/project/Temp/PRJNA1224991_lettcue/01.workflow/config.yaml
 ```
 
 ### Command Options Explained:

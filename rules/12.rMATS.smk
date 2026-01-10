@@ -34,7 +34,7 @@ rule infer_experiment:
     output:
         library = "07.AS/qc/strandness/{sample}.summary.txt",
     resources:
-        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
     threads: 
         1
     conda:
@@ -54,7 +54,7 @@ rule merge_strandness_results:
     output:
         "07.AS/qc/all_samples_strandness.txt",
     resources:
-        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
     threads: 
         1
     shell:
@@ -72,7 +72,7 @@ rule rmats_run:
         SE_MATS_JC = "07.AS/rmats_pair/{contrast}/SE.MATS.JC.txt",
         lib_check_log = "07.AS/rmats_pair/{contrast}/libType_check.log",
     resources:
-        **rule_resource(config, 'high_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'high_resource',  skip_queue_on_local=True,logger = logger),
     params:
         od = "07.AS/rmats_pair/{contrast}",
         tmp = "07.AS/rmats_pair/{contrast}/tmp",
@@ -129,7 +129,7 @@ rule rmats_single_run:
         summary = "07.AS/rmats_single/{sample}/summary.txt",
         lib_check_log = "07.AS/rmats_single/{sample}/libType_check.log",
     resources:
-        **rule_resource(config, 'high_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'high_resource',  skip_queue_on_local=True,logger = logger),
     params:
         od = "07.AS/rmats_single/{sample}",
         tmp = "07.AS/rmats_single/{sample}/tmp",

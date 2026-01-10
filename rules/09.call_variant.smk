@@ -12,7 +12,7 @@ rule CreateRefIndex:
         dict = os.path.splitext(config['STAR_index'][config['Genome_Version']]['genome_fa'])[0] + ".dict",
         fai = config['STAR_index'][config['Genome_Version']]['genome_fa'] + ".fai",
     resources:
-        **rule_resource(config, 'medium_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'medium_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/gatk.yaml")
     log:
@@ -38,7 +38,7 @@ rule AddOrReplaceReadGroups:
     benchmark:
         "benchmarks/04.variant/gatk/AddRG/{sample}.txt"
     resources:
-        **rule_resource(config, 'medium_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'medium_resource',  skip_queue_on_local=True,logger = logger),
     threads: 1
     params:
         java_opts = get_java_opts
@@ -61,7 +61,7 @@ rule MarkDuplicates:
         bam = temp('04.variant/gatk/{sample}/{sample}.rg.dedup.bam'),
         metrics = '04.variant/gatk_MarkDuplicates/{sample}.rg.dedup.metrics.txt',
     resources:
-        **rule_resource(config, 'high_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'high_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/gatk.yaml")
     log:
@@ -91,7 +91,7 @@ rule SplitNCigarReads:
         bam = '04.variant/gatk/{sample}/{sample}.rg.dedup.split.bam',
         bai = '04.variant/gatk/{sample}/{sample}.rg.dedup.split.bai',
     resources:
-        **rule_resource(config, 'high_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'high_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/gatk.yaml")
     log:
@@ -120,7 +120,7 @@ rule HaplotypeCaller:
         vcf = '04.variant/gatk/{sample}/{sample}.raw_variants.vcf',
         idx = '04.variant/gatk/{sample}/{sample}.raw_variants.vcf.idx'
     resources:
-        **rule_resource(config, 'high_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'high_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/gatk.yaml")
     log:
@@ -155,7 +155,7 @@ rule VariantFiltration:
         vcf = '04.variant/gatk/{sample}/{sample}.filtered.vcf',
         idx = '04.variant/gatk/{sample}/{sample}.filtered.vcf.idx'
     resources:
-        **rule_resource(config, 'medium_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'medium_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/gatk.yaml")
     log:
@@ -191,7 +191,7 @@ rule SelectVariants:
         vcf = '04.variant/gatk/{sample}/{sample}.final.pass.vcf',
         idx = '04.variant/gatk/{sample}/{sample}.final.pass.vcf.idx'
     resources:
-        **rule_resource(config, 'medium_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'medium_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/gatk.yaml")
     log:
@@ -218,7 +218,7 @@ rule bcftools_stats_raw:
     output:
         stats = '04.variant/gatk_bcftools_stats_raw/{sample}.raw_variants.stats'
     resources:
-        **rule_resource(config, 'medium_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'medium_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/bcftools.yaml"),
     params:
@@ -244,7 +244,7 @@ rule bcftools_stats_pass:
     output:
         stats = '04.variant/gatk_bcftools_stats_pass/{sample}.final.pass.stats'
     resources:
-        **rule_resource(config, 'medium_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'medium_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/bcftools.yaml"),
     params:
@@ -269,7 +269,7 @@ rule multiqc_bcftools_stats_raw:
     output:
         report = '04.variant/multiqc_gatk_bcftools_stats_raw/multiqc_gatk_bcftools_stats_raw.html',
     resources:
-        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/multiqc.yaml"),
     message:
@@ -301,7 +301,7 @@ rule multiqc_bcftools_stats_pass:
     output:
         report = '04.variant/multiqc_gatk_bcftools_stats_pass/multiqc_gatk_bcftools_stats_pass.html',
     resources:
-        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/multiqc.yaml"),
     message:

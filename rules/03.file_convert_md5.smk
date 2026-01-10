@@ -21,7 +21,7 @@ rule seq_preprocessor:
     benchmark:
         "benchmarks/seq_preprocessor.txt",
     resources:
-        **rule_resource(config, 'high_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'high_resource',  skip_queue_on_local=True,logger = logger),
     params:
         raw_data_path = config['raw_data_path'],
         md5 = config['raw_data']['md5'],
@@ -52,7 +52,7 @@ rule check_md5:
     output:
         md5_check = "01.qc/md5_check.tsv",
     resources:
-        **rule_resource(config, 'high_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'high_resource',  skip_queue_on_local=True,logger = logger),
     message:
         "Running md5 check on raw data files on {input.md5_check_json}",
     benchmark:
