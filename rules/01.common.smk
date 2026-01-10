@@ -3,7 +3,6 @@
 # loading packages
 import os
 import glob
-from loguru import logger
 from pathlib import Path
 from typing import Dict, Union
 from rich import print as rich_print
@@ -213,19 +212,24 @@ def check_gene_version(config: dict = None, logger = None) -> None:
     """
     Check if the gene version in config matches allowed list.
     """
+    # Use the provided logger or get the unified logger
+    if logger is None:
+        from snakemake_logger_plugin_rich_loguru import get_analysis_logger
+        logger = get_analysis_logger()
+
     try:
         version = config['Genome_Version']
         allowed = config['can_use_genome_version']
-        
+
         if version not in allowed:
             logger.error(f"Version mismatch! '{version}' is not in {allowed}")
             raise ValueError(f"Unsupported genome version: {version}")
-            
+
         logger.info(f"Config check passed: Genome_Version '{version}' is supported.")
 
     except KeyError as e:
         logger.error(f"Config structure error: Missing key {e}")
-        raise 
+        raise
     except TypeError:
         logger.error("Config must be a valid dictionary.")
         raise

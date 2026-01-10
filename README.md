@@ -1,9 +1,10 @@
 # RNAFlow - RNA-seq Analysis Pipeline
 
-RNAFlow is a comprehensive Snakemake-based pipeline for RNA-seq data analysis. It provides a complete workflow from raw data quality control to expression quantification, variant calling, and transcript assembly.
+RNAFlow is a comprehensive Snakemake-based pipeline for RNA-seq data analysis. It provides a complete workflow from raw data quality control to expression quantification, variant calling, and transcript assembly. The pipeline features a modular design that separates analysis code, analysis paths, and reference files for enhanced portability and maintainability.
 
 ## Table of Contents
 - [Overview](#overview)
+- [Key Features](#key-features)
 - [Pipeline Workflow](#pipeline-workflow)
 - [Directory Structure](#directory-structure)
 - [Installation](#installation)
@@ -14,10 +15,18 @@ RNAFlow is a comprehensive Snakemake-based pipeline for RNA-seq data analysis. I
 
 ## Overview
 
-RNAFlow is designed for analyzing RNA-seq data using STAR for alignment, RSEM for quantification, and additional tools for quality control, variant calling, transcript assembly, differential expression analysis, alternative splicing detection, and gene fusion identification. The pipeline supports multiple reference genomes including Lactuca_sativa (Lsat_Salinas_v8/v11) and GRCm39. The pipeline separates code from analysis data, keeping the workflow definition in the pipeline directory while processing data in a separate analysis directory.
+RNAFlow is designed for analyzing RNA-seq data using STAR for alignment, RSEM for quantification, and additional tools for quality control, variant calling, transcript assembly, differential expression analysis, alternative splicing detection, and gene fusion identification. The pipeline supports multiple reference genomes including Lactuca_sativa (Lsat_Salinas_v8/v11) and GRCm39. The pipeline follows a modular design that separates code, analysis paths, and reference files, allowing for easy migration to different environments by simply updating the reference path in the configuration file.
 
 **Version:** RNAFlow_v0.1.4
 **Author:** JZHANG
+
+## Key Features
+
+- **Modular Design**: Separates analysis code from analysis paths and reference files for enhanced portability
+- **Easy Migration**: Migrate the analysis pipeline to different paths by simply updating the `reference_path` in the configuration file (e.g., `reference_path: /data/jzhang/reference/RNAFlow_reference`)
+- **Flexible Configuration**: Run the pipeline with external configuration files using the format: `snakemake --dry-run --config analysisyaml=/path/to/your/config.yaml`
+- **Environment Management**: All analysis environments are managed using Conda, solving dependency installation issues
+- **Comprehensive Analysis**: Supports multiple reference genomes and provides complete RNA-seq analysis workflow
 
 ## Version History
 
@@ -137,15 +146,25 @@ pip install snakemake
 
 ## Configuration
 
-The pipeline uses two configuration files:
+The pipeline supports flexible configuration through external configuration files, allowing for separation of analysis code and analysis paths:
 
-### Main Configuration (`config.yaml`)
-Located in the root directory, this file specifies:
+### External Configuration File
+The recommended approach is to use an external configuration file that contains all analysis-specific parameters:
+
+```bash
+snakemake --config analysisyaml=/path/to/your/analysis/config.yaml
+```
+
+This external configuration file should specify:
 - Project name
-- Reference genome version (Lsat_Salinas_v8 or Lsat_Salinas_v11)
+- Reference genome version (Lsat_Salinas_v8, Lsat_Salinas_v11, or GRCm39)
 - Input data paths
 - Sample information file
 - Workflow and output directories
+- Reference path (e.g., `reference_path: /data/jzhang/reference/RNAFlow_reference`)
+
+### Main Configuration (`config.yaml`)
+Located in the root directory, this file serves as the base configuration and can be supplemented with the external configuration file.
 
 ### Detailed Configuration (`config/config.yaml`)
 Located in the config/ directory, this file contains:
@@ -159,15 +178,32 @@ Located in the config/ directory, this file contains:
 - Sample CSV file with sample information
 - Raw sequencing data in FASTQ format
 - Reference genome files (FASTA, GTF/GFF)
+- External configuration file with analysis-specific parameters
 
 ## Usage
 
 ### Running the Pipeline
 
+The pipeline can be run in two ways:
+
+#### Standard Execution
 To run the pipeline with 60 cores:
 
 ```bash
 snakemake --cores=60 -p --conda-frontend mamba --use-conda --rerun-triggers mtime
+```
+
+#### External Configuration Execution
+To run the pipeline with an external configuration file (recommended for analysis path separation):
+
+```bash
+snakemake --dry-run --config analysisyaml=/data/jzhang/project/Temp/PRJNA1224991_lettcue/01.workflow/config.yaml
+```
+
+After verifying the dry-run output, execute the pipeline with:
+
+```bash
+snakemake --cores=60 -p --conda-frontend mamba --use-conda --rerun-triggers mtime --config analysisyaml=/data/jzhang/project/Temp/PRJNA1224991_lettcue/01.workflow/config.yaml
 ```
 
 ### Command Options Explained:
@@ -176,6 +212,7 @@ snakemake --cores=60 -p --conda-frontend mamba --use-conda --rerun-triggers mtim
 - `--conda-frontend mamba`: Use mamba for faster environment management
 - `--use-conda`: Automatically manage conda environments
 - `--rerun-triggers mtime`: Rerun rules when input file modification times change
+- `--config analysisyaml=...`: Specify an external configuration file for flexible analysis path management
 
 ### Running Specific Parts of the Pipeline
 
@@ -191,7 +228,7 @@ snakemake --cores 16 02.mapping/STAR/sample/Aligned.sortedByCoord.out.bam
 
 ## Dependencies
 
-RNAFlow uses several bioinformatics tools managed through conda environments:
+RNAFlow uses several bioinformatics tools managed through conda environments, solving dependency installation issues:
 
 - **FastQC**: Quality control of raw sequencing data
 - **MultiQC**: Aggregation of quality control results
@@ -208,7 +245,7 @@ RNAFlow uses several bioinformatics tools managed through conda environments:
 - **edgeR**: Differential expression analysis
 - **limma**: Functional enrichment analysis
 
-All dependencies are defined in the `envs/` directory as conda environment YAML files.
+All dependencies are defined in the `envs/` directory as conda environment YAML files. The pipeline automatically manages these environments during execution using conda/mamba, ensuring consistent and reproducible analysis environments.
 
 ## Output
 

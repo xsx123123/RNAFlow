@@ -5,7 +5,6 @@ import os
 import sys
 import pandas as pd
 from pathlib import Path
-from loguru import logger
 from rich import print as rprint
 from typing import List, Dict, Optional
 
@@ -13,6 +12,10 @@ def _validate_df(df: pd.DataFrame, required_cols: List[str], index_col: str) -> 
     """
     [内部函数] 校验 DataFrame 的完整性和唯一性
     """
+    # Import the unified logger
+    from snakemake_logger_plugin_rich_loguru import get_analysis_logger
+    logger = get_analysis_logger()
+
     # 1. 校验必填列是否存在
     missing_cols = [col for col in required_cols if col not in df.columns]
     if missing_cols:

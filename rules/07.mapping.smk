@@ -1,37 +1,6 @@
 #!/usr/bin/snakemake
 # -*- coding: utf-8 -*-
 import os
-from loguru import logger
-
-rule build_STAR_index:
-    input:
-        genome_fa = config['STAR_index'][config['Genome_Version']]['genome_fa'],
-        genome_gtf = config['STAR_index'][config['Genome_Version']]['genome_gtf']
-    output:
-        idx_dir = directory(config['STAR_index'][config['Genome_Version']]['index'])
-    conda:
-        workflow.source_path("../envs/star.yml")
-    log:
-        "logs/02.mapping/STAR_index.log"
-    message:
-        "Building STAR index for {input.genome_fa}"
-    benchmark:
-        "benchmarks/STAR_index_benchmark.txt"
-    params:
-        genomeDir = config['STAR_index'][config['Genome_Version']]['index']
-    threads:
-        config['parameter']['threads']['STAR_INDEX']
-    shell:
-        """
-        mkdir -p {params.genomeDir} && \
-        STAR --genomeSAindexNbases 12 \
-             --runThreadN {threads} \
-             --runMode genomeGenerate \
-             --genomeDir {params.genomeDir} \
-             --genomeFastaFiles {input.genome_fa} \
-             --sjdbGTFfile {input.genome_gtf} \
-             > {log} 2>&1
-        """
 
 rule STAR_mapping:
     input:

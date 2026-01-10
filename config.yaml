@@ -1,20 +1,20 @@
-project_name: 'HYXM-251215018'
-Genome_Version: "GRCm39" # Lsat_Salinas_v8,Lsat_Salinas_v11,ITAG4.1,TAIR10.1,GRCm39,hg38
+project_name: 'PRJNA1224991'
+Genome_Version: "Lsat_Salinas_v11" # Lsat_Salinas_v8,Lsat_Salinas_v11,ITAG4.1,TAIR10.1,GRCm39,hg38
 # short read raw-data
 raw_data_path:
-  - /data/jzhang/project/Temp/HYXM-251215018/00.raw_data/HYXM-251215018-SEQ/Fastq
+  - /data/jzhang/project/Temp/PRJNA1224991_lettcue/00.raw_data
 # short read samples info
-sample_csv: /data/jzhang/project/Temp/HYXM-251215018/01.workflow/sample.csv
-paired_csv: /data/jzhang/project/Temp/HYXM-251215018/01.workflow/contrasts.csv
+sample_csv: /data/jzhang/project/Temp/PRJNA1224991_lettcue/01.workflow/samples.csv
+paired_csv: /data/jzhang/project/Temp/PRJNA1224991_lettcue/01.workflow/contrasts.csv
 # workflow
-workflow: /data/jzhang/project/Temp/HYXM-251215018/01.workflow
+workflow: /data/jzhang/project/Temp/PRJNA1224991_lettcue/01.workflow
 # RNAflow Output file
-data_deliver: /data/jzhang/project/Temp/HYXM-251215018/02.data_deliver
+data_deliver: /data/jzhang/project/Temp/PRJNA1224991_lettcue/02.data_deliver
 # Fragment Library Types
 Library_Types: fr-firststrand # fr-unstranded,fr-firststrand,fr-secondstrand
 # wheather call variant for RNA-seq
-call_variant: false
+call_variant: true
 # Detech Noval Transcripts by stringtie
-noval_Transcripts: false
+noval_Transcripts: true
 # rmats
 rmats: true

@@ -1,3 +1,5 @@
+# reference:
+reference_path : /data/jzhang/reference/RNAFlow_reference
 # Support gene version
 can_use_genome_version:
   - Lsat_Salinas_v11
@@ -5,54 +7,69 @@ can_use_genome_version:
   - ITAG4.1
   - TAIR10.1
   - GRCm39
+  - hg38
+  - GO
 # STAR Reference PATH
 STAR_index:
     Lsat_Salinas_v11:
-      index: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/Lsat_Salinas_v11
-      genome_fa: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/Lsat_Salinas_v11.genome.fasta
-      genome_gtf: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/Lsat_Salinas_v11.genome.gtf
-      genome_gff: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/Lsat_Salinas_v11.genome.gff
-      rsem_index: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/RSEM_Lsat_Salinas_v11/Lsat_Salinas_v11
-      rsem_index_dir: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/RSEM_Lsat_Salinas_v11/
-      bed12: /data/jzhang/reference/Lactuca_sativa_V11/STAR_Lactuca_sativa_V11_index/Lsat_Salinas_v11.genome.bed12
+      index: Lactuca_sativa_V11_ncbi/RSEM_Lactuca_sativa_V11_ncbi
+      genome_fa: Lactuca_sativa_V11_ncbi/GCF_002870075.4_Lsat_Salinas_v11_genomic.fna
+      genome_gtf: Lactuca_sativa_V11_ncbi/GCF_002870075.4_Lsat_Salinas_v11_genomic.gtf
+      genome_gff: Lactuca_sativa_V11_ncbi/GCF_002870075.4_Lsat_Salinas_v11_genomic.gff
+      rsem_index: Lactuca_sativa_V11_ncbi/RSEM_Lactuca_sativa_V11_ncbi/Lactuca_sativa_V11_ncbi
+      rsem_index_dir: Lactuca_sativa_V11_ncbi/RSEM_Lactuca_sativa_V11_ncbi/
+      bed12: Lactuca_sativa_V11_ncbi/GCF_002870075.4_Lsat_Salinas_v11_genomic.bed12
+      go_annotation: Lactuca_sativa_V11_ncbi/GCF_002870075.4-RS_2022_12_gene_ontology.go
       ploidy: 2
     Lsat_Salinas_v8:
-      index: /data/jzhang/reference/Lactuca_sativa_V8/STAR_Lactuca_sativa_V8_index/Lsat_Salinas_v8
-      genome_fa: /data/jzhang/reference/Lactuca_sativa_V8/STAR_Lactuca_sativa_V8_index/Lactuca_sativa_V8A.fasta
-      genome_gtf: /data/jzhang/reference/Lactuca_sativa_V8/STAR_Lactuca_sativa_V8_index/Lactuca_sativa_V8A.gtf
-      genome_gff: /data/jzhang/reference/Lactuca_sativa_V8/STAR_Lactuca_sativa_V8_index/Lactuca_sativa_V8A.gff3
-      rsem_index: /data/jzhang/reference/Lactuca_sativa_V8/STAR_Lactuca_sativa_V8_index/Lsat_Salinas_v8/Lsat_Salinas_v8
-      rsem_index_dir: /data/jzhang/reference/Lactuca_sativa_V8/STAR_Lactuca_sativa_V8_index/Lsat_Salinas_v8/
-      bed12: /data/jzhang/reference/Lactuca_sativa_V8/STAR_Lactuca_sativa_V8_index/Lactuca_sativa_V8A.bed12
+      index: Lactuca_sativa_V8/RSEM_Lactuca_sativa_V8
+      genome_fa: Lactuca_sativa_V8/Lactuca_sativa_V8A.fasta
+      genome_gtf: Lactuca_sativa_V8/Lactuca_sativa_V8A.gtf
+      genome_gff: Lactuca_sativa_V8/Lactuca_sativa_V8A.gff3
+      rsem_index: Lactuca_sativa_V8/RSEM_Lactuca_sativa_V8/Lactuca_sativa_V8
+      rsem_index_dir: Lactuca_sativa_V8/RSEM_Lactuca_sativa_V8/
+      bed12: Lactuca_sativa_V8/Lactuca_sativa_V8A.bed12
+      go_annotation: Lactuca_sativa_V8/Salinas_V8_eggNOG_GO.go
       ploidy: 2
     ITAG4.1:
-      index: /data/jzhang/reference/S_lycopersicum/ITAG4.1_star_index
-      genome_fa: /data/jzhang/reference/S_lycopersicum/S_lycopersicum_chromosomes.4.00.fa
-      genome_gtf: /data/jzhang/reference/S_lycopersicum/ITAG4.1_gene_models.gtf
-      genome_gff: /data/jzhang/reference/S_lycopersicum/ITAG4.1_gene_models.gff
-      rsem_index: /data/jzhang/reference/S_lycopersicum/RSEM_ITAG4.1/ITAG4.1_index
-      rsem_index_dir: /data/jzhang/reference/S_lycopersicum/RSEM_ITAG4.1/
-      bed12: /data/jzhang/reference/S_lycopersicum/ITAG4.1_gene_models.bed12
-      go_annotation: /data/jzhang/reference/S_lycopersicum/ITAG4.1_blast2go_annot.annot_deal
+      index: ITAG4.1/RSEM_ITAG4.1
+      genome_fa: ITAG4.1/S_lycopersicum_chromosomes.4.00.fa
+      genome_gtf: ITAG4.1/ITAG4.1_gene_models.gtf
+      genome_gff: ITAG4.1/ITAG4.1_gene_models.gff
+      rsem_index: ITAG4.1/RSEM_ITAG4.1/RSEM_ITAG4.1
+      rsem_index_dir: ITAG4.1/RSEM_ITAG4.1/
+      bed12: ITAG4.1/ITAG4.1_gene_models.bed12
+      go_annotation: ITAG4.1/ITAG4.1_blast2go_annot.annot_deal
       ploidy: 2
     TAIR10.1:
-      index: /data/jzhang/reference/Arabidopsis_Thaliana/TAIR10.1_STAR_INDEX
-      genome_fa: /data/jzhang/reference/Arabidopsis_Thaliana/TAIR10_chr_all.fas
-      genome_gtf: /data/jzhang/reference/Arabidopsis_Thaliana/Araport11_GTF_genes_transposons.20241001.gtf
-      genome_gff: /data/jzhang/reference/Arabidopsis_Thaliana/Araport11_GFF3_genes_transposons.20250813.gff
-      rsem_index: /data/jzhang/reference/Arabidopsis_Thaliana/RSEM_TAIR10.1/TAIR10.1_index
-      rsem_index_dir: /data/jzhang/reference/Arabidopsis_Thaliana/RSEM_TAIR10.1/
-      bed12: /data/jzhang/reference/Arabidopsis_Thaliana/Araport11_GTF_genes_transposons.20241001.bed12
+      index: TAIR10.1/RSEM_TAIR10.1
+      genome_fa: TAIR10.1/TAIR10_chr_all.fas
+      genome_gtf: TAIR10.1/Araport11_GTF_genes_transposons.20241001.gtf
+      genome_gff: TAIR10.1/Araport11_GFF3_genes_transposons.20250813.gff
+      rsem_index: TAIR10.1/RSEM_TAIR10.1/TAIR10.1_index
+      rsem_index_dir: TAIR10.1/RSEM_TAIR10.1/
+      bed12: TAIR10.1/Araport11_GTF_genes_transposons.20241001.bed12
+      go_annotation: TAIR10.1/gene_go_annotation.go
       ploidy: 2
     GRCm39:
-      index: /data/jzhang/reference/GRCm39/GRCm39_STAR_INDEX
-      genome_fa: /data/jzhang/reference/GRCm39/GRCm39.genome.fa
-      genome_gtf: /data/jzhang/reference/GRCm39/gencode.vM38.annotation.gtf
-      genome_gff: /data/jzhang/reference/GRCm39/gencode.vM38.annotation.gff3
-      rsem_index: /data/jzhang/reference/GRCm39/RSEM_GRCm39/GRCm39_INDEX
-      rsem_index_dir: /data/jzhang/reference/GRCm39/RSEM_GRCm39/
-      bed12: /data/jzhang/reference/GRCm39/gencode.vM38.annotation.bed12
-      go_annotation: /data/jzhang/reference/GRCm39/mgigene_go_annotation.tsv
+      index: GRCm39/RSEM_GRCm39
+      genome_fa: GRCm39/GRCm39.genome.fa
+      genome_gtf: GRCm39/gencode.vM38.annotation.gtf
+      genome_gff: GRCm39/gencode.vM38.annotation.gff3
+      rsem_index: GRCm39/RSEM_GRCm39/RSEM_GRCm39_index
+      rsem_index_dir: GRCm39/RSEM_GRCm39/
+      bed12: GRCm39/gencode.vM38.annotation.bed12
+      go_annotation: GRCm39/mgigene_go_annotation.tsv
       ploidy: 2
-GO:
-  obo: /data/jzhang/reference/go_database/go-basic.obo
+    hg38:
+      index: HG38/RSEM_hg38
+      genome_fa: HG38/GRCh38.p14.genome.fa
+      genome_gtf: HG38/gencode.v49.annotation.gtf
+      genome_gff: HG38/gencode.v49.annotation.gff3
+      rsem_index: HG38/RSEM_hg38/hg38_index
+      rsem_index_dir: HG38/RSEM_hg38/
+      bed12: HG38/gencode.v49.annotation.bed12
+      go_annotation: HG38/goa_human.go
+      ploidy: 2
+    GO:
+      obo: go_database/go-basic.obo

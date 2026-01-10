@@ -9,7 +9,6 @@ rule build_rsem_index:
         grp = config['STAR_index'][config['Genome_Version']]['rsem_index'] + '.grp',
         idx_fa = config['STAR_index'][config['Genome_Version']]['rsem_index'] + '.idx.fa',
         n2g_idx_fa = config['STAR_index'][config['Genome_Version']]['rsem_index'] + '.n2g.idx.fa',
-        index_dir =  config['STAR_index'][config['Genome_Version']]['rsem_index_dir'],
     conda:
         workflow.source_path("../envs/rsem.yaml"),
     log:
@@ -17,6 +16,7 @@ rule build_rsem_index:
     message:
         "Building rsem index for {input.genome_gtf}"
     params:
+        rsem_index_dir = config['STAR_index'][config['Genome_Version']]['rsem_index_dir'],
         rsem_index = config['STAR_index'][config['Genome_Version']]['rsem_index'],
     benchmark:
         "benchmarks/rsem_index_benchmark.txt"
@@ -24,7 +24,7 @@ rule build_rsem_index:
         config['parameter']['threads']['RSEM_INDEX']
     shell:
         """
-        mkdir -p {params.index_dir} &&
+        mkdir -p {params.rsem_index_dir} &&
         rsem-prepare-reference --gtf {input.genome_gtf} \
                        --star \
                        -p {threads} \

@@ -130,7 +130,7 @@ rule Enrichments:
     log:
         "logs/07.Enrichments/go_enrich.log",
     params:
-        obo = config['GO']['obo'],
+        obo = config['STAR_index']['GO']['obo'],
         go_annotation = config['STAR_index'][config['Genome_Version']]['go_annotation'],
         gene_col = config['parameter']['Enrichments']['gene_col'],
         r_script = workflow.source_path(config['parameter']['Enrichments']['PATH']),
