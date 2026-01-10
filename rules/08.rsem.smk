@@ -1,43 +1,41 @@
 #!/usr/bin/snakemake
 # -*- coding: utf-8 -*-
-rule build_rsem_index:
-    input:
-        genome_fa = config['STAR_index'][config['Genome_Version']]['genome_fa'],
-        genome_gtf = config['STAR_index'][config['Genome_Version']]['genome_gtf']
-    output:
-        chrlist = config['STAR_index'][config['Genome_Version']]['rsem_index'] + '.chrlist',
-        grp = config['STAR_index'][config['Genome_Version']]['rsem_index'] + '.grp',
-        idx_fa = config['STAR_index'][config['Genome_Version']]['rsem_index'] + '.idx.fa',
-        n2g_idx_fa = config['STAR_index'][config['Genome_Version']]['rsem_index'] + '.n2g.idx.fa',
-    conda:
-        workflow.source_path("../envs/rsem.yaml"),
-    log:
-        "logs/02.mapping/rsem_index.log"
-    message:
-        "Building rsem index for {input.genome_gtf}"
-    params:
-        rsem_index_dir = config['STAR_index'][config['Genome_Version']]['rsem_index_dir'],
-        rsem_index = config['STAR_index'][config['Genome_Version']]['rsem_index'],
-    benchmark:
-        "benchmarks/rsem_index_benchmark.txt"
-    threads:
-        config['parameter']['threads']['RSEM_INDEX']
-    shell:
-        """
-        mkdir -p {params.rsem_index_dir} &&
-        rsem-prepare-reference --gtf {input.genome_gtf} \
-                       --star \
-                       -p {threads} \
-                       {input.genome_fa} \
-                       {params.rsem_index}  2>{log}
-        """
+# rule build_rsem_index:
+#    input:
+#        genome_fa = config['STAR_index'][config['Genome_Version']]['genome_fa'],
+#        genome_gtf = config['STAR_index'][config['Genome_Version']]['genome_gtf']
+#    output:
+#        chrlist = config['STAR_index'][config['Genome_Version']]['rsem_index'] + '.ti',
+#        grp = config['STAR_index'][config['Genome_Version']]['rsem_index'] + '.seq',
+#       idx_fa = config['STAR_index'][config['Genome_Version']]['rsem_index'] + '.transcripts.fa',
+#    conda:
+#        workflow.source_path("../envs/rsem.yaml"),
+#    log:
+#        "logs/02.mapping/rsem_index.log"
+#    message:
+#        "Building rsem index for {input.genome_gtf}"
+#    params:
+#        rsem_index_dir = config['STAR_index'][config['Genome_Version']]['rsem_index_dir'],
+#        rsem_index = config['STAR_index'][config['Genome_Version']]['rsem_index'],
+#    benchmark:
+#        "benchmarks/rsem_index_benchmark.txt"
+#    threads:
+#        config['parameter']['threads']['RSEM_INDEX']
+#    shell:
+#        """
+#        mkdir -p {params.rsem_index_dir} &&
+#        rsem-prepare-reference --gtf {input.genome_gtf} \
+#                       --star \
+#                       -p {threads} \
+#                       {input.genome_fa} \
+#                       {params.rsem_index}  &>{log}
+#        """
 
 rule RSEM:
     input:
-        chrlist = config['STAR_index'][config['Genome_Version']]['rsem_index'] + '.chrlist',
-        grp = config['STAR_index'][config['Genome_Version']]['rsem_index'] + '.grp',
-        idx_fa = config['STAR_index'][config['Genome_Version']]['rsem_index'] + '.idx.fa',
-        n2g_idx_fa = config['STAR_index'][config['Genome_Version']]['rsem_index'] + '.n2g.idx.fa',
+        chrlist = config['STAR_index'][config['Genome_Version']]['rsem_index'] + '.ti',
+        grp = config['STAR_index'][config['Genome_Version']]['rsem_index'] + '.seq',
+        idx_fa = config['STAR_index'][config['Genome_Version']]['rsem_index'] + '.transcripts.fa',
         Transcriptome_bam = '02.mapping/STAR/{sample}/{sample}.Aligned.toTranscriptome.out.bam',
     output:
         genes_result = '03.count/rsem/{sample}.genes.results',
@@ -45,6 +43,8 @@ rule RSEM:
         cnt = '03.count/rsem/{sample}.stat/{sample}.cnt',
         model = '03.count/rsem/{sample}.stat/{sample}.model',
         theta = '03.count/rsem/{sample}.stat/{sample}.theta',
+    resources:
+        **rule_resource(config, 'high_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/rsem.yaml"),
     message:
@@ -81,6 +81,8 @@ rule rsem_multiqc:
         report = "03.count/multiqc_rsem_report.html",
     conda:
         workflow.source_path("../envs/multiqc.yaml"),
+    resources:
+        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     message:
         "Running MultiQC to aggregate rsem reports",
     params:
@@ -113,6 +115,8 @@ rule merge_rsem:
         tpm = "03.count/merge_rsem_tpm.tsv",
         counts = "03.count/merge_rsem_counts.tsv",
         fpkm = "03.count/merge_rsem_fpkm.tsv",
+    resources:
+        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/python3.yaml"),
     message:
@@ -146,6 +150,8 @@ rule ultimate:
         fpkm = "03.count/merge_rsem_fpkm.tsv",
     output:
         ultimate = directory("03.count/rsem_ultimate/")
+    resources:
+        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/rsem_ultimate.yaml"),
     message:

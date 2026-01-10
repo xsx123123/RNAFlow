@@ -7,9 +7,10 @@ import sys
 from snakemake.utils import min_version, validate
 
 # ------- Import Custom Modules ------- #
-from rules.id_convert import load_samples, load_contrasts
-from rules.validate import check_reference_paths,load_user_config,validate_genome_version
-from rules.reference_update import resolve_reference_paths
+from rules.utils.id_convert import load_samples, load_contrasts
+from rules.utils.validate import check_reference_paths,load_user_config,validate_genome_version
+from rules.utils.reference_update import resolve_reference_paths
+from rules.utils.resource_manager import rule_resource
 
 # Lock Snakemake Version
 min_version("9.9.0")
@@ -19,7 +20,7 @@ min_version("9.9.0")
 configfile: "config/config.yaml"
 configfile: "config/reference.yaml"
 configfile: "config/run_parameter.yaml"
-# Load project specific config (if exists)
+configfile: "config/cluster_config.yaml" 
 # configfile: "config.yaml"
 
 # Load CLI argument config (Highest Priority)

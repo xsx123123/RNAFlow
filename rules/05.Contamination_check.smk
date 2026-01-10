@@ -7,6 +7,8 @@ rule check_fastq_screen_conf:
         conf = workflow.source_path(config['parameter']['fastq_screen']['conf']),
     output:
         log = "01.qc/fastq_screen_config_check.log",
+    resources:
+        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     params:
         validate_fastq_screen = workflow.source_path(config['parameter']['validate_fastq_screen']['path']),
     log:
@@ -25,6 +27,8 @@ rule short_read_fastq_screen_r1:
         log = "01.qc/fastq_screen_config_check.log",
     output:
         fastq_screen_result = "01.qc/fastq_screen_r1/{sample}_R1_screen.txt",
+    resources:
+        **rule_resource(config, 'high_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     log:
         "logs/01.short_read_qc_r1/{sample}.r1.fastq_screen.log",
     conda:
@@ -60,6 +64,8 @@ rule short_read_fastq_screen_r2:
         log = "01.qc/fastq_screen_config_check.log",
     output:
         fastq_screen_result = "01.qc/fastq_screen_r2/{sample}_R2_screen.txt",
+    resources:
+        **rule_resource(config, 'high_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     log:
         "logs/01.short_read_qc_r2/{sample}.r2.fastq_screen.log",
     conda:
@@ -95,6 +101,8 @@ rule fastq_screen_multiqc_r1:
                                   sample=samples.keys()),
     output:
         report = "01.qc/fastq_screen_multiqc_r1/multiqc_r1_fastq_screen_report.html",
+    resources:
+        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/multiqc.yaml"),
     message:
@@ -125,6 +133,8 @@ rule fastq_screen_multiqc_r2:
                                 sample=samples.keys()),
     output:
         report = "01.qc/fastq_screen_multiqc_r2/multiqc_r2_fastq_screen_report.html",
+    resources:
+        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/multiqc.yaml"),
     message:

@@ -12,6 +12,8 @@ rule merge_qc_report:
         fastp_report = expand("01.qc/short_read_trim/{sample}.trimed.html", sample=samples.keys()),
     output:
         report = '01.qc/multiqc_merge_qc/multiqc_merge_qc_report.html',
+    resources:
+        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/multiqc.yaml"),
     params:

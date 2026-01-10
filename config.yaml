@@ -10,6 +10,9 @@ paired_csv: /data/jzhang/project/Temp/PRJNA1224991_lettcue/01.workflow/contrasts
 workflow: /data/jzhang/project/Temp/PRJNA1224991_lettcue/01.workflow
 # RNAflow Output file
 data_deliver: /data/jzhang/project/Temp/PRJNA1224991_lettcue/02.data_deliver
+# wheather run in HPC Cluster
+execution_mode: local #local,cluster
+queue_id: fat_x86
 # Fragment Library Types
 Library_Types: fr-firststrand # fr-unstranded,fr-firststrand,fr-secondstrand
 # wheather call variant for RNA-seq

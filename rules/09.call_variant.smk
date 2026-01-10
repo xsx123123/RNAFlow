@@ -11,6 +11,8 @@ rule CreateRefIndex:
     output:
         dict = os.path.splitext(config['STAR_index'][config['Genome_Version']]['genome_fa'])[0] + ".dict",
         fai = config['STAR_index'][config['Genome_Version']]['genome_fa'] + ".fai",
+    resources:
+        **rule_resource(config, 'medium_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/gatk.yaml")
     log:
@@ -36,7 +38,7 @@ rule AddOrReplaceReadGroups:
     benchmark:
         "benchmarks/04.variant/gatk/AddRG/{sample}.txt"
     resources:
-        mem_mb = 16384 
+        **rule_resource(config, 'medium_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     threads: 1
     params:
         java_opts = get_java_opts
@@ -58,14 +60,14 @@ rule MarkDuplicates:
     output:
         bam = temp('04.variant/gatk/{sample}/{sample}.rg.dedup.bam'),
         metrics = '04.variant/gatk_MarkDuplicates/{sample}.rg.dedup.metrics.txt',
+    resources:
+        **rule_resource(config, 'high_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/gatk.yaml")
     log:
         "logs/04.variant/gatk/MarkDup/{sample}.log"
     benchmark:
         "benchmarks/04.variant/gatk/MarkDup/{sample}.txt"
-    resources:
-        mem_mb = 40960 
     threads: 2
     params:
         java_opts = get_java_opts
@@ -88,14 +90,14 @@ rule SplitNCigarReads:
     output:
         bam = '04.variant/gatk/{sample}/{sample}.rg.dedup.split.bam',
         bai = '04.variant/gatk/{sample}/{sample}.rg.dedup.split.bai',
+    resources:
+        **rule_resource(config, 'high_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/gatk.yaml")
     log:
         "logs/04.variant/gatk/SplitN/{sample}.log"
     benchmark:
         "benchmarks/04.variant/gatk/SplitN/{sample}.txt"
-    resources:
-        mem_mb = 20480 
     threads: 4
     params:
         fasta = config['STAR_index'][config['Genome_Version']]['genome_fa'],
@@ -117,14 +119,14 @@ rule HaplotypeCaller:
     output:
         vcf = '04.variant/gatk/{sample}/{sample}.raw_variants.vcf',
         idx = '04.variant/gatk/{sample}/{sample}.raw_variants.vcf.idx'
+    resources:
+        **rule_resource(config, 'high_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/gatk.yaml")
     log:
         "logs/04.variant/gatk/HC/{sample}.log"
     benchmark:
         "benchmarks/04.variant/gatk/HC/{sample}.txt"
-    resources:
-        mem_mb = 32768
     threads: 
         config['parameter']['threads']['gatk']
     params:
@@ -152,14 +154,14 @@ rule VariantFiltration:
     output:
         vcf = '04.variant/gatk/{sample}/{sample}.filtered.vcf',
         idx = '04.variant/gatk/{sample}/{sample}.filtered.vcf.idx'
+    resources:
+        **rule_resource(config, 'medium_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/gatk.yaml")
     log:
         "logs/04.variant/gatk/Filter/{sample}.log"
     benchmark:
         "benchmarks/04.variant/gatk/Filter/{sample}.txt"
-    resources:
-        mem_mb = 8192
     threads: 1
     params:
         fasta = config['STAR_index'][config['Genome_Version']]['genome_fa'],
@@ -188,14 +190,14 @@ rule SelectVariants:
     output:
         vcf = '04.variant/gatk/{sample}/{sample}.final.pass.vcf',
         idx = '04.variant/gatk/{sample}/{sample}.final.pass.vcf.idx'
+    resources:
+        **rule_resource(config, 'medium_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/gatk.yaml")
     log:
         "logs/04.variant/gatk/Select/{sample}.log"
     benchmark:
         "benchmarks/04.variant/gatk/Select/{sample}.txt"
-    resources:
-        mem_mb = 8192
     threads: 1
     params:
         fasta = config['STAR_index'][config['Genome_Version']]['genome_fa'],
@@ -215,6 +217,8 @@ rule bcftools_stats_raw:
         idx = '04.variant/gatk/{sample}/{sample}.raw_variants.vcf.idx',
     output:
         stats = '04.variant/gatk_bcftools_stats_raw/{sample}.raw_variants.stats'
+    resources:
+        **rule_resource(config, 'medium_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/bcftools.yaml"),
     params:
@@ -223,8 +227,6 @@ rule bcftools_stats_raw:
         "logs/04.variant/gatk/bcftools_stats/{sample}.log"
     benchmark:
         "benchmarks/04.variant/gatk/bcftools_stats/{sample}.txt"
-    resources:
-        mem_mb = 8192
     threads: 
         5
     shell:
@@ -241,6 +243,8 @@ rule bcftools_stats_pass:
         idx = '04.variant/gatk/{sample}/{sample}.final.pass.vcf.idx'
     output:
         stats = '04.variant/gatk_bcftools_stats_pass/{sample}.final.pass.stats'
+    resources:
+        **rule_resource(config, 'medium_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/bcftools.yaml"),
     params:
@@ -249,8 +253,6 @@ rule bcftools_stats_pass:
         "logs/04.variant/gatk/bcftools_stats/{sample}.log"
     benchmark:
         "benchmarks/04.variant/gatk/bcftools_stats/{sample}.txt"
-    resources:
-        mem_mb = 8192
     threads: 
         5
     shell:
@@ -266,6 +268,8 @@ rule multiqc_bcftools_stats_raw:
                             sample=samples.keys()),
     output:
         report = '04.variant/multiqc_gatk_bcftools_stats_raw/multiqc_gatk_bcftools_stats_raw.html',
+    resources:
+        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/multiqc.yaml"),
     message:
@@ -296,6 +300,8 @@ rule multiqc_bcftools_stats_pass:
                             sample=samples.keys()),
     output:
         report = '04.variant/multiqc_gatk_bcftools_stats_pass/multiqc_gatk_bcftools_stats_pass.html',
+    resources:
+        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/multiqc.yaml"),
     message:

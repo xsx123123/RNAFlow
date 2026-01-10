@@ -11,6 +11,8 @@ rule short_read_qc_r1:
     output:
         r1_html = "01.qc/short_read_qc_r1/{sample}_R1_fastqc.html",
         r1_zip = "01.qc/short_read_qc_r1/{sample}_R1_fastqc.zip",
+    resources:
+        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/fastqc.yaml"),
     log:
@@ -40,6 +42,8 @@ rule short_read_qc_r2:
     output:
         r2_html = "01.qc/short_read_qc_r2/{sample}_R2_fastqc.html",
         r2_zip = "01.qc/short_read_qc_r2/{sample}_R2_fastqc.zip",
+    resources:
+        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/fastqc.yaml"),
     log:
@@ -66,6 +70,8 @@ rule short_read_multiqc_r1:
         fastqc_files_r1 = expand("01.qc/short_read_qc_r1/{sample}_R1_fastqc.zip", sample=samples.keys()),
     output:
         report_dir = "01.qc/short_read_r1_multiqc/multiqc_r1_raw-data_report.html",
+    resources:
+        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/multiqc.yaml"),
     message:
@@ -96,6 +102,8 @@ rule short_read_multiqc_r2:
         fastqc_files_r2 = expand("01.qc/short_read_qc_r2/{sample}_R2_fastqc.zip", sample=samples.keys()),
     output:
         report = "01.qc/short_read_r2_multiqc/multiqc_r2_raw-data_report.html",
+    resources:
+        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/multiqc.yaml"),
     message:

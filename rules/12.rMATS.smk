@@ -8,24 +8,24 @@ def get_contrast_bams(wildcards):
         raise ValueError(f"Unknown contrast: {wildcards.contrast}")
     return CONTRAST_MAP[wildcards.contrast]
 
-rule gtf2bed12:
-    input:
-        gtf = config['STAR_index'][config['Genome_Version']]['genome_gtf'],
-    output:
-        bed12 = config['STAR_index'][config['Genome_Version']]['bed12'],
-    threads: 
-        1
-    conda:
-        workflow.source_path("../envs/rseqc.yaml"),
-    log:
-        "logs/07.AS/rseqc/gtt2bed12.log"
-    benchmark:
-        "benchmarks/gtt2bed12.txt"
-    shell:
-        """
-        gtfToGenePred {input.gtf} /dev/stdout | genePredToBed \
-                      /dev/stdin {output.bed12} > {log} 2>&1
-        """
+# rule gtf2bed12:
+#    input:
+#        gtf = config['STAR_index'][config['Genome_Version']]['genome_gtf'],
+#    output:
+#        bed12 = config['STAR_index'][config['Genome_Version']]['bed12'],
+#    threads: 
+#        1
+#    conda:
+#        workflow.source_path("../envs/rseqc.yaml"),
+#    log:
+#        "logs/07.AS/rseqc/gtt2bed12.log"
+#    benchmark:
+#        "benchmarks/gtt2bed12.txt"
+#    shell:
+#        """
+#        gtfToGenePred {input.gtf} /dev/stdout | genePredToBed \
+#                      /dev/stdin {output.bed12} > {log} 2>&1
+#        """
 
 rule infer_experiment:
     input:
@@ -33,6 +33,8 @@ rule infer_experiment:
         bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
     output:
         library = "07.AS/qc/strandness/{sample}.summary.txt",
+    resources:
+        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     threads: 
         1
     conda:
@@ -51,6 +53,8 @@ rule merge_strandness_results:
         expand("07.AS/qc/strandness/{sample}.summary.txt", sample=samples.keys()),
     output:
         "07.AS/qc/all_samples_strandness.txt",
+    resources:
+        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     threads: 
         1
     shell:
@@ -67,6 +71,8 @@ rule rmats_run:
         summary = "07.AS/rmats_pair/{contrast}/summary.txt",
         SE_MATS_JC = "07.AS/rmats_pair/{contrast}/SE.MATS.JC.txt",
         lib_check_log = "07.AS/rmats_pair/{contrast}/libType_check.log",
+    resources:
+        **rule_resource(config, 'high_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     params:
         od = "07.AS/rmats_pair/{contrast}",
         tmp = "07.AS/rmats_pair/{contrast}/tmp",
@@ -122,6 +128,8 @@ rule rmats_single_run:
         mx = "07.AS/rmats_single/{sample}/MXE.MATS.JC.txt",
         summary = "07.AS/rmats_single/{sample}/summary.txt",
         lib_check_log = "07.AS/rmats_single/{sample}/libType_check.log",
+    resources:
+        **rule_resource(config, 'high_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     params:
         od = "07.AS/rmats_single/{sample}",
         tmp = "07.AS/rmats_single/{sample}/tmp",
