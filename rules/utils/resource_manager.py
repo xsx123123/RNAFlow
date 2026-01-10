@@ -12,10 +12,6 @@ def rule_resource(config, profile_name, queue_name=None, skip_queue_on_local=Fal
     根据 Config 获取规则的资源配置。
     能够智能处理 "Local模式" 与 "用户指定Queue" 之间的配置冲突。
     """
-    # 1. Logger 初始化
-    if logger is None:
-        logger = logging.getLogger(__name__)
-
     # 2. 获取并校验 Profile
     cluster_config = config.get('cluster_config', {})
     resource_profiles = cluster_config.get('resource_profiles', {})
@@ -30,7 +26,7 @@ def rule_resource(config, profile_name, queue_name=None, skip_queue_on_local=Fal
     profile = resource_profiles[profile_name].copy()
 
     # 3. 判断运行环境 (核心逻辑)
-    execution_mode = config.get('execution_mode', 'local')
+    execution_mode = config.get('execution_mode', {})
     current_cluster_name = cluster_config.get('current_cluster', 'default')
     
     # 只要 mode 是 local，或者集群配置是指向 default (通常指本地)，就视为本地执行
