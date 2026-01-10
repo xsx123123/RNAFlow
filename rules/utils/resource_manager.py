@@ -27,7 +27,7 @@ def rule_resource(config, profile_name, queue_name=None, skip_queue_on_local=Fal
 
     # 3. 判断运行环境 (核心逻辑)
     execution_mode = config.get('execution_mode', {})
-    current_cluster_name = cluster_config.get('current_cluster', 'default')
+    current_cluster_name = cluster_config.get('current_cluster', {})
     
     # 只要 mode 是 local，或者集群配置是指向 default (通常指本地)，就视为本地执行
     is_local_execution = (execution_mode == 'local') or (current_cluster_name == 'default')
@@ -53,7 +53,7 @@ def rule_resource(config, profile_name, queue_name=None, skip_queue_on_local=Fal
 
     # A. 优先使用传入的 queue_name (对应 config 里的 queue_id)
     if queue_name:
-        logger.info(f"Using explicit queue override: '{queue_name}' for rule profile '{profile_name}'")
+        # logger.info(f"Using explicit queue override: '{queue_name}' for rule profile '{profile_name}'")
         profile['queue'] = queue_name
     
     # B. 否则使用 profile 里的 queue_type 进行映射

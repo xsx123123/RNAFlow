@@ -55,7 +55,7 @@ rule multiqc_trim:
         fastp_report = expand("01.qc/short_read_trim/{sample}.trimed.html",
                               sample=samples.keys()),
     output:
-        report = '01.qc/multiqc_short_read_trim/multiqc_short_read_trim_report.html',\
+        report = '01.qc/multiqc_short_read_trim/multiqc_short_read_trim_report.html',
     resources:
         **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     conda:

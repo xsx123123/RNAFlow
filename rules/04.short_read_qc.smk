@@ -12,7 +12,7 @@ rule short_read_qc_r1:
         r1_html = "01.qc/short_read_qc_r1/{sample}_R1_fastqc.html",
         r1_zip = "01.qc/short_read_qc_r1/{sample}_R1_fastqc.zip",
     resources:
-        **rule_resource(config, 'low_resource', queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
+        **rule_resource(config,'low_resource',queue_name=config['queue_id'], skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/fastqc.yaml"),
     log:
