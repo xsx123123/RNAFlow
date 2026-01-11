@@ -250,7 +250,7 @@ rule mapping_report:
         "Running MultiQC to aggregate mapping reports",
     params:
         fastqc_reports = "02.mapping/",
-        report_dir = '02.mapping/mapping_report'),
+        report_dir = '02.mapping/mapping_report',
         report = "multiqc_mapping_report.html",
         title = "mapping report",
     log:
