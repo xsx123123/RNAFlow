@@ -48,6 +48,8 @@ def DataDeliver(config:dict = None) -> list:
     # bamcoverage
     data_deliver.extend(expand(f"02.mapping/bamCoverage/{{sample}}_{config['parameter']['bamCoverage']['normalizeUsing']}.bw",
                                           sample=samples.keys()))
+
+    data_deliver.append("02.mapping/mapping_report/multiqc_mapping_report.html")
     # count
     data_deliver.extend(expand("03.count/rsem/{sample}.genes.results",
                                           sample=samples.keys()))

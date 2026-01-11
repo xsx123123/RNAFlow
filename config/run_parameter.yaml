@@ -73,3 +73,7 @@ parameter:
     length_required: 75
     quality_threshold: 25
     adapter_fasta: "../data/Universal_Adapter.fa"
+  RNAFlow_Deliver_Tool:
+    path: "src/src/data-deliver/RNAFlow_Deliver_Tool/python/RNAFlow_Deliver/cli.py"
+    config_path: "src/src/data-deliver/RNAFlow_Deliver_Tool/config/full_delivery_config.yaml"
+    python: "src/src/data-deliver/RNAFlow_Deliver_Tool/python"

@@ -4,6 +4,7 @@
 # Author : JZHANG
 
 import sys
+import os
 from snakemake.utils import min_version, validate
 
 # ------- Import Custom Modules ------- #
@@ -66,4 +67,7 @@ include: 'rules/15.deliver.smk'
 # --------- 5. Target Rule --------- #
 rule all:
     input:
-        DataDeliver(config=config)
+        DataDeliver(config=config),
+        os.path.join(config['data_deliver'],'delivery_manifest.json'),
+        os.path.join(config['data_deliver'],'delivery_manifest.md5'),
+        os.path.join(config['data_deliver'],'delivery_details.log'),

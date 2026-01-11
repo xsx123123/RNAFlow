@@ -241,7 +241,7 @@ rule mapping_report:
         samtools_flagstat = expand('02.mapping/samtools_flagstat/{sample}_bam_flagstat.tsv',sample=samples.keys()),
         samtools_stats = expand('02.mapping/samtools_stats/{sample}_bam_stats.tsv',sample=samples.keys()),
     output:
-        report = os.path.join(config['data_deliver'],'02.mapping_report','multiqc_mapping_report.html'),
+        report = "02.mapping/mapping_report/multiqc_mapping_report.html",
     resources:
         **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
     conda:
@@ -250,7 +250,7 @@ rule mapping_report:
         "Running MultiQC to aggregate mapping reports",
     params:
         fastqc_reports = "02.mapping/",
-        report_dir = os.path.join(config['data_deliver'],'02.mapping_report'),
+        report_dir = '02.mapping/mapping_report'),
         report = "multiqc_mapping_report.html",
         title = "mapping report",
     log:
