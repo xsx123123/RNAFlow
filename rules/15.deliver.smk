@@ -7,9 +7,10 @@ rule delivery:
     input:
         DataDeliver(config)
     output:
-        manifest = os.path.join(config['data_deliver'],'delivery_manifest.json'),
-        manifest = os.path.join(config['data_deliver'],'delivery_manifest.md5'),
-        manifest = os.path.join(config['data_deliver'],'delivery_details.log'),
+        out_dir = config['data_deliver'],
+        manifest_json = os.path.join(config['data_deliver'],'delivery_manifest.json'),
+        manifest_md5 = os.path.join(config['data_deliver'],'delivery_manifest.md5'),
+        manifest_log = os.path.join(config['data_deliver'],'delivery_details.log'),
     resources:
         **rule_resource(config, 'high_resource',  skip_queue_on_local=True,logger = logger),
     conda:
