@@ -17,18 +17,24 @@ RNAFlow is a comprehensive Snakemake-based pipeline for RNA-seq data analysis. I
 
 RNAFlow is designed for analyzing RNA-seq data using STAR for alignment, RSEM for quantification, and additional tools for quality control, variant calling, transcript assembly, differential expression analysis, alternative splicing detection, and gene fusion identification. The pipeline supports multiple reference genomes including Lactuca_sativa (Lsat_Salinas_v8/v11) and GRCm39. The pipeline follows a modular design that separates code, analysis paths, and reference files, allowing for easy migration to different environments by simply updating the reference path in the configuration file.
 
-**Version:** RNAFlow_v0.1.4
+**Version:** RNAFlow_v0.1.5
 **Author:** JZHANG
 
 ## Key Features
 
 - **Modular Design**: Separates analysis code from analysis paths and reference files for enhanced portability
+- **Smart Data Recognition**: Automatically identifies sample data structures, supporting both directory-based (`raw_data/SampleID/`) and flat-file (`raw_data/SampleID*.fq.gz`) organizations.
 - **Easy Migration**: Migrate the analysis pipeline to different paths by simply updating the `reference_path` in the configuration file (e.g., `reference_path: /data/jzhang/reference/RNAFlow_reference`)
 - **Flexible Configuration**: Run the pipeline with external configuration files using the format: `snakemake --dry-run --config analysisyaml=/path/to/your/config.yaml`
 - **Environment Management**: All analysis environments are managed using Conda, solving dependency installation issues
 - **Comprehensive Analysis**: Supports multiple reference genomes and provides complete RNA-seq analysis workflow
 
 ## Version History
+
+### RNAFlow_v0.1.5 (2026-01-11)
+- **Feature**: Implemented smart input data recognition. The pipeline now automatically detects sample files whether they are organized in individual directories or as flat files in a common directory, simplifying sample sheet preparation.
+- **Improvement**: Enhanced CLI output experience with `rich-loguru` integration for better logging and error reporting.
+- **Documentation**: Updated directory structures and usage examples.
 
 ### RNAFlow_v0.1.4 (2026-01-07)
 - Added rMATS analysis for alternative splicing detection
