@@ -2,19 +2,19 @@ cluster_config:
   resource_profiles:
     low_resource:
       threads: 2
-      mem_mb: 8000
+      mem_mb: 18000
       runtime: 60  # minutes
       queue_type: "default_queue"
 
     medium_resource:
       threads: 10
-      mem_mb: 16000
+      mem_mb: 86000
       runtime: 120  # minutes
       queue_type: "default_queue"
 
     high_resource:
       threads: 18
-      mem_mb: 32000
+      mem_mb: 100000
       runtime: 240  # minutes
       queue_type: "high_mem_queue"
 

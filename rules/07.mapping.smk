@@ -10,7 +10,7 @@ rule STAR_mapping:
         r1 = "01.qc/short_read_trim/{sample}.R1.trimed.fq.gz",
         r2 = "01.qc/short_read_trim/{sample}.R2.trimed.fq.gz",
     output:
-        Aligned_bam = '02.mapping/STAR/{sample}/{sample}.Aligned.sortedByCoord.out.bam',
+        Aligned_bam =  '02.mapping/STAR/{sample}/{sample}.Aligned.sortedByCoord.out.bam',
         Transcriptome_bam = '02.mapping/STAR/{sample}/{sample}.Aligned.toTranscriptome.out.bam',
         log_final = '02.mapping/STAR/{sample}/{sample}.Log.final.out',
     resources:
@@ -103,7 +103,7 @@ rule sort_index:
         config['parameter']['threads']['samtools'],
     shell:
         """
-        (mv {input.Aligned_bam} {output.rename_bam} &&
+        (ln -s -r {input.Aligned_bam} {output.rename_bam} &&
         samtools sort -@ {threads} -o {output.sort_bam} {output.rename_bam} &&
         samtools index -@ {threads} {output.sort_bam})  &>{log}
         """
@@ -233,8 +233,6 @@ rule bamCoverage:
 
 rule mapping_report:
     input:
-        Aligned_bam =  expand('02.mapping/STAR/{sample}/{sample}.Aligned.sortedByCoord.out.bam',sample=samples.keys()),
-        Transcriptome_bam = expand('02.mapping/STAR/{sample}/{sample}.Aligned.toTranscriptome.out.bam',sample=samples.keys()),
         log_final = expand('02.mapping/STAR/{sample}/{sample}.Log.final.out',sample=samples.keys()),
         qualimap_report_html = expand('02.mapping/qualimap_report/{sample}/qualimapReport.html',sample=samples.keys()),
         qualimap_report_txt = expand('02.mapping/qualimap_report/{sample}/genome_results.txt',sample=samples.keys()),
@@ -243,7 +241,7 @@ rule mapping_report:
     output:
         report = "02.mapping/mapping_report/multiqc_mapping_report.html",
     resources:
-        **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'low_resource',skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/multiqc.yaml"),
     message:
@@ -252,7 +250,7 @@ rule mapping_report:
         fastqc_reports = "02.mapping/",
         report_dir = '02.mapping/mapping_report',
         report = "multiqc_mapping_report.html",
-        title = "mapping report",
+        title = "mapping_report",
     log:
         "logs/02.mapping/multiqc_mapping_report.log",
     benchmark:
