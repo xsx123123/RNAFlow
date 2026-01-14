@@ -57,7 +57,7 @@ graph TD
     %% =======================
     %% 2. Core Workflow Layer (Snakemake)
     %% =======================
-    subgraph Workflow_Layer [Core Workflow (Snakemake)]
+    subgraph Workflow_Layer [Core Workflow - Snakemake]
         direction TB
         
         %% Pre-processing
