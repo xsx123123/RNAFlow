@@ -380,6 +380,31 @@ docker run -it --rm \
 python report/bioreport/main.py --input results_dir --output report_dir --ai
 ```
 
+## 📅 开发计划 (Roadmap)
+
+### 高级差异分析模块 (Advanced Experimental Design)
+为了支持更复杂的生物学实验设计（如时间序列分析、双因素交互作用），计划在下一版本中对 DEG 模块进行重构，不再局限于简单的两两比较 (Wald test)。
+
+**拟定设计方案：**
+
+1.  **配置增强 (`config.yaml`)**:
+    引入 `statistical_model` 字段，支持自定义设计公式：
+    ```yaml
+    # 高级模式示例：双因素交互 (Genotype x Treatment)
+    statistical_model:
+      design_formula: "~ Genotype + Condition + Genotype:Condition"
+      test_type: "LRT"  # Likelihood Ratio Test (用于多因素)
+      reduced_formula: "~ Genotype + Condition" # LRT 需要的简化公式
+    ```
+
+2.  **对比矩阵升级**:
+    现有的 `contrasts.csv` 将升级为更灵活的 `comparisons.csv`，允许用户直接指定 DESeq2 的提取参数：
+    ```csv
+    comparison_name,contrast_argument
+    WT_Drought_vs_Water,c("Condition", "Drought", "Water")
+    Genotype_Interaction,name="GenotypeMut.ConditionDrought"
+    ```
+
 ## 📈 版本历史
 
 ### RNAFlow_v0.1.6 (Current)
