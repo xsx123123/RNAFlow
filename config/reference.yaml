@@ -1,5 +1,8 @@
 # reference:
 reference_path : /data/jzhang/reference/RNAFlow_reference
+# FastQ Screen Database Root Path (For migration)
+# This path should contain subdirectories like 'hg38', 'GRCm39', 'fastq_screen_database', etc.
+fastq_screen_db_path: /data/jzhang/reference/fastq_screen_database
 # Support gene version
 can_use_genome_version:
   - Lsat_Salinas_v11

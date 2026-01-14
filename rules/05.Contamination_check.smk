@@ -2,9 +2,23 @@
 # -*- coding: utf-8 -*-
 import os
 # ----- rule ----- #
+
+rule generate_fastq_screen_conf:
+    input:
+        template = workflow.source_path("src/src/fastq_screen/fastq_screen.conf.template")
+    output:
+        conf = "01.qc/fastq_screen.conf"
+    params:
+        db_path = config.get("fastq_screen_db_path", "/data/jzhang/reference/") # Default fallback
+    localrule: True
+    shell:
+        """
+        sed "s|__FASTQ_SCREEN_DB_PATH__|{params.db_path}|g" {input.template} > {output.conf}
+        """
+
 rule check_fastq_screen_conf:
     input:
-        conf = workflow.source_path(config['parameter']['fastq_screen']['conf']),
+        conf = "01.qc/fastq_screen.conf",
     output:
         log = "01.qc/fastq_screen_config_check.log",
     resources:
@@ -25,6 +39,7 @@ rule short_read_fastq_screen_r1:
     input:
         md5_check = "01.qc/md5_check.tsv",
         log = "01.qc/fastq_screen_config_check.log",
+        conf = "01.qc/fastq_screen.conf"
     output:
         fastq_screen_result = "01.qc/fastq_screen_r1/{sample}_R1_screen.txt",
     resources:
@@ -38,7 +53,6 @@ rule short_read_fastq_screen_r1:
         link_r1_dir = os.path.join("00.raw_data",
                                       config['convert_md5'],
                                       "{sample}/{sample}_R1.fq.gz"),
-        conf = workflow.source_path(config['parameter']['fastq_screen']['conf']),
         subset = config['parameter'][ 'fastq_screen']['subset'],
         aligner = config['parameter']['fastq_screen']['aligner'],
     message:
@@ -53,7 +67,7 @@ rule short_read_fastq_screen_r1:
                      --force \
                      --subset  {params.subset} \
                      --aligner  {params.aligner} \
-                     --conf {params.conf} \
+                     --conf {input.conf} \
                      --outdir {params.out_dir} \
                      {params.link_r1_dir} &> {log}
         """
@@ -62,6 +76,7 @@ rule short_read_fastq_screen_r2:
     input:
         md5_check = "01.qc/md5_check.tsv",
         log = "01.qc/fastq_screen_config_check.log",
+        conf = "01.qc/fastq_screen.conf"
     output:
         fastq_screen_result = "01.qc/fastq_screen_r2/{sample}_R2_screen.txt",
     resources:
@@ -72,7 +87,6 @@ rule short_read_fastq_screen_r2:
         workflow.source_path('../envs/fastq_screen.yaml'),
     params:
         out_dir = "01.qc/fastq_screen_r2/",
-        conf = workflow.source_path(config['parameter']['fastq_screen']['conf']),
         subset = config['parameter'][ 'fastq_screen']['subset'],
         aligner = config['parameter']['fastq_screen']['aligner'],
         link_r2_dir = os.path.join("00.raw_data",
@@ -90,7 +104,7 @@ rule short_read_fastq_screen_r2:
                      --force \
                      --subset  {params.subset} \
                      --aligner  {params.aligner} \
-                     --conf {params.conf} \
+                     --conf {input.conf} \
                      --outdir {params.out_dir} \
                      {params.link_r2_dir} &> {log}
         """

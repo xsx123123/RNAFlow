@@ -15,4 +15,4 @@ convert_md5: 'link_dir'
 r1_suffix: _R1.fq.g【z
 r2_suffix: _R2.fq.gz
 md5: MD5.txt
-pipeline_version: "RNAFlow v0.1.5"
+pipeline_version: "RNAFlow v0.1.6"
