@@ -18,6 +18,7 @@ parameter:
     stringtie: 16
     gatk: 1
     rmats: 6
+    rnaflow-cli: 8
   validate_fastq_screen:
     path: ../src/src/fastq_screen/validate_fastq_screen.py
   fastq_screen:
@@ -74,6 +75,7 @@ parameter:
     quality_threshold: 25
     adapter_fasta: "../data/Universal_Adapter.fa"
   RNAFlow_Deliver_Tool:
-    path: "src/src/data-deliver/RNAFlow_Deliver_Tool/python/RNAFlow_Deliver/cli.py"
-    config_path: "src/src/data-deliver/RNAFlow_Deliver_Tool/config/full_delivery_config.yaml"
-    python: "src/src/data-deliver/RNAFlow_Deliver_Tool/python"
+    config_path: "../src/src/data-deliver/RNAFlow_Deliver_Tool/config/full_delivery_config.yaml"
+    config_path_report: "../src/src/data-deliver/RNAFlow_Deliver_Tool/config/report.yaml"
+  Report:
+    docker_version: bioreportrna:v0.0.3

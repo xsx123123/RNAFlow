@@ -98,7 +98,7 @@ def DataDeliver(config:dict = None) -> list:
         data_deliver.extend(expand("07.AS/rmats_pair/{contrast}/SE.MATS.JC.txt", contrast=ALL_CONTRASTS))
 
     data_deliver.append("07.Enrichments/")
-    data_deliver.append(os.path.join(config['data_deliver'], "report_data/config.json"))
+
     if config['print_target']:
        rich_print(data_deliver)
     return  data_deliver

@@ -71,3 +71,8 @@ rule all:
         os.path.join(config['data_deliver'],'delivery_manifest.json'),
         os.path.join(config['data_deliver'],'delivery_manifest.md5'),
         os.path.join(config['data_deliver'],'delivery_details.log'),
+        os.path.join(config['data_deliver'], "report_data/project_summary.json"),
+        os.path.join(config['data_deliver'],'report_data','delivery_manifest.json'),
+        os.path.join(config['data_deliver'],'report_data','delivery_manifest.md5'),
+        os.path.join(config['data_deliver'],'report_data','delivery_details.log'),
+        os.path.join(config['data_deliver'], "Analysis_Report/index.html"),
