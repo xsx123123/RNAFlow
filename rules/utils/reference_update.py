@@ -35,7 +35,7 @@ def resolve_reference_paths(config, targets, base_path=None):
         logger.error(f"无法解析 targets 参数类型: {type(targets)}，跳过路径更新。")
         return
 
-    logger.info(f"正在批量更新参考基因组路径: {genome_list} (Base: {root_dir})")
+    # logger.info(f"正在批量更新参考基因组路径: {genome_list} (Base: {root_dir})")
 
     # 2. 循环处理列表中的每一个基因组版本
     star_index_config = config.get("STAR_index", {})
@@ -52,12 +52,10 @@ def resolve_reference_paths(config, targets, base_path=None):
         count = 0
         for key, value in ref_dict.items():
             if isinstance(value, str):
-                # 防止重复拼接（如果路径已经是绝对路径，或者已经拼接过）
-                # 同时也排除掉明显不是相对路径的字符串
                 if not value.startswith(root_dir) and not value.startswith("/"):
                     full_path = os.path.join(root_dir, value)
                     ref_dict[key] = full_path
                     count += 1
 
         if count > 0:
-            logger.success(f"[{version}] 成功更新了 {count} 个文件路径")
+            # logger.success(f"[{version}] 成功更新了 {count} 个文件路径")
