@@ -15,12 +15,12 @@ from rich.padding import Padding
 
 def check_reference_paths(ref_dict):
     """
-    Rich 美化版（现代极简风）：检查参考基因组文件路径。
+    Rich-styled (modern minimalist): Check reference genome file paths.
     """
     console = Console()
     
     if not ref_dict:
-        # 警告也可以稍微现代一点
+        # Warning can also be a bit more modern
         msg = Text("⚠ Warning: Reference dictionary is empty!", style="bold yellow")
         console.print(Align.center(msg))
         return
@@ -28,7 +28,7 @@ def check_reference_paths(ref_dict):
     keys_to_check = ["index", "genome_fa", "genome_gtf", "genome_gff", "rsem_index_dir"]
     missing_entries = []
 
-    # 状态栏保持简洁
+    # Keep status bar concise
     with console.status("[bold cyan]Scanning reference configuration...", spinner="dots2"):
         for genome_name, params in ref_dict.items():
             if not isinstance(params, dict):
@@ -38,38 +38,38 @@ def check_reference_paths(ref_dict):
                     missing_entries.append((genome_name, key, path))
 
     if missing_entries:
-        # --- 1. 顶部标题 ---
-        # 使用 Rule 创建一个横穿屏幕的标题线，既醒目又不臃肿
+        # --- 1. Top title ---
+        # Use Rule to create a full-screen title line that is both prominent and not bloated
         console.print()
         console.rule("[bold red]🚨 CONFIGURATION ERROR[/]", style="red")
         console.print()
 
-        # --- 2. 创建现代表格 ---
-        # box.SIMPLE_HEAD 只保留表头下的一条线，非常干净
-        # 或者 box.SIMPLE 保留简单的横线
+        # --- 2. Create modern table ---
+        # box.SIMPLE_HEAD only keeps a line under the header, very clean
+        # or box.SIMPLE keeps simple horizontal lines
         table = Table(
-            box=box.SIMPLE_HEAD, 
+            box=box.SIMPLE_HEAD,
             show_header=True,
             header_style="bold red",
             collapse_padding=True,
             pad_edge=False,
-            row_styles=["none", "dim"] # 隔行变暗，增加层次感
+            row_styles=["none", "dim"] # Alternate rows dimmed for hierarchy
         )
         
-        # 定义列 (文字全部居中)
+        # Define columns (all text centered)
         table.add_column("Genome Version", style="bold cyan", justify="center", width=20)
         table.add_column("Missing Key", style="yellow", justify="center", width=20)
-        table.add_column("Target Path (Not Found)", style="white", justify="center") # 路径保持白色，醒目
+        table.add_column("Target Path (Not Found)", style="white", justify="center") # Keep path white for visibility
 
         for genome, key, path in missing_entries:
             table.add_row(genome, key, path)
 
-        # --- 3. 整体居中展示 ---
-        # 使用 Align.center 让表格悬浮在终端中间
-        # 使用 Padding 增加一点上下呼吸感
+        # --- 3. Center display ---
+        # Use Align.center to float the table in the middle of the terminal
+        # Use Padding to add some breathing space above and below
         console.print(Align.center(Padding(table, (1, 2))))
 
-        # --- 4. 底部提示 ---
+        # --- 4. Bottom prompt ---
         console.print()
         console.print(Align.center("[grey50]Please verify the paths in [bold]config.yaml[/] and try again.[/]"))
         console.rule(style="red")
@@ -77,7 +77,7 @@ def check_reference_paths(ref_dict):
         
         sys.exit(1)
     else:
-        # 成功提示：简洁有力
+        # Success message: concise and powerful
         console.print(Align.center("#####   --------------- Validation Complete  ---------------   #####"),style="yellow")
         console.print()
         console.print(Align.center("[bold green]✔ System Check Passed[/]"), style="green")
@@ -87,39 +87,39 @@ def check_reference_paths(ref_dict):
 
 def load_user_config(config, cmd_arg_name="user_yaml") -> None:
     """
-    解析命令行传递的配置文件路径，并将其合并到当前 config 中。
-    
-    参数:
-    config (dict): Snakemake 的全局 config 对象
-    cmd_arg_name (str): 命令行 --config 后面的键名，默认为 "user_yaml"
+    Parse the configuration file path passed from the command line and merge it into the current config.
+
+    Args:
+    config (dict): Snakemake's global config object
+    cmd_arg_name (str): The key name after --config in command line, defaults to "user_yaml"
     """
     custom_path = config.get(cmd_arg_name)
 
-    # 如果用户没传这个参数，直接返回，使用默认配置
+    # If the user didn't pass this parameter, return directly and use the default configuration
     if not custom_path:
         return
 
-    # 2. 检查文件是否存在
+    # 2. Check if the file exists
     if not os.path.exists(custom_path):
-        # 红色报错信息，方便在日志中看到
-        sys.exit(f"\n\033[91m[Config Error] 找不到指定的用户配置文件: {custom_path}\033[0m\n请检查路径是否正确。\n")
+        # Red error message, easy to see in logs
+        sys.exit(f"\n\033[91m[Config Error] Cannot find the specified user configuration file: {custom_path}\033[0m\nPlease check if the path is correct.\n")
 
-    # 3. 加载并合并配置
-    print(f"\033[92m[Config Info] 正在加载外部项目配置: {custom_path}\033[0m")
+    # 3. Load and merge configuration
+    print(f"\033[92m[Config Info] Loading external project configuration: {custom_path}\033[0m")
     
     try:
         with open(custom_path, 'r') as f:
             custom_data = yaml.safe_load(f)
         
         if custom_data:
-            # 核心步骤：update_config 会递归合并字典
-            # 这里的 custom_data 会覆盖 config 中已有的同名 Key
+            # Core step: update_config will recursively merge dictionaries
+            # Here, custom_data will override existing keys with the same name in config
             update_config(config, custom_data)
         else:
-            print(f"[Config Warning] 文件 {custom_path} 内容为空，跳过加载。")
+            print(f"[Config Warning] File {custom_path} is empty, skipping loading.")
 
     except Exception as e:
-        sys.exit(f"\n[Config Error] 解析 YAML 文件失败: {e}\n")
+        sys.exit(f"\n[Config Error] Failed to parse YAML file: {e}\n")
 
 def validate_genome_version(config: Dict[str, Any], logger = None) -> str:
     """

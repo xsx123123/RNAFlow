@@ -59,3 +59,4 @@ def resolve_reference_paths(config, targets, base_path=None):
 
         if count > 0:
             # logger.success(f"[{version}] 成功更新了 {count} 个文件路径")
+            pass

@@ -52,7 +52,7 @@ rule delivery_report:
         config_path = workflow.source_path(config['parameter']['RNAFlow_Deliver_Tool']['config_path_report']),
         source_dir = config['workflow'],
     log:
-        "logs/delivery.log",
+        "logs/delivery_report.log",
     benchmark:
         "benchmark/delivery_report.txt",
     threads:
