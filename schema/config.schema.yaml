@@ -11,6 +11,14 @@ properties:
     type: "string"
     description: "Genome version to use for analysis"
     enum: ["Lsat_Salinas_v8", "Lsat_Salinas_v11", "ITAG4.1", "TAIR10.1", "GRCm39"]
+  species:
+    type: "string"
+    description: "Species name"
+    minLength: 1
+  client:
+    type: "string"
+    description: "Client information"
+    minLength: 1
   raw_data_path:
     type: "array"
     description: "Paths to raw data directories"
@@ -32,6 +40,15 @@ properties:
   data_deliver:
     type: "string"
     description: "Path to data delivery directory"
+    minLength: 1
+  execution_mode:
+    type: "string"
+    description: "Execution mode for the pipeline"
+    enum: ["local", "cluster"]
+    default: "local"
+  queue_id:
+    type: "string"
+    description: "Queue ID for cluster execution"
     minLength: 1
   Library_Types:
     type: "string"

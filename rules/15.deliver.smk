@@ -54,7 +54,7 @@ rule delivery_report:
     log:
         "logs/delivery.log",
     benchmark:
-        "benchmark/delivery.txt",
+        "benchmark/delivery_report.txt",
     threads:
         config['parameter']['threads']['rnaflow-cli'],
     shell:
@@ -142,7 +142,7 @@ rule Report:
     params:
         data_dir = os.path.join(config['data_deliver'],'report_data','data'),
         Report_dir = os.path.join(config['data_deliver'], "Analysis_Report"),
-        docker_version = workflow.source_path(config['parameter']['Report']['docker_version']),
+        docker_version = config['parameter']['Report']['docker_version'],
     log:
         "logs/Report.log",
     benchmark:

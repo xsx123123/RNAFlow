@@ -19,6 +19,7 @@ parameter:
     gatk: 1
     rmats: 6
     rnaflow-cli: 8
+    Report: 10
   validate_fastq_screen:
     path: ../src/src/fastq_screen/validate_fastq_screen.py
   fastq_screen:
