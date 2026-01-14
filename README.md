@@ -153,7 +153,7 @@ graph TD
     class Conf_Main,Conf_Ref,Conf_Env,Input_Data config;
     class node_QC,node_Map,node_Quant,Mod_DEG,Mod_Var,Mod_Spl,Mod_Fus,Mod_Asm,node_Agg workflow;
     class Action_Init,Action_Inject,Action_Render,Template,Output_Site report;
-    class AI_Router,Model_Doubao,Model_Qwen,Token_Ctrl AI_Engine ai;
+    class AI_Router,Model_Doubao,Model_Qwen,Token_Ctrl,AI_Engine ai;
 ```
 
 ### 🔄 核心数据流说明
