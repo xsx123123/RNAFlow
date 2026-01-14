@@ -68,9 +68,9 @@ rule delivery_report:
 
 rule generate_docker_json:
     input:
-        manifest_json = os.path.join(config['data_deliver'],'delivery_manifest.json'),
-        manifest_md5 = os.path.join(config['data_deliver'],'delivery_manifest.md5'),
-        manifest_log = os.path.join(config['data_deliver'],'delivery_details.log'),
+        manifest_json = os.path.join(config['data_deliver'],'report_data','delivery_manifest.json'),
+        manifest_md5 = os.path.join(config['data_deliver'],'report_data','delivery_manifest.md5'),
+        manifest_log = os.path.join(config['data_deliver'],'report_data','delivery_details.log'),
         sample_sheet = config['sample_csv'],
     output:
         json_file = os.path.join(config['data_deliver'], "report_data/project_summary.json")
@@ -133,6 +133,9 @@ rule Report:
     input:
         DataDeliver(config),
         json_file = os.path.join(config['data_deliver'], "report_data/project_summary.json"),
+        manifest_json = os.path.join(config['data_deliver'],'report_data','delivery_manifest.json'),
+        manifest_md5 = os.path.join(config['data_deliver'],'report_data','delivery_manifest.md5'),
+        manifest_log = os.path.join(config['data_deliver'],'report_data','delivery_details.log'),
     output:
         Report_html =  os.path.join(config['data_deliver'], "Analysis_Report/index.html")
     resources:
