@@ -5,7 +5,7 @@ import os
 
 rule generate_fastq_screen_conf:
     input:
-        template = workflow.source_path("../data/fastq_screen.conf_template")
+        template = workflow.source_path(config['parameter']['validate_fastq_screen']['path_conf']),
     output:
         conf = "01.qc/fastq_screen.conf"
     params:
