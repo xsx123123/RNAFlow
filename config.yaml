@@ -14,7 +14,7 @@ workflow: /data/jzhang/project/Temp/PRJNA1224991_lettcue/01.workflow
 data_deliver: /data/jzhang/project/Temp/PRJNA1224991_lettcue/02.data_deliver
 # wheather run in HPC Cluster
 execution_mode: local #local,cluster
-queue_id: fat_x86
+queue_id: default
 # Fragment Library Types
 Library_Types: fr-firststrand # fr-unstranded,fr-firststrand,fr-secondstrand
 # wheather call variant for RNA-seq

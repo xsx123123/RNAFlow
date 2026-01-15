@@ -18,8 +18,19 @@ def rule_resource(config, profile_name, skip_queue_on_local=False, logger=None):
     queue_name = config.get('queue_id') 
 
     # 2. 获取并校验 Profile
-    cluster_config = config.get('cluster_config', {})
-    resource_profiles = cluster_config.get('resource_profiles', {})
+    cluster_config = config.get('cluster_config')
+    if not cluster_config:
+        error_msg = "Critical Config Error: 'cluster_config' section is missing. Please check your configuration file."
+        if logger:
+            logger.error(error_msg)
+        raise ValueError(error_msg)
+
+    resource_profiles = cluster_config.get('resource_profiles')
+    if not resource_profiles:
+        error_msg = "Critical Config Error: 'resource_profiles' is missing within 'cluster_config'. Please define resource profiles."
+        if logger:
+            logger.error(error_msg)
+        raise ValueError(error_msg)
 
     if profile_name not in resource_profiles:
         available = list(resource_profiles.keys())
@@ -31,9 +42,9 @@ def rule_resource(config, profile_name, skip_queue_on_local=False, logger=None):
     profile = resource_profiles[profile_name].copy()
 
     # 3. 判断运行环境
-    # 使用 get 获取，若不存在则默认为 None 或 'local'/'default' 字符串，避免返回空字典
-    execution_mode = config.get('execution_mode', 'local')
-    current_cluster_name = cluster_config.get('current_cluster', 'default')
+    # 使用 get 获取，若不存在则默认为 None
+    execution_mode = config.get('execution_mode')
+    current_cluster_name = cluster_config.get('queue_id')
     
     # 只要 mode 是 local，或者集群配置是指向 default (通常指本地)，就视为本地执行
     is_local_execution = (execution_mode == 'local') or (current_cluster_name == 'default')
