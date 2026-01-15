@@ -80,4 +80,4 @@ parameter:
     config_path: "../src/src/data-deliver/RNAFlow_Deliver_Tool/config/full_delivery_config.yaml"
     config_path_report: "../src/src/data-deliver/RNAFlow_Deliver_Tool/config/report.yaml"
   Report:
-    docker_version: bioreportrna:v0.0.5
+    docker_version: bioreportrna:v0.0.7
