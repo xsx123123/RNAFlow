@@ -1,0 +1,38 @@
+######################################
+## Bowtie, Bowtie 2, BWA or minimap2 #
+######################################
+#BOWTIE2 bowtie2
+
+############
+## Threads #
+############
+THREADS         16
+
+##############
+## DATABASES #
+##############
+## 所有的路径都将相对于 __FASTQ_SCREEN_DB_PATH__
+DATABASE    Human               __FASTQ_SCREEN_DB_PATH__/bowtie2_hg38_index/hg38_index
+DATABASE    Mouse               __FASTQ_SCREEN_DB_PATH__/bowtie2_GRCm39_index/GRCm39_index
+DATABASE    Ecoli               __FASTQ_SCREEN_DB_PATH__/bowtie2_Escherichia_coli_index/Escherichia_coli_index
+DATABASE    PhiX                __FASTQ_SCREEN_DB_PATH__/bowtie2_phiX174_index/phiX174_index
+DATABASE    Adapters            __FASTQ_SCREEN_DB_PATH__/bowtie2_adapter_index/adapter_index
+DATABASE    Vectors             __FASTQ_SCREEN_DB_PATH__/bowtie2_UniVec_index/UniVec_index
+DATABASE    MG8                 __FASTQ_SCREEN_DB_PATH__/bowtie2_MG8_index/MG8_index
+DATABASE    ASM584v2            __FASTQ_SCREEN_DB_PATH__/bowtie2_ASM584v2_index/ASM584v2_index
+DATABASE    ASM14353v4          __FASTQ_SCREEN_DB_PATH__/bowtie2_ASM14353v4_index/ASM14353v4_index
+DATABASE    Lactuca_sativa_V11  __FASTQ_SCREEN_DB_PATH__/Lactuca_sativa_V11/bowtie2_Lactuca_sativa_V11_index/Lactuca_sativa_V11_index
+DATABASE    Aspsy1              __FASTQ_SCREEN_DB_PATH__/bowtie2_Aspsy1_index/Aspsy1_index
+DATABASE    Penicillium_subrubescens  __FASTQ_SCREEN_DB_PATH__/bowtie2_Penicillium_subrubescens_index/Penicillium_subrubescens_index
+DATABASE    Agrobacterium_vaccinii    __FASTQ_SCREEN_DB_PATH__/bowtie2_Agrobacterium_vaccinii_index/Agrobacterium_vaccinii_index
+DATABASE    Pseudomonas         __FASTQ_SCREEN_DB_PATH__/bowtie2_Pseudomonas_index/Pseudomonas_index
+DATABASE    Streptomyces_clavuligerus __FASTQ_SCREEN_DB_PATH__/bowtie2_Streptomyces_clavuligerus_index/Streptomyces_clavuligerus_index
+DATABASE    Clavibacter_californiensis __FASTQ_SCREEN_DB_PATH__/bowtie2_Clavibacter_californiensis_index/Clavibacter_californiensis_index
+DATABASE    Erwinia_tasmaniensis_Et1_99 __FASTQ_SCREEN_DB_PATH__/bowtie2_Erwinia_tasmaniensis_Et1_99_index/Erwinia_tasmaniensis_Et1_99_index
+DATABASE    Xanthomonas_euvesicatoria_pv.alfalfae __FASTQ_SCREEN_DB_PATH__/bowtie2_Xanthomonas_euvesicatoria_pv.alfalfae_index/Xanthomonas_euvesicatoria_pv.alfalfae_index
+DATABASE    plant_vrius_genome  __FASTQ_SCREEN_DB_PATH__/bowtie2_plant_vrius_genome_index/plant_vrius_genome_index
+DATABASE    Arabidopsis_thaliana __FASTQ_SCREEN_DB_PATH__/bowtie2_Arabidopsis_thaliana_index/Arabidopsis_thaliana_index
+DATABASE    Brassica_napus      __FASTQ_SCREEN_DB_PATH__/bowtie2_Brassica_napus_index/Brassica_napus_index
+DATABASE    Zm-B73-REFERENCE-NAM-5.0 __FASTQ_SCREEN_DB_PATH__/bowtie2_Zm-B73-REFERENCE-NAM-5.0_index/Zm-B73-REFERENCE-NAM-5.0_index
+DATABASE    Tomato              __FASTQ_SCREEN_DB_PATH__/bowtie2_Tomato_index/Tomato_index
+DATABASE    Oryza_sativa        __FASTQ_SCREEN_DB_PATH__/bowtie2_Oryza_sativa.IRGSP_index/Oryza_sativa.IRGSP_index
