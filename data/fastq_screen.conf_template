@@ -21,7 +21,7 @@ DATABASE    Vectors             __FASTQ_SCREEN_DB_PATH__/bowtie2_UniVec_index/Un
 DATABASE    MG8                 __FASTQ_SCREEN_DB_PATH__/bowtie2_MG8_index/MG8_index
 DATABASE    ASM584v2            __FASTQ_SCREEN_DB_PATH__/bowtie2_ASM584v2_index/ASM584v2_index
 DATABASE    ASM14353v4          __FASTQ_SCREEN_DB_PATH__/bowtie2_ASM14353v4_index/ASM14353v4_index
-DATABASE    Lactuca_sativa_V11  __FASTQ_SCREEN_DB_PATH__/Lactuca_sativa_V11/bowtie2_Lactuca_sativa_V11_index/Lactuca_sativa_V11_index
+DATABASE    Lactuca_sativa_V11  __FASTQ_SCREEN_DB_PATH__/bowtie2_Lactuca_sativa_V11_index/Lactuca_sativa_V11_index
 DATABASE    Aspsy1              __FASTQ_SCREEN_DB_PATH__/bowtie2_Aspsy1_index/Aspsy1_index
 DATABASE    Penicillium_subrubescens  __FASTQ_SCREEN_DB_PATH__/bowtie2_Penicillium_subrubescens_index/Penicillium_subrubescens_index
 DATABASE    Agrobacterium_vaccinii    __FASTQ_SCREEN_DB_PATH__/bowtie2_Agrobacterium_vaccinii_index/Agrobacterium_vaccinii_index
