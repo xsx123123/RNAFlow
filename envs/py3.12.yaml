@@ -12,6 +12,7 @@ dependencies:
   - libffi=3.4.6=h2dba641_1
   - libgcc=15.2.0=he0feb66_16
   - libgcc-ng=15.2.0=h69a702a_16
+  - openssl>=3.0
   - libgomp=15.2.0=he0feb66_16
   - liblzma=5.8.1=hb9d3cd8_2
   - libnsl=2.0.1=hb9d3cd8_1
