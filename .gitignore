@@ -2,7 +2,6 @@
 *.rds
 *.RData
 *.h5ad
-*.fa
 *.fasta
 *.fq
 *.fastq
