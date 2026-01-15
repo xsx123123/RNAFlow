@@ -9,7 +9,7 @@ rule generate_fastq_screen_conf:
     output:
         conf = "01.qc/fastq_screen.conf"
     params:
-        db_path = config.get("fastq_screen_db_path", "/data/jzhang/reference/") # Default fallback
+        db_path = config.get("fastq_screen_db_path", "/data/jzhang/reference/"),
     localrule: True
     shell:
         """
