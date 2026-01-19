@@ -88,20 +88,17 @@ rule Report:
         """
         ( 
         # 1. 创建输出目录
-        mkdir -p {params.Report_dir} && \
+        mkdir -p {params.Report_dir} && \\
         
-        # 2. 检查 Docker 镜像逻辑
-        if ! docker image inspect {params.docker_version} >/dev/null 2>&1; then \
-            echo "Docker image {params.docker_version} not found, pulling..." >&2; \
-            docker pull {params.docker_version}; \
-        fi && \
+        # 2. 运行 Apptainer 容器
+        # 使用 docker:// 协议直接加载 Docker 镜像，Apptainer 会自动处理转换和缓存
+        # --cleanenv: 防止主机环境变量污染容器
+        # --bind: 挂载目录 (Apptainer 默认读写挂载)
         
-        # 3. 运行 Docker 容器
-        docker run --rm \
-               --user $(id -u):$(id -g)  \
-               -v {params.data_dir}:/data:rw \
-               -v {input.json_file}:/app/project_summary.json:rw \
-               -v {params.Report_dir}:/workspace/:rw \
-               {params.docker_version} 
+        apptainer run --cleanenv \\
+               --bind {params.data_dir}:/data \\
+               --bind {input.json_file}:/app/project_summary.json \\
+               --bind {params.Report_dir}:/workspace/ \\
+               docker://{params.docker_version}
         ) &>{log}
         """

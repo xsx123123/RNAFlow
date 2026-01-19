@@ -21,7 +21,7 @@ STAR_index:
       genome_gff: Lactuca_sativa_V11_ncbi/GCF_002870075.4_Lsat_Salinas_v11_genomic.gff
       rsem_index: Lactuca_sativa_V11_ncbi/RSEM_Lactuca_sativa_V11_ncbi/Lactuca_sativa_V11_ncbi
       rsem_index_dir: Lactuca_sativa_V11_ncbi/RSEM_Lactuca_sativa_V11_ncbi/
-      bed12: Lactuca_sativa_V11_ncbi/GCF_002870075.4_Lsat_Salinas_v11_genomic.bed12
+      bed12: Lactuca_sativa_V11_ncbi/GCF_002870075.4_Lsat_Salinas_v11_genomic.final.bed12
       go_annotation: Lactuca_sativa_V11_ncbi/GCF_002870075.4-RS_2022_12_gene_ontology.go
       ploidy: 2
     Lsat_Salinas_v8:
