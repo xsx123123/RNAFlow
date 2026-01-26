@@ -382,6 +382,18 @@ python report/bioreport/main.py --input results_dir --output report_dir --ai
 
 ## 📅 开发计划 (Roadmap)
 
+### 云原生参考基因组管理 (Cloud-Native Reference Management)
+采用 **BYOC (Bring Your Own Cloud)** 策略，赋能用户构建属于自己的生物数据中心，实现"无状态迁移" (Stateless Portability)。
+
+1.  **Reference Factory (构建工厂)**:
+    *   提供独立的 Snakemake 构建流程 (`build_reference.smk`)，用户可一键将 FASTA/GTF 转换为 STAR/RSEM 索引。
+    *   **自动云端同步**：支持将构建产物自动推送到**用户配置的**对象存储桶（AWS S3 / Aliyun OSS / 自建 MinIO）。
+    *   **配置自动化**：构建完成后自动生成包含 S3 路径的 `reference.yaml`，实现全组服务器共享一套索引。
+
+2.  **S3 架构原生支持**:
+    *   流程内置对 S3 协议的支持，利用 Snakemake 的 Remote Provider 机制实现 **自动缓存 (Auto-Caching)**。
+    *   **成本可控**：用户完全掌控自己的存储与流量，支持内网部署 MinIO 以零成本实现高速分发。
+
 ### 高级差异分析模块 (Advanced Experimental Design)
 为了支持更复杂的生物学实验设计（如时间序列分析、双因素交互作用），计划在下一版本中对 DEG 模块进行重构，不再局限于简单的两两比较 (Wald test)。
 
@@ -410,6 +422,7 @@ python report/bioreport/main.py --input results_dir --output report_dir --ai
 ### RNAFlow_v0.1.6 (Current)
 - **Feature**: 深度集成 **BioReport v2** 报告系统。
 - **Feature**: 增加规则 `14.Merge_qc` 和 `15.deliver`，实现全流程结果自动化整理。
+- **Feature**: 新增 **Execution Mode** 切换功能 (`run_mode: qc_only`)，支持快速执行质控与比对，便于大规模数据初筛。
 - **Improvement**: 更新 `11.DEG_Enrichments`，整合富集分析逻辑。
 - **Optimization**: 完善 AI 解读引擎的流控与容错机制。
 

@@ -41,11 +41,14 @@ def rule_resource(config, profile_name, skip_queue_on_local=False, logger=None):
 
     profile = resource_profiles[profile_name].copy()
 
-    execution_mode = config.get('execution_mode', {})
-    current_cluster_name = cluster_config.get('current_cluster', {})
+    # 3. 判断运行环境
+    # 使用 get 获取，若不存在则默认为 None
+    execution_mode = config.get('execution_mode')
+    current_cluster_name = cluster_config.get('queue_id')
     
     is_local_execution = (execution_mode == 'local') or (current_cluster_name == 'default')
 
+    # 4. 【关键更新】本地模式下的智能清洗逻辑
     if is_local_execution and skip_queue_on_local:
         if queue_name:
             if logger:
