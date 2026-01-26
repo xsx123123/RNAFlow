@@ -60,7 +60,7 @@ parameter:
   Enrichments:
     PATH: ../src/src/Enrichments/go_enricher.r
     PATH_py: ../src/src/Enrichments/deg_enrich_wrapper.py
-    gene_col: ENSEMBL
+    gene_col: 'Entrez ID'
     gene_regex: gene:/
   qc_rsem_ultimate:
     path: ../src/src/gene_matrix/qc_rsem_ultimate.py

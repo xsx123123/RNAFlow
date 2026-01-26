@@ -41,15 +41,8 @@ def rule_resource(config, profile_name, skip_queue_on_local=False, logger=None):
 
     profile = resource_profiles[profile_name].copy()
 
-<<<<<<< HEAD
     execution_mode = config.get('execution_mode', {})
     current_cluster_name = cluster_config.get('current_cluster', {})
-=======
-    # 3. 判断运行环境
-    # 使用 get 获取，若不存在则默认为 None
-    execution_mode = config.get('execution_mode')
-    current_cluster_name = cluster_config.get('queue_id')
->>>>>>> a377c2d87d6077037484e43892ebf81c823ea160
     
     is_local_execution = (execution_mode == 'local') or (current_cluster_name == 'default')
 
