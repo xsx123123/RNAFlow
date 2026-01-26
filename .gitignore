@@ -13,6 +13,7 @@
 ./Compile_release
 .snakemake
 ./log
+./logs
 *.log
 *.csv
 .gitignore
