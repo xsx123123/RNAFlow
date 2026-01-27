@@ -9,7 +9,7 @@ from rich import print as rich_print
 from utils.datadeliver import qc_clean,mapping,count,Deg,call_variant,noval_Transcripts,rmats
 
 # Target rule function
-def DataDeliver(config: Dict = None, samples: Dict = None, logger) -> List[str]:
+def DataDeliver(config: Dict = None, samples: Dict = None) -> List[str]:
     """
     This function performs Bioinformation analysis on the input configuration
     and returns a list of results.
@@ -77,6 +77,24 @@ def DataDeliver(config: Dict = None, samples: Dict = None, logger) -> List[str]:
     if config.get('print_target'):
         rich_print(data_deliver)
     return data_deliver
+
+def ReportData(config:dict = None) -> List[str]:
+    """
+    quarto rna-seq report data
+    """
+    if config.get('report'):
+        return [
+                os.path.join(config['data_deliver'],'delivery_manifest.json'),
+                os.path.join(config['data_deliver'],'delivery_manifest.md5'),
+                os.path.join(config['data_deliver'],'delivery_details.log'),
+                os.path.join(config['data_deliver'],'report_data/project_summary.json'),
+                os.path.join(config['data_deliver'],'report_data','delivery_manifest.json'),
+                os.path.join(config['data_deliver'],'report_data','delivery_manifest.md5'),
+                os.path.join(config['data_deliver'],'report_data','delivery_details.log'),
+                os.path.join(config['data_deliver'], "Analysis_Report/index.html")
+                ]
+    else:
+        return []
 
 def get_sample_data_dir(sample_id: str = None, config: dict = None) -> str:
     """

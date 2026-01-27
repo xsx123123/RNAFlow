@@ -12,6 +12,7 @@ paired_csv: /data/jzhang/project/Temp/PRJNA1224991_lettcue/01.workflow/contrasts
 workflow: /data/jzhang/project/Temp/PRJNA1224991_lettcue/01.workflow
 # RNAflow Output file
 data_deliver: /data/jzhang/project/Temp/PRJNA1224991_lettcue/02.data_deliver
+# ---------------------------------------------------------------------- #
 # wheather run in HPC Cluster
 execution_mode: local #local,cluster
 queue_id: default
@@ -19,6 +20,8 @@ queue_id: default
 Library_Types: fr-firststrand # fr-unstranded,fr-firststrand,fr-secondstrand
 # only run QC for RNA-seq
 only_qc: true
+# wheather generate HTML report for RNA-seq
+report: true
 # wheather deg for RNA-seq
 deg: true
 # wheather fastq_screen for RNA-seq

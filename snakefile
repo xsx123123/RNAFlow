@@ -8,7 +8,7 @@ import os
 from snakemake.utils import min_version, validate
 
 # ------- Import Custom Modules ------- #
-from rules.utils.id_convert import load_samples, load_contrasts
+from rules.utils.id_convert import load_samples,load_contrasts
 from rules.utils.validate import check_reference_paths,load_user_config,validate_genome_version
 from rules.utils.reference_update import resolve_reference_paths
 from rules.utils.resource_manager import rule_resource
@@ -67,12 +67,5 @@ include: 'rules/16.Report.smk'
 # --------- 5. Target Rule --------- #
 rule all:
     input:
-        DataDeliver(config=config),
-        os.path.join(config['data_deliver'],'delivery_manifest.json'),
-        os.path.join(config['data_deliver'],'delivery_manifest.md5'),
-        os.path.join(config['data_deliver'],'delivery_details.log'),
-        os.path.join(config['data_deliver'], "report_data/project_summary.json"),
-        os.path.join(config['data_deliver'],'report_data','delivery_manifest.json'),
-        os.path.join(config['data_deliver'],'report_data','delivery_manifest.md5'),
-        os.path.join(config['data_deliver'],'report_data','delivery_details.log'),
-        os.path.join(config['data_deliver'], "Analysis_Report/index.html"),
+        DataDeliver(config=config,samples = samples),
+        ReportData(config=config),
