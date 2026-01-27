@@ -10,8 +10,8 @@ rule STAR_mapping:
         r1 = "01.qc/short_read_trim/{sample}.R1.trimed.fq.gz",
         r2 = "01.qc/short_read_trim/{sample}.R2.trimed.fq.gz",
     output:
-        Aligned_bam =  '02.mapping/STAR/{sample}/{sample}.Aligned.sortedByCoord.out.bam',
-        Transcriptome_bam = '02.mapping/STAR/{sample}/{sample}.Aligned.toTranscriptome.out.bam',
+        Aligned_bam =  temp('02.mapping/STAR/{sample}/{sample}.Aligned.sortedByCoord.out.bam'),
+        Transcriptome_bam = temp('02.mapping/STAR/{sample}/{sample}.Aligned.toTranscriptome.out.bam'),
         log_final = '02.mapping/STAR/{sample}/{sample}.Log.final.out',
     resources:
         **rule_resource(config, 'high_resource',  skip_queue_on_local=True,logger = logger),
@@ -86,7 +86,6 @@ rule sort_index:
         Aligned_bam = '02.mapping/STAR/{sample}/{sample}.Aligned.sortedByCoord.out.bam',
         Transcriptome_bam = '02.mapping/STAR/{sample}/{sample}.Aligned.toTranscriptome.out.bam',
     output:
-        rename_bam = '02.mapping/STAR/sort_index/{sample}.bam',
         sort_bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
         sort_bam_bai = '02.mapping/STAR/sort_index/{sample}.sort.bam.bai',
     resources:
@@ -103,9 +102,38 @@ rule sort_index:
         config['parameter']['threads']['samtools'],
     shell:
         """
-        (ln -s -r {input.Aligned_bam} {output.rename_bam} &&
-        samtools sort -@ {threads} -o {output.sort_bam} {output.rename_bam} &&
+        (ln -s -r {input.Aligned_bam} {output.sort_bam} &&
         samtools index -@ {threads} {output.sort_bam})  &>{log}
+        """
+
+rule estimate_library_complexity:
+    """
+    Estimate library complexity using Preseq
+    """
+    input:
+        sort_bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
+        sort_bam_bai = '02.mapping/STAR/sort_index/{sample}.sort.bam.bai',
+    output:
+        preseq = '02.mapping/preseq/{sample}.lc_extrap.txt',
+        c_curve = '02.mapping/preseq/{sample}.c_curve.txt',
+    resources:
+        **rule_resource(config, 'low_resource', skip_queue_on_local=True, logger=logger),
+    conda:
+        workflow.source_path("../envs/Preseq.yaml"),
+    message:
+        "Running Preseq for {wildcards.sample}",
+    log:
+        "logs/02.mapping/preseq_{sample}.log",
+    benchmark:
+        "benchmarks/{sample}_preseq_benchmark.txt",
+    threads:
+        1
+    shell:
+        """
+        exec 2> {log}
+        set -x
+        preseq lc_extrap -pe -v -output {output.preseq} -B {input.sort_bam}
+        preseq c_curve -pe -v -output {output.c_curve} -B  {input.sort_bam}
         """
 
 rule qualimap_qc:
@@ -197,6 +225,33 @@ rule samtools_stats:
                  {input.bam} > {output.samtools_stats}  2>{log}
         """
 
+rule bam2carm:
+    input:
+        bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
+        bai = '02.mapping/STAR/sort_index/{sample}.sort.bam.bai'
+    output:
+        carm = '02.mapping/carm/{sample}.carm',
+        carm_index = '02.mapping/carm/{sample}.carm.crai',
+    resources:
+        **rule_resource(config, 'medium_resource',  skip_queue_on_local=True,logger = logger),
+    conda:
+        workflow.source_path("../envs/bwa2.yaml"),
+    message:
+        "Running bam compress of BAM : {input.bam}",
+    log:
+        "logs/02.mapping/bam_dup_stats_{sample}.log",
+    benchmark:
+        "benchmarks/{sample}_Dup_bam_stats_benchmark.txt",
+    threads:
+        config['parameter']['threads']['bam2carm'],
+    params:
+        reference = config['STAR_index'][config['Genome_Version']]['genome_fa'],
+    shell:
+        """
+        samtools view -@ {threads} -C -T {params.reference} -o {output.cram} {input.bam}
+        samtools index  -@ {threads} {output.cram}
+        """
+
 rule bamCoverage:
     input:
         bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
@@ -238,6 +293,8 @@ rule mapping_report:
         qualimap_report_txt = expand('02.mapping/qualimap_report/{sample}/genome_results.txt',sample=samples.keys()),
         samtools_flagstat = expand('02.mapping/samtools_flagstat/{sample}_bam_flagstat.tsv',sample=samples.keys()),
         samtools_stats = expand('02.mapping/samtools_stats/{sample}_bam_stats.tsv',sample=samples.keys()),
+        preseq = expand('02.mapping/preseq/{sample}.lc_extrap.txt',sample=samples.keys()),
+        c_curve = expand('02.mapping/preseq/{sample}.c_curve.txt',sample=samples.keys()),
     output:
         report = "02.mapping/mapping_report/multiqc_mapping_report.html",
     resources:

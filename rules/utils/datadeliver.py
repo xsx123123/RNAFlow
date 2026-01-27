@@ -65,7 +65,10 @@ def mapping(samples: Dict = None, data_deliver: List = None, config: Dict = None
     data_deliver.extend(expand("02.mapping/samtools_stats/{sample}_bam_stats.tsv", sample=samples.keys()))
     data_deliver.extend(expand("02.mapping/qualimap_report/{sample}/qualimapReport.html", sample=samples.keys()))
     data_deliver.extend(expand("02.mapping/qualimap_report/{sample}/genome_results.txt", sample=samples.keys()))
-
+    data_deliver.extend(expand("02.mapping/preseq/{sample}.lc_extrap.txt", sample=samples.keys()))
+    data_deliver.extend(expand("02.mapping/preseq/{sample}.c_curve.txt", sample=samples.keys()))
+    data_deliver.extend(expand('02.mapping/carm/{sample}.carm',sample=samples.keys()))
+    data_deliver.extend(expand('02.mapping/carm/{sample}.carm.crai',sample=samples.keys()))
     # bamcoverage - need to handle config parameter properly
     normalize_method = config.get('parameter', {}).get('bamCoverage', {}).get('normalizeUsing', 'RPKM')
     # Create file paths dynamically since expand doesn't support variable substitution in the middle of the string
@@ -203,8 +206,12 @@ def rmats(samples: Dict = None, data_deliver: List = None, all_contrasts: List =
     data_deliver.extend(expand("07.AS/rmats_single/{sample}/SE.MATS.JC.txt", sample=samples.keys()))
     data_deliver.extend(expand("07.AS/rmats_single/{sample}/MXE.MATS.JC.txt", sample=samples.keys()))
     data_deliver.extend(expand("07.AS/rmats_single/{sample}/summary.txt", sample=samples.keys()))
+    data_deliver.append("07.AS/rmats_single/rmats_detail.txt")
+    data_deliver.append("07.AS/rmats_single/rmats_summary.txt")
     # rmats pair sample
     if all_contrasts:  # Only add contrast-related outputs if contrasts are provided
         data_deliver.extend(expand("07.AS/rmats_pair/{contrast}/summary.txt", contrast=all_contrasts))
         data_deliver.extend(expand("07.AS/rmats_pair/{contrast}/SE.MATS.JC.txt", contrast=all_contrasts))
+        data_deliver.append("07.AS/rmats_pair/rmats_detail.txt")
+        data_deliver.append("07.AS/rmats_pair/rmats_summary.txt")
     return data_deliver

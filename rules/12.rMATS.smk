@@ -118,6 +118,33 @@ rule rmats_run:
             > {log} 2>&1
         """
 
+rule merge_rmats:
+    input:
+        summary = expand("07.AS/rmats_pair/{contrast}/summary.txt", contrast=all_contrasts),
+        SE_MATS_JC = expand("07.AS/rmats_pair/{contrast}/SE.MATS.JC.txt", contrast=all_contrasts),
+    output:
+        detail = "07.AS/rmats_pair/rmats_detail.txt",
+        sumarry = "07.AS/rmats_pair/rmats_summary.txt",
+    resources:
+        **rule_resource(config, 'high_resource',  skip_queue_on_local=True,logger = logger),
+    params:
+        rmats_dir = '07.AS/rmats_pair/'
+        path = workflow.source_path(config['parameter']['rmats_summary']['path']),
+    threads: 
+        config['parameter']['threads']['rmats']
+    conda:
+        workflow.source_path("../envs/python3.yaml")
+    log:
+        "logs/07.AS/rmats_pair/rmats_{contrast}.log"
+    benchmark:
+        "benchmarks/rmats_pair_{contrast}.txt"
+    shell:
+        """
+        chmod +x {params.path}
+        python3 {params.path} -i {params.rmats_dir}  --mode summary  -o  {output.sumarry} &>{log}
+        python3 {params.path} -i {params.rmats_dir}  --mode details  -o  {output.detail} &>{log}
+        """
+    
 rule rmats_single_run:
     input:
         bam = "02.mapping/STAR/sort_index/{sample}.sort.bam",
@@ -170,3 +197,31 @@ rule rmats_single_run:
             --nthread {threads} \
             > {log} 2>&1
         """
+
+rule merge_rmats_single:
+    input:
+        summary = "07.AS/rmats_single/{sample}/summary.txt",
+        se = "07.AS/rmats_single/{sample}/SE.MATS.JC.txt",
+    output:
+        detail = "07.AS/rmats_single/rmats_detail.txt",
+        sumarry = "07.AS/rmats_single/rmats_summary.txt",
+    resources:
+        **rule_resource(config, 'high_resource',  skip_queue_on_local=True,logger = logger),
+    params:
+        rmats_dir = '07.AS/rmats_single/'
+        path = workflow.source_path(config['parameter']['rmats_summary']['path']),
+    threads: 
+        config['parameter']['threads']['rmats']
+    conda:
+        workflow.source_path("../envs/python3.yaml")
+    log:
+        "logs/07.AS/rmats_single/rmats_{sample}.log"
+    benchmark:
+        "benchmarks/rmats_single_{sample}.txt"
+    shell:
+        """
+        chmod +x {params.path}
+        python3 {params.path} -i {params.rmats_dir}  --mode summary  -o  {output.sumarry} &> {log}
+        python3 {params.path} -i {params.rmats_dir}  --mode details  -o  {output.detail} &> {log}
+        """
+# ----- rule ----- #
