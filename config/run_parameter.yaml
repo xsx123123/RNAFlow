@@ -24,7 +24,6 @@ parameter:
     path: ../src/src/fastq_screen/validate_fastq_screen.py
     path_conf: ../data/fastq_screen.conf_template
   fastq_screen:
-    run: true
     path: ../src/src/fastq_screen/fastq_screen
     dir: ../src/src/fastq_screen/
     conf: ../src/src/fastq_screen/fastq_screen.conf

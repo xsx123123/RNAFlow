@@ -67,6 +67,10 @@ properties:
     type: "boolean"
     description: "Whether to run rmats analysis"
     default: true
+  deg:
+    type: "boolean"
+    description: "Whether to run deg analysis"
+    default: true
   parameter:
     type: "object"
     description: "Software parameters configuration"

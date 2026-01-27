@@ -17,6 +17,12 @@ execution_mode: local #local,cluster
 queue_id: default
 # Fragment Library Types
 Library_Types: fr-firststrand # fr-unstranded,fr-firststrand,fr-secondstrand
+# only run QC for RNA-seq
+only_qc: true
+# wheather deg for RNA-seq
+deg: true
+# wheather fastq_screen for RNA-seq
+fastq_screen: true
 # wheather call variant for RNA-seq
 call_variant: true
 # Detech Noval Transcripts by stringtie
