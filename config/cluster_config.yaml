@@ -1,3 +1,24 @@
+# RNAFlow Pipeline - Cluster Resource Configuration
+#
+# This file defines standardized resource profiles for different computational tasks
+# in the RNA-seq analysis pipeline. These profiles are used when running Snakemake
+# with cluster execution (e.g., --executor slurm, --executor pbs).
+#
+# Each resource profile specifies:
+# - threads: Number of CPU cores to allocate
+# - mem_mb: Memory allocation in megabytes
+# - runtime: Maximum job runtime in minutes
+# - queue_type: Target queue/partition for job submission
+#
+# Resource Profile Guidelines:
+# - low_resource: Basic QC tasks, lightweight processing (FastQC, MultiQC, etc.)
+# - medium_resource: Moderate computational tasks (alignment post-processing, variant calling)
+# - high_resource: Heavy computational tasks (STAR alignment, RSEM quantification, assembly)
+# - very_high_resource: Extremely resource-intensive tasks (large genome indexing, complex analyses)
+#
+# Note: Adjust memory and thread values based on your cluster's available resources
+# and typical job requirements for your specific use cases.
+
 cluster_config:
   resource_profiles:
     low_resource:

@@ -1,85 +1,154 @@
-# software parameter
+# RNAFlow Pipeline - Runtime Parameter Configuration
+#
+# This file contains detailed runtime parameters for individual pipeline tools and modules.
+# It defines software-specific settings, thread allocations, quality thresholds, and
+# other configurable parameters that control the behavior of each analysis step.
+#
+# Key Configuration Sections:
+# - threads: CPU thread allocation for each tool/module
+# - software_paths: Paths to custom scripts and executables
+# - tool_parameters: Tool-specific configuration parameters and thresholds
+# - analysis_settings: Biological/analysis-specific parameters (e.g., ploidy, filtering thresholds)
+#
+# Note: These parameters should be adjusted based on your specific experimental design,
+# data quality, and computational resources. Default values are optimized for typical
+# RNA-seq experiments but may need tuning for specific use cases.
+
+# Runtime Parameters Configuration
 parameter:
+  # Thread Allocation for Pipeline Tools
+  # Number of CPU threads to allocate for each computational tool
   threads:
-    json_md5_verifier: 40   
-    fastqc: 1
-    fastp: 8
-    multiqc: 1
-    fastq_screen: 10
-    STAR_INDEX: 40
-    STAR_MAPPING: 16
-    samtools: 10
-    samtools_flagstat: 10
-    samtools_stats: 10
-    qualimap: 10
-    RSEM_INDEX: 20
-    rsem-calculate: 20
-    bam2cram: 10
-    bamCoverage: 20
-    stringtie: 16
-    gatk: 1
-    rmats: 6
-    rnaflow-cli: 8
-    Report: 10
+    json_md5_verifier: 40    # MD5 verification (I/O intensive)
+    fastqc: 1               # FastQC (single-threaded by design)
+    fastp: 8                # Fastp adapter trimming and quality filtering
+    multiqc: 1              # MultiQC report generation (single-threaded)
+    fastq_screen: 10        # Fastq_screen contamination screening
+    STAR_INDEX: 40          # STAR index building (very resource intensive)
+    STAR_MAPPING: 16        # STAR alignment (memory and CPU intensive)
+    samtools: 10            # Samtools operations (sorting, indexing, etc.)
+    samtools_flagstat: 10   # Samtools flagstat statistics
+    samtools_stats: 10      # Samtools comprehensive statistics
+    qualimap: 10            # Qualimap BAM quality control
+    RSEM_INDEX: 20          # RSEM index building
+    rsem-calculate: 20      # RSEM expression quantification
+    bam2cram: 10            # BAM to CRAM compression
+    bamCoverage: 20         # BigWig coverage track generation
+    stringtie: 16           # StringTie transcript assembly
+    gatk: 1                 # GATK variant calling (Java-based, memory managed separately)
+    rmats: 6                # rMATS alternative splicing analysis
+    rnaflow-cli: 8          # RNAFlow delivery tool
+    Report: 10              # Containerized report generation
+
+  # FastQ Screen Configuration
+  # Parameters for contamination screening using fastq_screen
   validate_fastq_screen:
-    path: ../src/src/fastq_screen/validate_fastq_screen.py
-    path_conf: ../data/fastq_screen.conf_template
+    path: ../src/src/fastq_screen/validate_fastq_screen.py    # Validation script path
+    path_conf: ../data/fastq_screen.conf_template             # Template configuration file
   fastq_screen:
-    path: ../src/src/fastq_screen/fastq_screen
-    dir: ../src/src/fastq_screen/
-    conf: ../src/src/fastq_screen/fastq_screen.conf
-    subset: 100000
-    aligner: Bowtie2
+    path: ../src/src/fastq_screen/fastq_screen               # Fastq_screen executable
+    dir: ../src/src/fastq_screen/                            # Fastq_screen directory
+    conf: ../src/src/fastq_screen/fastq_screen.conf          # Configuration file
+    subset: 100000          # Number of reads to sample for screening (performance optimization)
+    aligner: Bowtie2        # Alignment tool to use (Bowtie2 or BWA)
+
+  # RSEM Expression Matrix Configuration
+  # Parameters for merging individual RSEM results into expression matrices
   merge_rsem:
-    path: ../src/src/gene_matrix/merge_rsem.py
-    extension: .genes.results
+    path: ../src/src/gene_matrix/merge_rsem.py               # Merge script path
+    extension: .genes.results                                # File extension for RSEM output
+
+  # StringTie Assembly Parameters
+  # Quality filtering thresholds for transcript assembly
   stringtie:
-    min_length: 200      # 最小转录本长度 (植物lncRNA通常>200)
-    min_cov: 5           # 最小覆盖度
-    min_fpkm: 1.0        # 最小 FPKM (过滤低表达噪音)
+    min_length: 200         # Minimum transcript length in bp (plant lncRNA typically >200bp)
+    min_cov: 5              # Minimum read coverage required for transcript inclusion
+    min_fpkm: 1.0           # Minimum FPKM threshold to filter low-expression noise
+
+  # STAR Aligner Configuration
+  # Platform-specific settings for STAR alignment
   STAR:
-    PL: ILUMINA
+    PL: ILUMINA             # Sequencing platform (ILUMINA, IONTORRENT, etc.)
+
+  # Qualimap Quality Control Settings
+  # Parameters for BAM quality assessment using Qualimap
   qualimap:
-    format: HTML
-    mem: 20000M
+    format: HTML            # Output format for Qualimap reports
+    mem: 20000M             # Java memory allocation for Qualimap
+
+  # Coverage Track Generation Parameters
+  # Settings for generating normalized coverage tracks (BigWig files)
   bamCoverage:
-    binSize: 10
-    smoothLength: 14
-    normalizeUsing: RPKM # RPKM,CPM,BPM,RPGC
+    binSize: 10             # Bin size in bp for coverage calculation
+    smoothLength: 14        # Smoothing window size in bp
+    normalizeUsing: RPKM    # Normalization method (RPKM, CPM, BPM, RPGC)
+
+  # GATK Variant Calling Filters
+  # RNA-seq specific filtering thresholds for variant calling
   gatk:
     filter:
       rna_seq:
-        window_size: 35        # 窗口大小
-        cluster_size: 3        # 集群数量阈值
-        fs_threshold: 30.0     # Fisher Strand 阈值 (RNA建议30, DNA建议60)
-        qd_threshold: 2.0      # Quality by Depth 阈值
+        window_size: 35       # Sliding window size for cluster detection
+        cluster_size: 3       # Minimum number of variants in cluster to trigger filtering
+        fs_threshold: 30.0    # Fisher Strand bias threshold (RNA-seq: 30, DNA-seq: 60)
+        qd_threshold: 2.0     # Quality by Depth threshold for variant filtering
+
+  # Differential Expression Analysis Settings
+  # Parameters for DESeq2 differential expression analysis
   DEG:
-    PATH: ../src/src/DEG/run_deseq2.r
-    LFC: 1
-    PVAL: 0.05
+    PATH: ../src/src/DEG/run_deseq2.r    # DESeq2 R script path
+    LFC: 1                  # Log2 Fold Change threshold for significance
+    PVAL: 0.05              # Adjusted p-value threshold for significance
+
+  # Functional Enrichment Analysis Configuration
+  # Settings for Gene Ontology and pathway enrichment analysis
   Enrichments:
-    PATH: ../src/src/Enrichments/go_enricher.r
-    PATH_py: ../src/src/Enrichments/deg_enrich_wrapper.py
-    gene_col: 'Entrez ID'
-    gene_regex: gene:/
+    PATH: ../src/src/Enrichments/go_enricher.r              # GO enrichment R script
+    PATH_py: ../src/src/Enrichments/deg_enrich_wrapper.py   # Python wrapper script
+    gene_col: 'Entrez ID'   # Column name containing gene identifiers in DEG results
+    gene_regex: gene:/      # Regular expression pattern for extracting gene IDs
+
+  # RSEM Quality Control Parameters
+  # Settings for RSEM result validation and quality assessment
   qc_rsem_ultimate:
-    path: ../src/src/gene_matrix/qc_rsem_ultimate.py
+    path: ../src/src/gene_matrix/qc_rsem_ultimate.py        # QC script path
+
+  # Expression Distribution Visualization
+  # Parameters for gene expression distribution plots
   Distribution:
-    path:  ../src/src/DEG/run_dist.r
-    width: 10
-    height: 11
+    path:  ../src/src/DEG/run_dist.r                        # Distribution plotting script
+    width: 10               # Plot width in inches
+    height: 11              # Plot height in inches
+
+  # Heatmap Visualization Settings
+  # Parameters for expression heatmap generation
   Heatmap:
-    path:  ../src/src/DEG/run_pheatmap.r
+    path:  ../src/src/DEG/run_pheatmap.r                    # Heatmap plotting script
+
+  # rMATS Alternative Splicing Configuration
+  # Parameters for alternative splicing analysis using rMATS
   rmats:
-    readLength: 125
+    readLength: 125         # Expected read length for splicing analysis
+
+  # rMATS Result Aggregation
+  # Script for merging and summarizing rMATS results across samples/contrasts
   rmats_summary:
-    path: ../src/src/rMATS/merge_rmats_summary.py
+    path: ../src/src/rMATS/merge_rmats_summary.py           # Summary script path
+
+  # Read Trimming and Quality Filtering
+  # Parameters for adapter trimming and quality filtering with Fastp
   trim:
-    length_required: 75
-    quality_threshold: 25
-    adapter_fasta: "../data/Universal_Adapter.fa"
+    length_required: 75     # Minimum read length after trimming (discards shorter reads)
+    quality_threshold: 25   # Phred quality score threshold for base trimming
+    adapter_fasta: "../data/Universal_Adapter.fa"           # Custom adapter sequences file
+
+  # Data Delivery Configuration
+  # Settings for the RNAFlow data delivery and organization system
   RNAFlow_Deliver_Tool:
     config_path: "../src/src/data-deliver/RNAFlow_Deliver_Tool/config/full_delivery_config.yaml"
     config_path_report: "../src/src/data-deliver/RNAFlow_Deliver_Tool/config/report.yaml"
+
+  # Final Report Generation Settings
+  # Configuration for the containerized Quarto reporting system
   Report:
-    docker_version: bioreportrna:v0.0.7
+    docker_version: bioreportrna:v0.0.7    # Docker image version for report generation

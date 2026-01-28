@@ -1,18 +1,42 @@
-# softeware path
+# RNAFlow Pipeline - Core Configuration File
+#
+# This file contains the main pipeline configuration parameters that control
+# the overall behavior and execution of the RNA-seq analysis workflow.
+#
+# Key Configuration Sections:
+# - software: Paths to custom/compiled executables and scripts
+# - raw_data: Raw data processing parameters and file naming conventions
+# - pipeline_control: Global pipeline execution flags and settings
+# - output_settings: Output directory structure and file naming preferences
+#
+# Note: This file should be customized for each project run. For reference genome
+# paths, library types, and other reference-specific settings, see the
+# reference.yaml and run_parameter.yaml files.
+
+# Software Paths
+# Paths to custom compiled executables and Python scripts used by the pipeline
 software:
   json_md5_verifier: ../src/src/md5/Compile_release/json_md5_verifier_x86_64/release/json_md5_verifier
   seq_preprocessor: ../src/src/md5/Compile_release/seq_preprocessor_x86_64/release/seq_preprocessor
   check_libtype: ../src/src/library_type/check_libtype.py
-# md5
+
+# Raw Data Configuration
+# Settings related to raw sequencing data processing and file handling
 raw_data:
-  md5: 'md5.txt'
-# Other parameter
-print_target: false
-print_sample: false
-log_level: INFO
-bam_remove: true
-convert_md5: 'link_dir'
-r1_suffix: _R1.fq.g【z
-r2_suffix: _R2.fq.gz
-md5: MD5.txt
-pipeline_version: "RNAFlow v0.1.6"
+  md5: 'md5.txt'  # Name of the MD5 checksum file for raw data validation
+
+# Pipeline Control Flags
+# Global boolean flags that control pipeline execution behavior
+print_target: false    # Print target files list instead of executing (debug mode)
+print_sample: false    # Print sample information during execution (debug mode)
+log_level: INFO        # Logging verbosity level (DEBUG, INFO, WARNING, ERROR)
+bam_remove: true       # Remove intermediate BAM files to save disk space
+only_qc: false         # Run only QC analysis (raw data QC, mapping, counting)
+
+# Output and File Naming Configuration
+# Settings that control output directory structure and file naming conventions
+convert_md5: 'link_dir'     # Directory name for symbolic links to raw data
+r1_suffix: _R1.fq.gz        # File suffix for R1 (forward) reads
+r2_suffix: _R2.fq.gz        # File suffix for R2 (reverse) reads
+md5: MD5.txt                # MD5 checksum filename for processed data
+pipeline_version: "RNAFlow v0.1.7"  # Pipeline version for reproducibility tracking

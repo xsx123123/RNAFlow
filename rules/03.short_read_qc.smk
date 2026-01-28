@@ -1,8 +1,50 @@
-#!/usr/bin/snakemake
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+RNAFlow Pipeline - Short Read Quality Control Module
+
+This module performs comprehensive quality control analysis on raw sequencing reads
+using FastQC and MultiQC. The analysis is performed separately on R1 and R2 reads
+to provide detailed insights into read quality, adapter contamination, sequence
+bias, and other quality metrics.
+
+Key Components:
+- short_read_qc_r1/r2: Individual FastQC analysis for R1 and R2 reads
+- short_read_multiqc_r1/r2: Aggregation of FastQC results using MultiQC
+
+The quality control results serve as the foundation for downstream analysis decisions,
+including adapter trimming, quality filtering, and assessment of overall data quality.
+Poor quality metrics can indicate issues with library preparation, sequencing runs,
+or sample quality that may require troubleshooting or exclusion from further analysis.
+"""
+
 import os
-# ----- rule ----- #
+
+
 rule short_read_qc_r1:
+    """
+    Perform comprehensive quality control analysis on R1 reads using FastQC.
+
+    This rule runs FastQC on the R1 (forward) reads to generate detailed quality
+    metrics including:
+    - Per base sequence quality
+    - Per sequence quality scores
+    - Per base sequence content
+    - Per sequence GC content
+    - Sequence length distribution
+    - Sequence duplication levels
+    - Overrepresented sequences
+    - Adapter content
+
+    FastQC provides both HTML reports for visual inspection and ZIP files containing
+    raw data tables for programmatic analysis. The MD5 check dependency ensures that
+    only validated, uncorrupted data is processed.
+
+    Quality metrics from this analysis inform downstream decisions about:
+    - Whether adapter trimming is necessary
+    - Appropriate quality filtering thresholds
+    - Potential issues with library preparation or sequencing
+    """
     input:
         md5_check = "01.qc/md5_check.tsv",
         link_r1_dir = os.path.join("00.raw_data",
@@ -24,7 +66,7 @@ rule short_read_qc_r1:
         "Running FastQC on {wildcards.sample} r1",
     benchmark:
         "benchmarks/{sample}_r1_fastqc_benchmark.txt",
-    threads: 
+    threads:
         config['parameter']['threads']['fastqc'],
     shell:
         """
@@ -34,6 +76,22 @@ rule short_read_qc_r1:
         """
 
 rule short_read_qc_r2:
+    """
+    Perform comprehensive quality control analysis on R2 reads using FastQC.
+
+    This rule runs FastQC on the R2 (reverse) reads, providing the same comprehensive
+    quality metrics as the R1 analysis but specific to the reverse reads. In paired-end
+    sequencing, R2 reads often show different quality patterns compared to R1 reads,
+    particularly in terms of quality degradation towards the end of reads.
+
+    Comparing R1 and R2 quality metrics helps identify:
+    - Asymmetric quality degradation between read pairs
+    - Differences in adapter contamination patterns
+    - Potential issues with reverse read sequencing chemistry
+
+    Like the R1 analysis, this generates both HTML and ZIP output formats for flexible
+    downstream analysis and reporting.
+    """
     input:
         md5_check = "01.qc/md5_check.tsv",
         link_r2_dir = os.path.join("00.raw_data",
@@ -64,8 +122,23 @@ rule short_read_qc_r2:
                --threads {threads} &> {log.r2}
         """
 
-# logger.info('Run MultiQC to summarize R1 fastqc QC reports')
 rule short_read_multiqc_r1:
+    """
+    Aggregate R1 FastQC quality control reports across all samples using MultiQC.
+
+    This rule collects FastQC results from all samples for R1 reads and generates
+    a comprehensive HTML report that enables cross-sample comparison of quality
+    metrics. MultiQC provides interactive plots and summary statistics that help
+    identify:
+    - Consistent quality issues across all samples
+    - Outlier samples with poor quality metrics
+    - Batch effects or technical artifacts
+    - Overall data quality trends
+
+    The aggregated report is essential for quality assurance and provides a single
+    dashboard for assessing the quality of all R1 reads in the experiment before
+    proceeding to downstream analysis.
+    """
     input:
         fastqc_files_r1 = expand("01.qc/short_read_qc_r1/{sample}_R1_fastqc.zip", sample=samples.keys()),
     output:
@@ -96,8 +169,23 @@ rule short_read_multiqc_r1:
                 -n {params.report} &> {log}
         """
 
-# logger.info('Run MultiQC to summarize R2 fastqc QC reports')
 rule short_read_multiqc_r2:
+    """
+    Aggregate R2 FastQC quality control reports across all samples using MultiQC.
+
+    Similar to the R1 aggregation, this rule creates a comprehensive MultiQC report
+    for all R2 reads across samples. Having separate R1 and R2 MultiQC reports allows
+    for detailed comparison of quality patterns between forward and reverse reads.
+
+    This report is particularly useful for:
+    - Identifying asymmetric quality issues between read pairs
+    - Assessing whether R2-specific problems exist (e.g., worse quality in R2)
+    - Comparing adapter contamination patterns between R1 and R2
+    - Validating that both read directions meet quality standards
+
+    The R2 MultiQC report complements the R1 report to provide a complete picture
+    of raw data quality for paired-end sequencing experiments.
+    """
     input:
         fastqc_files_r2 = expand("01.qc/short_read_qc_r2/{sample}_R2_fastqc.zip", sample=samples.keys()),
     output:

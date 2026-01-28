@@ -1,8 +1,46 @@
 #!/usr/bin/snakemake
 # -*- coding: utf-8 -*-
+"""
+RNAFlow Pipeline - Alternative Splicing Analysis Module
+
+This module implements comprehensive alternative splicing (AS) analysis using rMATS
+(replicate Multivariate Analysis of Transcript Splicing), a powerful tool for
+detecting and quantifying differential alternative splicing events from RNA-seq data.
+
+Key Components:
+- Library strandness detection: Determines library preparation protocol
+- rmats_run: Paired-sample differential splicing analysis between experimental conditions
+- rmats_single_run: Single-sample splicing event detection for individual samples
+- Result merging and summarization: Aggregates results across contrasts and samples
+
+The pipeline supports detection of five major types of alternative splicing events:
+- Skipped Exon (SE)
+- Mutually Exclusive Exons (MXE)
+- Alternative 5' Splice Site (A5SS)
+- Alternative 3' Splice Site (A3SS)
+- Retained Intron (RI)
+
+Both paired (differential) and single-sample analyses are supported, enabling comprehensive
+characterization of splicing patterns in the transcriptome.
+"""
+
 def get_contrast_bams(wildcards):
     """
     根据 wildcards.contrast 从字典中取回 {'b1': [...], 'b2': [...]}
+
+    This helper function retrieves the BAM file lists for two experimental groups
+    based on the contrast identifier. It uses the global CONTRAST_MAP dictionary
+    which maps contrast names to sample groupings defined in the pipeline configuration.
+
+    Args:
+        wildcards: Snakemake wildcards object containing the 'contrast' identifier
+
+    Returns:
+        dict: Dictionary with 'b1' and 'b2' keys containing lists of BAM file paths
+              for the two comparison groups
+
+    Raises:
+        ValueError: If the specified contrast is not found in CONTRAST_MAP
     """
     if wildcards.contrast not in CONTRAST_MAP:
         raise ValueError(f"Unknown contrast: {wildcards.contrast}")
@@ -13,7 +51,7 @@ def get_contrast_bams(wildcards):
 #        gtf = config['STAR_index'][config['Genome_Version']]['genome_gtf'],
 #    output:
 #        bed12 = config['STAR_index'][config['Genome_Version']]['bed12'],
-#    threads: 
+#    threads:
 #        1
 #    conda:
 #        workflow.source_path("../envs/rseqc.yaml"),
@@ -28,6 +66,23 @@ def get_contrast_bams(wildcards):
 #        """
 
 rule infer_experiment:
+    """
+    Determine RNA-seq library strandness using RSeQC's infer_experiment tool.
+
+    Library strandness is crucial for accurate alternative splicing analysis as it
+    affects how reads are interpreted relative to gene orientation. This rule uses
+    RSeQC's infer_experiment.py to analyze the alignment patterns of reads against
+    known gene annotations to determine whether the library is:
+    - Unstranded (fr-unstranded)
+    - Stranded forward (fr-firststrand)
+    - Stranded reverse (fr-secondstrand)
+
+    The BED12 reference file contains gene structure information in BED format,
+    which is used as the annotation reference for strandness determination.
+
+    Output is a summary text file containing the inferred library type and supporting
+    statistics for each sample.
+    """
     input:
         bed12 = config['STAR_index'][config['Genome_Version']]['bed12'],
         bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
@@ -35,7 +90,7 @@ rule infer_experiment:
         library = "07.AS/qc/strandness/{sample}.summary.txt",
     resources:
         **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
-    threads: 
+    threads:
         1
     conda:
         workflow.source_path("../envs/rseqc.yaml"),
@@ -49,13 +104,25 @@ rule infer_experiment:
         """
 
 rule merge_strandness_results:
+    """
+    Aggregate strandness detection results from all samples into a single file.
+
+    This rule combines the individual strandness summary files from all samples
+    into one comprehensive file that can be used by downstream rMATS analysis.
+    The merged file maintains sample-specific information while providing a unified
+    view of library preparation protocols across the entire experiment.
+
+    This aggregation is essential for the custom library type detection script
+    that determines the appropriate --libType parameter for rMATS based on the
+    experimental design and actual library characteristics.
+    """
     input:
         expand("07.AS/qc/strandness/{sample}.summary.txt", sample=samples.keys()),
     output:
         "07.AS/qc/all_samples_strandness.txt",
     resources:
         **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
-    threads: 
+    threads:
         1
     shell:
         """
@@ -63,6 +130,27 @@ rule merge_strandness_results:
         """
 
 rule rmats_run:
+    """
+    Perform differential alternative splicing analysis between experimental conditions using rMATS.
+
+    This rule executes rMATS in paired mode to detect statistically significant differences
+    in alternative splicing patterns between two experimental groups (e.g., treatment vs control).
+    rMATS uses a hierarchical model to account for biological replicates and provides
+    robust statistical testing for differential splicing events.
+
+    Key features:
+    - Supports all five major AS event types (SE, MXE, A5SS, A3SS, RI)
+    - Implements replicate-aware statistical modeling
+    - Automatically detects library strandness from QC results
+    - Generates comprehensive output including effect sizes (ΔPSI) and p-values
+
+    The rule uses a custom library type detection script that analyzes the aggregated
+    strandness results to determine the appropriate --libType parameter for rMATS,
+    ensuring accurate analysis regardless of the actual library preparation protocol used.
+
+    Outputs include detailed results for each AS event type, summary statistics,
+    and library type detection logs for quality assurance.
+    """
     input:
         unpack(get_contrast_bams),
         gtf = config['STAR_index'][config['Genome_Version']]['genome_gtf'],
@@ -81,7 +169,7 @@ rule rmats_run:
         check_libtype = workflow.source_path(config['software']['check_libtype']),
         b1_str = lambda w, input: ",".join([os.path.abspath(f) for f in input.b1]),
         b2_str = lambda w, input: ",".join([os.path.abspath(f) for f in input.b2]),
-    threads: 
+    threads:
         config['parameter']['threads']['rmats']
     conda:
         workflow.source_path("../envs/rmats.yaml")
@@ -97,12 +185,12 @@ rule rmats_run:
             {input.lib_qc} \
             "{params.libType}" \
             {output.lib_check_log})
-    
+
         # run ramts
         mkdir -p {params.tmp}
         echo "{params.b1_str}" > {params.tmp}/b1.txt
         echo "{params.b2_str}" > {params.tmp}/b2.txt
-        
+
         rmats.py \
             --b1 {params.tmp}/b1.txt \
             --b2 {params.tmp}/b2.txt \
@@ -118,7 +206,22 @@ rule rmats_run:
             > {log} 2>&1
         """
 
-rule merge_rmats:
+rule merge_rmats_summary:
+    """
+    Aggregate and summarize differential splicing results across all experimental contrasts.
+
+    This rule collects rMATS results from all pairwise comparisons (contrasts) and
+    generates comprehensive summary files that provide an overview of alternative
+    splicing patterns across the entire experiment.
+
+    Two output modes are generated:
+    - Summary mode: High-level statistics and overview of splicing events across contrasts
+    - Details mode: Comprehensive listing of all detected splicing events with their
+      statistical significance, effect sizes, and genomic coordinates
+
+    These aggregated results facilitate cross-contrast comparisons and help identify
+    consistent splicing patterns or condition-specific alternative splicing events.
+    """
     input:
         summary = expand("07.AS/rmats_pair/{contrast}/summary.txt", contrast=ALL_CONTRASTS),
         SE_MATS_JC = expand("07.AS/rmats_pair/{contrast}/SE.MATS.JC.txt", contrast=ALL_CONTRASTS),
@@ -130,7 +233,7 @@ rule merge_rmats:
     params:
         rmats_dir = '07.AS/rmats_pair/',
         path = workflow.source_path(config['parameter']['rmats_summary']['path']),
-    threads: 
+    threads:
         config['parameter']['threads']['rmats']
     conda:
         workflow.source_path("../envs/python3.yaml")
@@ -144,8 +247,26 @@ rule merge_rmats:
         python3 {params.path} -i {params.rmats_dir}  --mode summary  -o  {output.sumarry} &>{log}
         python3 {params.path} -i {params.rmats_dir}  --mode details  -o  {output.detail} &>{log}
         """
-    
+
 rule rmats_single_run:
+    """
+    Perform single-sample alternative splicing event detection using rMATS.
+
+    While the paired analysis focuses on differential splicing between conditions,
+    this rule detects all alternative splicing events present in individual samples.
+    This is valuable for:
+    - Characterizing the complete splicing landscape of each sample
+    - Identifying sample-specific splicing events
+    - Providing baseline splicing profiles for quality control
+    - Supporting downstream analyses that require per-sample splicing catalogs
+
+    The rule uses rMATS in single-sample mode (--statoff flag disables statistical
+    testing since there are no replicates for comparison) and automatically detects
+    the appropriate library type from the aggregated strandness results.
+
+    Output includes comprehensive splicing event detection for all five AS types
+    along with summary statistics for each sample.
+    """
     input:
         bam = "02.mapping/STAR/sort_index/{sample}.sort.bam",
         gtf = config['STAR_index'][config['Genome_Version']]['genome_gtf'],
@@ -164,7 +285,7 @@ rule rmats_single_run:
         check_libtype = workflow.source_path(config['software']['check_libtype']),
         readLength = config['parameter']['rmats']['readLength'],
         b1_abs = lambda w, input: os.path.abspath(input.bam)
-    threads: 
+    threads:
         config['parameter']['threads']['rmats']
     conda:
         workflow.source_path("../envs/rmats.yaml")
@@ -180,7 +301,7 @@ rule rmats_single_run:
             {input.lib_qc} \
             "{params.libType}" \
             {output.lib_check_log})
-    
+
         # run ramts
         mkdir -p {params.tmp}
         echo "{params.b1_abs}" > {params.tmp}/b1.txt
@@ -198,7 +319,23 @@ rule rmats_single_run:
             > {log} 2>&1
         """
 
-rule merge_rmats_single:
+rule merge_rmats_single_summary:
+    """
+    Aggregate single-sample splicing detection results across all samples.
+
+    This rule combines the individual splicing event catalogs from all samples
+    into comprehensive summary files that provide a complete view of alternative
+    splicing across the entire dataset.
+
+    Similar to the paired analysis aggregation, this rule generates:
+    - Summary mode: Overview statistics of splicing events across all samples
+    - Details mode: Complete listing of all detected splicing events with their
+      genomic coordinates, junction counts, and sample-specific information
+
+    These aggregated single-sample results complement the differential analysis
+    by providing context about the overall splicing complexity and helping to
+    distinguish truly novel events from technical artifacts.
+    """
     input:
         summary = expand("07.AS/rmats_single/{sample}/summary.txt",sample=samples.keys()),
         se = expand("07.AS/rmats_single/{sample}/SE.MATS.JC.txt",sample=samples.keys()),
@@ -210,7 +347,7 @@ rule merge_rmats_single:
     params:
         rmats_dir = '07.AS/rmats_single/',
         path = workflow.source_path(config['parameter']['rmats_summary']['path']),
-    threads: 
+    threads:
         config['parameter']['threads']['rmats']
     conda:
         workflow.source_path("../envs/python3.yaml")

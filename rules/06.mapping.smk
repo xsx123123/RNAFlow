@@ -1,8 +1,40 @@
 #!/usr/bin/snakemake
 # -*- coding: utf-8 -*-
+"""
+RNAFlow Pipeline - RNA-seq Mapping and Post-Alignment Processing Module
+
+This module handles the core alignment step using STAR (Spliced Transcripts
+Alignment to a Reference) and performs comprehensive post-alignment processing
+including quality control, format conversion, and coverage analysis.
+
+Key Components:
+- STAR_mapping: Primary alignment with comprehensive parameter tuning
+- sort_index: BAM sorting and indexing for downstream analysis
+- Quality Control: Multiple QC metrics using Qualimap, Samtools, and Preseq
+- Format Conversion: BAM to CRAM compression for storage efficiency
+- Coverage Analysis: BigWig generation for visualization
+- Report Aggregation: MultiQC report generation for comprehensive QC summary
+
+The module is designed to handle both standard RNA-seq and specialized analyses
+like fusion detection (via chimeric read output) and transcriptome quantification.
+"""
+
 import os
 
 rule STAR_mapping:
+    """
+    Perform spliced alignment of RNA-seq reads using STAR aligner.
+
+    This rule executes the primary alignment step with optimized parameters for
+    RNA-seq data, including:
+    - Two-pass mode for improved splice junction detection
+    - Chimeric read detection for fusion analysis
+    - Transcriptome-aligned BAM generation for quantification
+    - Comprehensive quality filtering and alignment parameters
+
+    The rule outputs coordinate-sorted BAM files, transcriptome-aligned BAM files,
+    and detailed alignment statistics in the Log.final.out file.
+    """
     input:
         idx_dir = config['STAR_index'][config['Genome_Version']]['index'],
         genome_fa = config['STAR_index'][config['Genome_Version']]['genome_fa'],
@@ -82,6 +114,14 @@ rule STAR_mapping:
         """
 
 rule sort_index:
+    """
+    Sort and index aligned BAM files for efficient downstream processing.
+
+    This rule renames the coordinate-sorted BAM file from STAR's output and
+    generates a corresponding BAI index file using samtools. The sorted BAM
+    files are essential for most downstream analyses including variant calling,
+    coverage analysis, and visualization.
+    """
     input:
         Aligned_bam = '02.mapping/STAR/{sample}/{sample}.Aligned.sortedByCoord.out.bam',
         Transcriptome_bam = '02.mapping/STAR/{sample}/{sample}.Aligned.toTranscriptome.out.bam',
@@ -108,7 +148,16 @@ rule sort_index:
 
 rule estimate_library_complexity:
     """
-    Estimate library complexity using Preseq
+    Estimate library complexity using Preseq.
+
+    This rule uses Preseq to predict the complexity of the sequencing library
+    by estimating how many additional unique reads would be observed if more
+    sequencing were performed. This helps assess whether the current sequencing
+    depth is sufficient or if additional sequencing would yield diminishing returns.
+
+    Outputs two files:
+    - lc_extrap.txt: Library complexity extrapolation predictions
+    - c_curve.txt: Complexity curve showing observed vs. predicted unique reads
     """
     input:
         sort_bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
@@ -137,6 +186,14 @@ rule estimate_library_complexity:
         """
 
 rule qualimap_qc:
+    """
+    Perform comprehensive BAM quality control using Qualimap.
+
+    This rule runs Qualimap's bamqc module to generate detailed quality metrics
+    including coverage distribution, insert size distribution, GC content bias,
+    and mapping quality statistics. The output includes both HTML reports for
+    visual inspection and text files for programmatic analysis.
+    """
     input:
         bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
         bai = '02.mapping/STAR/sort_index/{sample}.sort.bam.bai'
@@ -158,7 +215,7 @@ rule qualimap_qc:
         outformat = config['parameter']['qualimap']["format"],
         mem = config['parameter']['qualimap']["mem"],
         prefix_dir = '02.mapping/qualimap_report/{sample}/',
-    threads: 
+    threads:
         config['parameter']["threads"]["qualimap"],
     shell:
         """
@@ -172,6 +229,14 @@ rule qualimap_qc:
         """
 
 rule samtools_flagst:
+    """
+    Generate alignment statistics using samtools flagstat.
+
+    This rule produces a tab-separated summary of alignment metrics including
+    total reads, mapped reads, properly paired reads, and various quality
+    categories. The TSV format makes it easy to parse programmatically for
+    downstream analysis and reporting.
+    """
     input:
         bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
         bai = '02.mapping/STAR/sort_index/{sample}.sort.bam.bai'
@@ -198,6 +263,14 @@ rule samtools_flagst:
         """
 
 rule samtools_stats:
+    """
+    Generate comprehensive alignment statistics using samtools stats.
+
+    This rule provides detailed alignment statistics including base quality
+    distributions, insert size metrics, coverage statistics, and error rates.
+    The comprehensive output is useful for deep quality assessment and
+    troubleshooting alignment issues.
+    """
     input:
         bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
         bai = '02.mapping/STAR/sort_index/{sample}.sort.bam.bai'
@@ -226,6 +299,15 @@ rule samtools_stats:
         """
 
 rule bam2cram:
+    """
+    Convert BAM files to CRAM format for storage efficiency.
+
+    This rule compresses the sorted BAM files into CRAM format, which typically
+    achieves 40-60% smaller file sizes compared to BAM while maintaining full
+    compatibility with most bioinformatics tools. The CRAM format uses reference-
+    based compression, making it ideal for large-scale RNA-seq projects where
+    storage costs are a concern.
+    """
     input:
         bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
         bai = '02.mapping/STAR/sort_index/{sample}.sort.bam.bai'
@@ -253,6 +335,14 @@ rule bam2cram:
         """
 
 rule record_ref_metadata:
+    """
+    Record reference genome metadata for reproducibility.
+
+    This rule creates a text file containing essential reference genome
+    information including the genome version, FASTA file path, and sequence
+    dictionary information. This metadata is crucial for ensuring reproducibility
+    and proper interpretation of results across different analysis runs.
+    """
     input:
         ref = config['STAR_index'][config['Genome_Version']]['genome_fa'],
     output:
@@ -275,6 +365,14 @@ rule record_ref_metadata:
         """
 
 rule bamCoverage:
+    """
+    Generate normalized coverage tracks in BigWig format for visualization.
+
+    This rule uses deeptools bamCoverage to create normalized coverage tracks
+    that can be visualized in genome browsers like IGV or UCSC Genome Browser.
+    The normalization method (typically RPKM, CPM, or BPM) ensures that coverage
+    tracks are comparable across samples with different sequencing depths.
+    """
     input:
         bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
         bai = '02.mapping/STAR/sort_index/{sample}.sort.bam.bai'
@@ -309,6 +407,15 @@ rule bamCoverage:
         """
 
 rule mapping_report:
+    """
+    Aggregate all mapping QC results into a comprehensive MultiQC report.
+
+    This rule collects QC metrics from all previous mapping-related rules
+    (STAR, Qualimap, Samtools, Preseq) and generates a unified HTML report
+    using MultiQC. The aggregated report provides a single dashboard for
+    assessing the quality of all samples in the RNA-seq experiment, making
+    it easy to identify potential issues or outliers.
+    """
     input:
         log_final = expand('02.mapping/STAR/{sample}/{sample}.Log.final.out',sample=samples.keys()),
         qualimap_report_html = expand('02.mapping/qualimap_report/{sample}/qualimapReport.html',sample=samples.keys()),
@@ -344,4 +451,3 @@ rule mapping_report:
                 -i {params.title} \
                 -n {params.report} &> {log}
         """
-# ----- rule ----- #

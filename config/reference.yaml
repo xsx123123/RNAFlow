@@ -1,18 +1,42 @@
-# reference:
+# RNAFlow Pipeline - Reference Genome Configuration
+#
+# This file defines the paths to reference genome files and other reference databases
+# used by the RNA-seq analysis pipeline. It contains configuration for multiple
+# supported organisms and genome versions.
+#
+# Key Configuration Sections:
+# - reference_path: Root directory containing all reference genome files
+# - fastq_screen_db_path: Root directory for contamination screening databases
+# - can_use_genome_version: List of supported genome versions
+# - STAR_index: Detailed reference file paths for each supported genome version
+#
+# Migration Note: When moving this pipeline to a different server or environment,
+# update the 'reference_path' and 'fastq_screen_db_path' variables to point to the
+# correct locations on the new system.
+
+# Reference Genome Root Directory
+# Base path where all reference genome files are stored
 reference_path : /data/jzhang/reference/RNAFlow_reference
-# FastQ Screen Database Root Path (For migration)
-# This path should contain subdirectories like 'hg38', 'GRCm39', 'fastq_screen_database', etc.
+
+# FastQ Screen Database Root Path
+# Directory containing contamination screening databases for fastq_screen
+# Should contain subdirectories like 'hg38', 'GRCm39', 'fastq_screen_database', etc.
 fastq_screen_db_path: /data/jzhang/reference/fastq_screen_database
-# Support gene version
+
+# Supported Genome Versions
+# List of genome versions that are officially supported by this pipeline configuration
 can_use_genome_version:
-  - Lsat_Salinas_v11
-  - Lsat_Salinas_v8
-  - ITAG4.1
-  - TAIR10.1
-  - GRCm39
-  - hg38
-  - GO
-# STAR Reference PATH
+  - Lsat_Salinas_v11    # Lactuca sativa (Lettuce) Salinas v11
+  - Lsat_Salinas_v8     # Lactuca sativa (Lettuce) Salinas v8
+  - ITAG4.1             # Solanum lycopersicum (Tomato) ITAG4.1
+  - TAIR10.1            # Arabidopsis thaliana TAIR10.1
+  - GRCm39              # Mus musculus (Mouse) GRCm39
+  - hg38                # Homo sapiens (Human) GRCh38/hg38
+  - GO                  # Gene Ontology database
+
+# STAR Index and Reference File Configuration
+# Detailed file paths for each supported genome version
+# Each entry should contain all required reference files for the pipeline modules
 STAR_index:
     Lsat_Salinas_v11:
       index: Lactuca_sativa_V11_ncbi/RSEM_Lactuca_sativa_V11_ncbi

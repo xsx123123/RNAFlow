@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # *---utf-8---*
-# Version: RNAFlow_v0.1
+# Version: RNAFlow v0.1.7
 # Author : JZHANG
 
 import sys
@@ -51,19 +51,19 @@ ALL_CONTRASTS, CONTRAST_MAP = load_contrasts(config["paired_csv"], samples)
 # --------- 4. Rules Import --------- #
 include: 'rules/00.log.smk'
 include: 'rules/01.common.smk'
-include: 'rules/03.file_convert_md5.smk'
-include: 'rules/04.short_read_qc.smk'
-include: 'rules/05.Contamination_check.smk'
-include: 'rules/06.short_read_clean.smk'
-include: 'rules/07.mapping.smk'
-include: 'rules/08.rsem.smk'
-include: 'rules/09.call_variant.smk'
-include: 'rules/10.Assembly.smk'
-include: 'rules/11.DEG_Enrichments.smk'
-include: 'rules/12.rMATS.smk'
-include: 'rules/14.Merge_qc.smk'
-include: 'rules/15.deliver.smk'
-include: 'rules/16.Report.smk'
+include: 'rules/02.file_convert_md5.smk'
+include: 'rules/03.short_read_qc.smk'
+include: 'rules/04.Contamination_check.smk'
+include: 'rules/05.short_read_clean.smk'
+include: 'rules/06.mapping.smk'
+include: 'rules/07.rsem.smk'
+include: 'rules/08.call_variant.smk'
+include: 'rules/09.Assembly.smk'
+include: 'rules/10.DEG_Enrichments.smk'
+include: 'rules/11.rMATS.smk'
+include: 'rules/13.Merge_qc.smk'
+include: 'rules/14.deliver.smk'
+include: 'rules/15.Report.smk'
 # --------- 5. Target Rule --------- #
 rule all:
     input:

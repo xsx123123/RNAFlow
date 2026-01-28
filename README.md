@@ -433,6 +433,11 @@ python report/bioreport/main.py --input results_dir --output report_dir --ai
 
 ## 📈 版本历史
 
+### RNAFlow_v0.1.7
+- **Feature**: 增加`estimate_library_complexity`rule，用于评估文库复杂度。
+- **Feature**: 增加`rmats_summary`功能，用于合并配对和单独样本的AS分析结果。
+- **Improvement**: 使用`temp()`将分析过程`bam`文件标记为分析完成后移除，同时添加`bam2cram`rule,减少分析流程存储开销。
+
 ### RNAFlow_v0.1.6
 - **Feature**: 模块化重构 `DataDeliver` 函数，提高代码可维护性。
 - **Feature**: 增强配置验证机制，提升错误提示准确性。

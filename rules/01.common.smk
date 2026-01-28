@@ -1,18 +1,58 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# loading packages
+"""
+RNAFlow Pipeline - Common Utility Functions Module
+
+This module provides essential utility functions that are used across multiple
+rules in the RNA-seq analysis pipeline. It handles core functionality including:
+
+Key Components:
+- Data delivery orchestration (DataDeliver function)
+- Report data collection (ReportData function)
+- Sample data directory resolution
+- Reference index validation (BWA, STAR)
+- Genome version compatibility checking
+
+These functions ensure consistent behavior across the pipeline and provide
+robust error handling for common scenarios like missing files, invalid
+configurations, and path resolution issues.
+"""
+
 import os
 import glob
+import sys
 from pathlib import Path
 from typing import Dict, Union, List, Callable
 from rich import print as rich_print
 from utils.datadeliver import qc_clean,mapping,count,Deg,call_variant,noval_Transcripts,rmats
 
-# Target rule function
-def DataDeliver(config: Dict = None, samples: Dict = None,all_contrasts: Dict = None) -> List[str]:
+# Import logger for consistent logging
+from snakemake_logger_plugin_rich_loguru import get_analysis_logger
+logger = get_analysis_logger()
+
+def DataDeliver(config: Dict = None, samples: Dict = None, all_contrasts: Dict = None) -> List[str]:
     """
-    This function performs Bioinformation analysis on the input configuration
-    and returns a list of results.
+    Main data delivery orchestrator function that determines which analysis modules
+    to execute based on the pipeline configuration and returns the list of expected
+    output files.
+
+    This function serves as the central hub for the RNA-seq analysis workflow,
+    dynamically enabling/disabling analysis modules based on user configuration.
+
+    Args:
+        config (Dict): Pipeline configuration dictionary containing module flags
+        samples (Dict): Dictionary of sample information from sample sheet
+        all_contrasts (Dict): Dictionary of differential expression contrasts
+
+    Returns:
+        List[str]: List of expected output file paths that will be generated
+                  by the enabled analysis modules.
+
+    Configuration Options:
+        - only_qc: When True, runs only QC, mapping, and counting modules
+        - print_target: When True, prints the target file list using Rich
+        - Individual module flags: qc_clean, mapping, count, DEG, call_variant,
+          noval_Transcripts, rmats (set to True to enable each module)
     """
     # Initialize data deliver - short-read raw-data QC result
     data_deliver = [
@@ -40,7 +80,7 @@ def DataDeliver(config: Dict = None, samples: Dict = None,all_contrasts: Dict = 
     def execute_novel_transcripts(samples, data_deliver):
         return noval_Transcripts(samples, data_deliver)
 
-    def execute_rmats(samples, data_deliver,all_contrasts):
+    def execute_rmats(samples, data_deliver, all_contrasts):
         # Assuming ALL_CONTRASTS is available in the config or global scope
         all_contrasts = config.get('all_contrasts', []) if config else []
         return rmats(samples, data_deliver, all_contrasts)
@@ -72,7 +112,7 @@ def DataDeliver(config: Dict = None, samples: Dict = None,all_contrasts: Dict = 
     for module, func in module_functions.items():
         if config.get(module, False):  # Only execute if the module is enabled in config
             if module == "rmats":
-                data_deliver = func(samples, data_deliver,all_contrasts)
+                data_deliver = func(samples, data_deliver, all_contrasts)
             else:
                 data_deliver = func(samples, data_deliver)
     # Print target if required
@@ -80,9 +120,19 @@ def DataDeliver(config: Dict = None, samples: Dict = None,all_contrasts: Dict = 
         rich_print(data_deliver)
     return data_deliver
 
-def ReportData(config:dict = None) -> List[str]:
+def ReportData(config: dict = None) -> List[str]:
     """
-    quarto rna-seq report data
+    Collects all files required for generating the final Quarto RNA-seq analysis report.
+
+    This function returns the list of manifest files, summary JSON, and HTML report
+    that are needed for the final delivery and reporting stage of the pipeline.
+
+    Args:
+        config (dict): Pipeline configuration dictionary
+
+    Returns:
+        List[str]: List of report-related file paths, or empty list if reporting
+                   is disabled in configuration.
     """
     if config.get('report'):
         return [
@@ -100,12 +150,25 @@ def ReportData(config:dict = None) -> List[str]:
 
 def get_sample_data_dir(sample_id: str = None, config: dict = None) -> str:
     """
-    Find the directory containing fastq files based on sample_id.
+    Resolves the directory path containing FASTQ files for a given sample ID.
 
-    Logic update:
-    1. First check if a subdirectory named with sample_id exists.
-    2. If the subdirectory doesn't exist, check if there are files starting with sample_id in the directory.
-       If files exist, return the base_dir.
+    This function handles two common directory structures:
+    1. Sample-specific subdirectories: raw_data/SampleID/
+    2. Flat directory structure: raw_data/SampleID_R1.fq.gz
+
+    The function uses fuzzy matching with glob patterns to handle various
+    naming conventions and file extensions.
+
+    Args:
+        sample_id (str): The sample identifier to search for
+        config (dict): Pipeline configuration with 'raw_data_path' key
+
+    Returns:
+        str: Absolute path to the directory containing the sample's FASTQ files
+
+    Raises:
+        ValueError: If 'raw_data_path' is missing from config
+        FileNotFoundError: If no matching files or directories are found
     """
 
     # Ensure config has this key to prevent errors
@@ -138,21 +201,40 @@ def get_sample_data_dir(sample_id: str = None, config: dict = None) -> str:
     # If the loop ends without finding anything
     raise FileNotFoundError(f"Could not find data directory or files for {sample_id} in {config['raw_data_path']}")
 
-def get_all_input_dirs(sample_keys:str = None,
-                       config:dict = config) -> list:
+def get_all_input_dirs(sample_keys: str = None,
+                       config: dict = config) -> list:
     """
-    Iterate through all sample IDs, call get_sample_data_dir,
-    and return a list containing all data directories.
+    Aggregates unique input directories for all specified samples.
+
+    This function iterates through all sample IDs and resolves their data
+    directories using get_sample_data_dir(), then returns a deduplicated list.
+
+    Args:
+        sample_keys (str): Iterable of sample identifiers
+        config (dict): Pipeline configuration dictionary
+
+    Returns:
+        list: Deduplicated list of input directories containing sample data
     """
     dir_list = []
     for sample_id in sample_keys:
-        dir_list.append(get_sample_data_dir(sample_id,config = config))
+        dir_list.append(get_sample_data_dir(sample_id, config = config))
 
     return list(set(dir_list))
 
-def judge_bwa_index(config:dict = None) -> bool:
+def judge_bwa_index(config: dict = None) -> bool:
     """
-    Determine whether to rebuild the bwa index
+    Validates BWA-MEM2 index completeness by checking for required index files.
+
+    BWA-MEM2 requires specific index files to be present for proper alignment.
+    This function checks if all necessary files exist and returns True if
+    the index needs to be rebuilt.
+
+    Args:
+        config (dict): Pipeline configuration with 'bwa_mem2' section
+
+    Returns:
+        bool: True if index files are missing (needs rebuild), False if complete
     """
     bwa_index = config['bwa_mem2']['index']
     bwa_index_files = [bwa_index + suffix for suffix in ['.0123', '.amb', '.ann', '.bwt.2bit.64', '.pac', '.alt']]
@@ -161,10 +243,21 @@ def judge_bwa_index(config:dict = None) -> bool:
 
 def judge_star_index(config: dict, Genome_Version: str) -> bool:
     """
-    Determine whether to rebuild the STAR index
+    Validates STAR index completeness by checking for required index files.
+
+    STAR aligner requires a comprehensive set of index files generated during
+    the indexing process. This function verifies that all necessary files are
+    present and returns True if the index needs to be rebuilt.
+
+    Args:
+        config (dict): Pipeline configuration with 'STAR_index' section
+        Genome_Version (str): Specific genome version to validate
+
     Returns:
-        True: Files are missing, need to build
-        False: Files are complete, no need to build
+        bool: True if index files are missing (needs rebuild), False if complete
+
+    Raises:
+        KeyError: If the specified genome version is not found in configuration
     """
 
     try:
@@ -207,7 +300,21 @@ def judge_star_index(config: dict, Genome_Version: str) -> bool:
 
 def check_gene_version(config: dict = None, logger = None) -> None:
     """
-    Check if the gene version in config matches allowed list.
+    Validates that the configured genome version is supported by the pipeline.
+
+    This function ensures that the user-specified genome version matches one of
+    the allowed versions defined in the pipeline configuration, preventing
+    runtime errors due to unsupported reference genomes.
+
+    Args:
+        config (dict): Pipeline configuration with 'Genome_Version' and
+                      'can_use_genome_version' keys
+        logger: Optional logger instance (falls back to unified logger if None)
+
+    Raises:
+        ValueError: If the genome version is not in the allowed list
+        KeyError: If required configuration keys are missing
+        TypeError: If config is not a valid dictionary
     """
     # Use the provided logger or get the unified logger
     if logger is None:
