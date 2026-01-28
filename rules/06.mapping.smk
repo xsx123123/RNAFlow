@@ -142,48 +142,48 @@ rule sort_index:
         config['parameter']['threads']['samtools'],
     shell:
         """
-        (mv {input.Aligned_bam} {output.sort_bam} &&
+        ( samtools sort -@ {threads} {input.Aligned_bam} -o {output.sort_bam}
         samtools index -@ {threads} {output.sort_bam})  &>{log}
         """
 
-rule estimate_library_complexity:
-    """
-    Estimate library complexity using Preseq.
-
-    This rule uses Preseq to predict the complexity of the sequencing library
-    by estimating how many additional unique reads would be observed if more
-    sequencing were performed. This helps assess whether the current sequencing
-    depth is sufficient or if additional sequencing would yield diminishing returns.
-
-    Outputs two files:
-    - lc_extrap.txt: Library complexity extrapolation predictions
-    - c_curve.txt: Complexity curve showing observed vs. predicted unique reads
-    """
-    input:
-        sort_bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
-        sort_bam_bai = '02.mapping/STAR/sort_index/{sample}.sort.bam.bai',
-    output:
-        preseq = '02.mapping/preseq/{sample}.lc_extrap.txt',
-        c_curve = '02.mapping/preseq/{sample}.c_curve.txt',
-    resources:
-        **rule_resource(config, 'low_resource', skip_queue_on_local=True, logger=logger),
-    conda:
-        workflow.source_path("../envs/Preseq.yaml"),
-    message:
-        "Running Preseq for {wildcards.sample}",
-    log:
-        "logs/02.mapping/preseq_{sample}.log",
-    benchmark:
-        "benchmarks/{sample}_preseq_benchmark.txt",
-    threads:
-        1
-    shell:
-        """
-        exec 2> {log}
-        set -x
-        preseq lc_extrap -pe -v -output {output.preseq} -B {input.sort_bam}
-        preseq c_curve -pe -v -output {output.c_curve} -B  {input.sort_bam}
-        """
+# rule estimate_library_complexity:
+#    """
+#    Estimate library complexity using Preseq.
+#
+#    This rule uses Preseq to predict the complexity of the sequencing library
+#    by estimating how many additional unique reads would be observed if more
+#    sequencing were performed. This helps assess whether the current sequencing
+#    depth is sufficient or if additional sequencing would yield diminishing returns.
+#
+#    Outputs two files:
+#    - lc_extrap.txt: Library complexity extrapolation predictions
+#    - c_curve.txt: Complexity curve showing observed vs. predicted unique reads
+#    """
+#    input:
+#        sort_bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
+#        sort_bam_bai = '02.mapping/STAR/sort_index/{sample}.sort.bam.bai',
+#    output:
+#        preseq = '02.mapping/preseq/{sample}.lc_extrap.txt',
+#        c_curve = '02.mapping/preseq/{sample}.c_curve.txt',
+#    resources:
+#        **rule_resource(config, 'low_resource', skip_queue_on_local=True, logger=logger),
+#    conda:
+#        workflow.source_path("../envs/Preseq.yaml"),
+#    message:
+#        "Running Preseq for {wildcards.sample}",
+#    log:
+#        "logs/02.mapping/preseq_{sample}.log",
+#    benchmark:
+#        "benchmarks/{sample}_preseq_benchmark.txt",
+#    threads:
+#        1
+#    shell:
+#        """
+#        exec 2> {log}
+#        set -x
+#        preseq lc_extrap -pe -v -output {output.preseq} -B {input.sort_bam}
+#        preseq c_curve -pe -v -output {output.c_curve} -B  {input.sort_bam}
+#        """
 
 rule qualimap_qc:
     """
@@ -422,8 +422,8 @@ rule mapping_report:
         qualimap_report_txt = expand('02.mapping/qualimap_report/{sample}/genome_results.txt',sample=samples.keys()),
         samtools_flagstat = expand('02.mapping/samtools_flagstat/{sample}_bam_flagstat.tsv',sample=samples.keys()),
         samtools_stats = expand('02.mapping/samtools_stats/{sample}_bam_stats.tsv',sample=samples.keys()),
-        preseq = expand('02.mapping/preseq/{sample}.lc_extrap.txt',sample=samples.keys()),
-        c_curve = expand('02.mapping/preseq/{sample}.c_curve.txt',sample=samples.keys()),
+        # preseq = expand('02.mapping/preseq/{sample}.lc_extrap.txt',sample=samples.keys()),
+        # c_curve = expand('02.mapping/preseq/{sample}.c_curve.txt',sample=samples.keys()),
     output:
         report = "02.mapping/mapping_report/multiqc_mapping_report.html",
     resources:
