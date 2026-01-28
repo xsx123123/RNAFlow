@@ -161,10 +161,10 @@ graph TD
 ```
 
 ### 🔄 核心数据流说明
-1.  **输入解析**: Snakemake 自动读取 `config.yaml` 并识别输入数据结构。
+1.  **输入解析**: `Snakemake` 自动读取 `config.yaml` 并识别输入数据结构。
 2.  **核心计算**: 通过 STAR + RSEM 获得表达矩阵，并行触发高级分析模块。
 3.  **结果汇聚**: `15.deliver.smk` 将关键结果汇总到交付目录。
-4.  **智能报告**: BioReport 系统提取分析结果并调用 AI 引擎进行生物学解读，最终生成 Quarto HTML 站点。
+4.  **智能报告**: `BioReport` 系统提取分析结果并调用 AI 引擎进行生物学解读，最终生成 `Quarto HTML` 报告。
 
 ## 📊 BioReport 报告系统
 
