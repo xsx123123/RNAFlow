@@ -30,6 +30,9 @@ from utils.datadeliver import qc_clean,mapping,count,Deg,call_variant,noval_Tran
 from snakemake_logger_plugin_rich_loguru import get_analysis_logger
 logger = get_analysis_logger()
 
+# Flag to track if the QC warning has already been displayed
+_qc_warning_logged = False
+
 def DataDeliver(config: Dict = None, samples: Dict = None, all_contrasts: Dict = None) -> List[str]:
     """
     Main data delivery orchestrator function that determines which analysis modules
@@ -100,8 +103,11 @@ def DataDeliver(config: Dict = None, samples: Dict = None, all_contrasts: Dict =
     config = {**default_config, **(config or {})}
 
     # Special case: If `only_qc` is True, enable `qc_clean`, `mapping`, and `count`, disable others
+    global _qc_warning_logged
     if config.get('only_qc'):
-        logger.info('ONLY RUN QC ANALYSIS FOR RNA-SEQ : RAW DATA QC & MAPPING & COUNT')
+        if not _qc_warning_logged:
+            logger.warning(' 🦉🦉 \033[33m ONLY RUN QC ANALYSIS FOR RNA-SEQ : RAW DATA QC & MAPPING & COUNT \033[0m🐝🐝 ')
+            _qc_warning_logged = True
         for module in module_functions:
             if module in ['qc_clean', 'mapping', 'count']:
                 config[module] = True
