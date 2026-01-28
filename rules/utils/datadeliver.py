@@ -67,8 +67,9 @@ def mapping(samples: Dict = None, data_deliver: List = None, config: Dict = None
     data_deliver.extend(expand("02.mapping/qualimap_report/{sample}/genome_results.txt", sample=samples.keys()))
     data_deliver.extend(expand("02.mapping/preseq/{sample}.lc_extrap.txt", sample=samples.keys()))
     data_deliver.extend(expand("02.mapping/preseq/{sample}.c_curve.txt", sample=samples.keys()))
-    data_deliver.extend(expand('02.mapping/carm/{sample}.carm',sample=samples.keys()))
-    data_deliver.extend(expand('02.mapping/carm/{sample}.carm.crai',sample=samples.keys()))
+    data_deliver.extend(expand('02.mapping/cram/{sample}.cram',sample=samples.keys()))
+    data_deliver.extend(expand('02.mapping/cram/{sample}.cram.crai',sample=samples.keys()))
+    data_deliver.append('02.mapping/cram/reference_version.txt')
     # bamcoverage - need to handle config parameter properly
     normalize_method = config.get('parameter', {}).get('bamCoverage', {}).get('normalizeUsing', 'RPKM')
     # Create file paths dynamically since expand doesn't support variable substitution in the middle of the string

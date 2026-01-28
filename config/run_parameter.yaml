@@ -14,7 +14,7 @@ parameter:
     qualimap: 10
     RSEM_INDEX: 20
     rsem-calculate: 20
-    bam2carm: 10
+    bam2cram: 10
     bamCoverage: 20
     stringtie: 16
     gatk: 1
@@ -73,7 +73,7 @@ parameter:
   rmats:
     readLength: 125
   rmats_summary:
-    path: src/src/rMATS/merge_rmats_summary.py
+    path: ../src/src/rMATS/merge_rmats_summary.py
   trim:
     length_required: 75
     quality_threshold: 25

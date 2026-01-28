@@ -67,5 +67,5 @@ include: 'rules/16.Report.smk'
 # --------- 5. Target Rule --------- #
 rule all:
     input:
-        DataDeliver(config=config,samples = samples),
+        DataDeliver(config=config,samples = samples,all_contrasts = ALL_CONTRASTS),
         ReportData(config=config),

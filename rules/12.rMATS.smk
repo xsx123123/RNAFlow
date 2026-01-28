@@ -120,24 +120,24 @@ rule rmats_run:
 
 rule merge_rmats:
     input:
-        summary = expand("07.AS/rmats_pair/{contrast}/summary.txt", contrast=all_contrasts),
-        SE_MATS_JC = expand("07.AS/rmats_pair/{contrast}/SE.MATS.JC.txt", contrast=all_contrasts),
+        summary = expand("07.AS/rmats_pair/{contrast}/summary.txt", contrast=ALL_CONTRASTS),
+        SE_MATS_JC = expand("07.AS/rmats_pair/{contrast}/SE.MATS.JC.txt", contrast=ALL_CONTRASTS),
     output:
         detail = "07.AS/rmats_pair/rmats_detail.txt",
         sumarry = "07.AS/rmats_pair/rmats_summary.txt",
     resources:
         **rule_resource(config, 'high_resource',  skip_queue_on_local=True,logger = logger),
     params:
-        rmats_dir = '07.AS/rmats_pair/'
+        rmats_dir = '07.AS/rmats_pair/',
         path = workflow.source_path(config['parameter']['rmats_summary']['path']),
     threads: 
         config['parameter']['threads']['rmats']
     conda:
         workflow.source_path("../envs/python3.yaml")
     log:
-        "logs/07.AS/rmats_pair/rmats_{contrast}.log"
+        "logs/07.AS/rmats_pair/rmats_detail_summary.log"
     benchmark:
-        "benchmarks/rmats_pair_{contrast}.txt"
+        "benchmarks/rmats_pair_detail_summary.txt"
     shell:
         """
         chmod +x {params.path}
@@ -200,24 +200,24 @@ rule rmats_single_run:
 
 rule merge_rmats_single:
     input:
-        summary = "07.AS/rmats_single/{sample}/summary.txt",
-        se = "07.AS/rmats_single/{sample}/SE.MATS.JC.txt",
+        summary = expand("07.AS/rmats_single/{sample}/summary.txt",sample=samples.keys()),
+        se = expand("07.AS/rmats_single/{sample}/SE.MATS.JC.txt",sample=samples.keys()),
     output:
         detail = "07.AS/rmats_single/rmats_detail.txt",
         sumarry = "07.AS/rmats_single/rmats_summary.txt",
     resources:
         **rule_resource(config, 'high_resource',  skip_queue_on_local=True,logger = logger),
     params:
-        rmats_dir = '07.AS/rmats_single/'
+        rmats_dir = '07.AS/rmats_single/',
         path = workflow.source_path(config['parameter']['rmats_summary']['path']),
     threads: 
         config['parameter']['threads']['rmats']
     conda:
         workflow.source_path("../envs/python3.yaml")
     log:
-        "logs/07.AS/rmats_single/rmats_{sample}.log"
+        "logs/07.AS/rmats_single/rmats_detail_summary.log"
     benchmark:
-        "benchmarks/rmats_single_{sample}.txt"
+        "benchmarks/rmats_single_detail_summary.txt"
     shell:
         """
         chmod +x {params.path}

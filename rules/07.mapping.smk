@@ -86,7 +86,7 @@ rule sort_index:
         Aligned_bam = '02.mapping/STAR/{sample}/{sample}.Aligned.sortedByCoord.out.bam',
         Transcriptome_bam = '02.mapping/STAR/{sample}/{sample}.Aligned.toTranscriptome.out.bam',
     output:
-        sort_bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
+        sort_bam = temp('02.mapping/STAR/sort_index/{sample}.sort.bam'),
         sort_bam_bai = '02.mapping/STAR/sort_index/{sample}.sort.bam.bai',
     resources:
         **rule_resource(config, 'high_resource',  skip_queue_on_local=True,logger = logger),
@@ -102,7 +102,7 @@ rule sort_index:
         config['parameter']['threads']['samtools'],
     shell:
         """
-        (ln -s -r {input.Aligned_bam} {output.sort_bam} &&
+        (mv {input.Aligned_bam} {output.sort_bam} &&
         samtools index -@ {threads} {output.sort_bam})  &>{log}
         """
 
@@ -225,13 +225,13 @@ rule samtools_stats:
                  {input.bam} > {output.samtools_stats}  2>{log}
         """
 
-rule bam2carm:
+rule bam2cram:
     input:
         bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
         bai = '02.mapping/STAR/sort_index/{sample}.sort.bam.bai'
     output:
-        carm = '02.mapping/carm/{sample}.carm',
-        carm_index = '02.mapping/carm/{sample}.carm.crai',
+        cram = '02.mapping/cram/{sample}.cram',
+        cram_index = '02.mapping/cram/{sample}.cram.crai',
     resources:
         **rule_resource(config, 'medium_resource',  skip_queue_on_local=True,logger = logger),
     conda:
@@ -243,13 +243,35 @@ rule bam2carm:
     benchmark:
         "benchmarks/{sample}_Dup_bam_stats_benchmark.txt",
     threads:
-        config['parameter']['threads']['bam2carm'],
+        config['parameter']['threads']['bam2cram'],
     params:
         reference = config['STAR_index'][config['Genome_Version']]['genome_fa'],
     shell:
         """
         samtools view -@ {threads} -C -T {params.reference} -o {output.cram} {input.bam}
         samtools index  -@ {threads} {output.cram}
+        """
+
+rule record_ref_metadata:
+    input:
+        ref = config['STAR_index'][config['Genome_Version']]['genome_fa'],
+    output:
+        ref_info = '02.mapping/cram/reference_version.txt',
+    resources:
+        **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
+    conda:
+        workflow.source_path("../envs/bwa2.yaml"),
+    log:
+        "logs/02.mapping/cram_reference.log",
+    benchmark:
+        "benchmarks/cram_reference_benchmark.txt",
+    threads:
+        1
+    shell:
+        """
+        echo "Genome_Version: {config[Genome_Version]}" > {output.ref_info}
+        echo "Fasta_Path: {input.ref}" >> {output.ref_info}
+        samtools dict  {input.ref} | grep '^@SQ' >> {output.ref_info}
         """
 
 rule bamCoverage:

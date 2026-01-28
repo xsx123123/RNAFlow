@@ -9,7 +9,7 @@ from rich import print as rich_print
 from utils.datadeliver import qc_clean,mapping,count,Deg,call_variant,noval_Transcripts,rmats
 
 # Target rule function
-def DataDeliver(config: Dict = None, samples: Dict = None) -> List[str]:
+def DataDeliver(config: Dict = None, samples: Dict = None,all_contrasts: Dict = None) -> List[str]:
     """
     This function performs Bioinformation analysis on the input configuration
     and returns a list of results.
@@ -40,7 +40,7 @@ def DataDeliver(config: Dict = None, samples: Dict = None) -> List[str]:
     def execute_novel_transcripts(samples, data_deliver):
         return noval_Transcripts(samples, data_deliver)
 
-    def execute_rmats(samples, data_deliver):
+    def execute_rmats(samples, data_deliver,all_contrasts):
         # Assuming ALL_CONTRASTS is available in the config or global scope
         all_contrasts = config.get('all_contrasts', []) if config else []
         return rmats(samples, data_deliver, all_contrasts)
@@ -70,9 +70,11 @@ def DataDeliver(config: Dict = None, samples: Dict = None) -> List[str]:
 
     # Execute modules based on config
     for module, func in module_functions.items():
-        if config[module]:
-            data_deliver = func(samples, data_deliver)
-
+        if config.get(module, False):  # Only execute if the module is enabled in config
+            if module == "rmats":
+                data_deliver = func(samples, data_deliver,all_contrasts)
+            else:
+                data_deliver = func(samples, data_deliver)
     # Print target if required
     if config.get('print_target'):
         rich_print(data_deliver)
