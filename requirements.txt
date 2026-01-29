@@ -84,6 +84,7 @@ snakemake-interface-executor-plugins @ file:///opt/conda/conda-bld/snakemake-int
 snakemake-interface-logger-plugins @ file:///opt/conda/conda-bld/snakemake-interface-logger-plugins_1753366655471/work
 snakemake-interface-report-plugins @ file:///opt/conda/conda-bld/snakemake-interface-report-plugins_1753806369295/work
 snakemake-interface-storage-plugins @ file:///opt/conda/conda-bld/snakemake-interface-storage-plugins_1753822070523/work
+snakemake-logger-plugin-rich-loguru
 snakemake-logger-plugin-snkmt==0.1.4
 snkmt==0.2.1
 SQLAlchemy==2.0.43
