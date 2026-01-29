@@ -67,6 +67,9 @@ def mapping(samples: Dict = None, data_deliver: List = None, config: Dict = None
     data_deliver.extend(expand("02.mapping/qualimap_report/{sample}/genome_results.txt", sample=samples.keys()))
     data_deliver.extend(expand('02.mapping/cram/{sample}.cram',sample=samples.keys()))
     data_deliver.extend(expand('02.mapping/cram/{sample}.cram.crai',sample=samples.keys()))
+    data_deliver.extend(expand("02.mapping/read_distribution/{sample}.read_distribution.txt",sample=samples.keys()))
+    data_deliver.extend(expand("02.mapping/bamCoverage/{sample}.geneBodyCoverage.txt",sample=samples.keys()))
+    data_deliver.extend(expand('02.mapping/rseqc/tin/{sample}.summary.txt',sample=samples.keys()))
     data_deliver.append('02.mapping/cram/reference_version.txt')
     # bamcoverage - need to handle config parameter properly
     normalize_method = config.get('parameter', {}).get('bamCoverage', {}).get('normalizeUsing', 'RPKM')
