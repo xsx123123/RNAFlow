@@ -65,6 +65,55 @@ def get_contrast_bams(wildcards):
 #                      /dev/stdin {output.bed12} > {log} 2>&1
 #        """
 
+rule CIRCexplorer2_run:
+    """
+    Description: 
+        Identify and annotate circular RNAs (circRNAs) using STAR chimeric alignment results.
+    
+    Workflow:
+        1. Clean: Remove headers and metadata from STAR output to ensure compatibility with CIRCexplorer2.
+        2. Parse: Extract back-spliced junctions from the cleaned file.
+        3. Relocate: Move the output BED file to the specified directory (handling CIRCexplorer2's fixed output behavior).
+        4. Annotate: Annotate circRNAs with gene models to identify host genes and types.
+    """
+    input:
+        Chimeric = '02.mapping/STAR/{sample}/{sample}.Chimeric.out.junction',
+    output:
+        Chimeric_clean = temp('02.mapping/STAR/{sample}/{sample}.Chimeric.clean.junction'),
+        back_spliced_junction = '02.mapping/STAR/{sample}/back_spliced_junction.bed',
+        circularRNA = '02.mapping/STAR/{sample}/circularRNA_known.txt',
+    resources:
+        **rule_resource(config, 'low_resource', skip_queue_on_local=True, logger=logger),
+    threads:
+        1
+    conda:
+        workflow.source_path("../envs/circexplorer2.yaml"),
+    log:
+        "logs/02.mapping/CIRCexplorer2/{sample}.log",
+    benchmark:
+        "benchmarks/CIRCexplorer2_{sample}.txt",
+    params:
+        ref_all = config['STAR_index'][config['Genome_Version']]['ref_all'],
+        genome = config['STAR_index'][config['Genome_Version']]['genome_fa'],
+    shell:
+        """
+        (
+        awk '$1!="junction_type" && $1!~/^#/' {input.Chimeric} > {output.Chimeric_clean}
+
+        CIRCexplorer2 parse -t STAR {output.Chimeric_clean} 
+
+        if [ -f "back_spliced_junction.bed" ]; then
+            mv back_spliced_junction.bed {output.back_spliced_junction}
+        fi
+
+        CIRCexplorer2 annotate -r {params.ref_all} \
+                               -g {params.genome} \
+                               -b {output.back_spliced_junction} \
+                               -o {output.circularRNA} 
+        
+        ) > {log} 2>&1
+        """
+
 rule infer_experiment:
     """
     Determine RNA-seq library strandness using RSeQC's infer_experiment tool.
@@ -127,6 +176,48 @@ rule merge_strandness_results:
     shell:
         """
         grep -H "" {input} > {output}
+        """
+
+rule junction_annotation:
+    """
+    RSeQC: Junction Annotation
+    
+    This module compares detected splice junctions to reference gene model.
+    Splicing annotation is performed in two levels: splice event level and splice junction level.
+    It helps to identify:
+    - Annotated junctions (known)
+    - Partial novel junctions
+    - Complete novel junctions
+    """
+    input:
+        bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
+        bai = '02.mapping/STAR/sort_index/{sample}.sort.bam.bai',
+        bed =  config['STAR_index'][config['Genome_Version']]['bed12'],
+    output:
+        splice_events =  "02.mapping/junction_annotation/{sample}.splice_events.pdf",
+        splice_junction =  "02.mapping/junction_annotation/{sample}.splice_junction.pdf",
+        junction = "02.mapping/junction_annotation/{sample}.junction.bed", 
+        junction_Interact = "02.mapping/junction_annotation/{sample}.junction.Interact.bed", 
+        junction_plot =  "02.mapping/junction_annotation/{sample}.junction_plot.r",
+        junction_xls =  "02.mapping/junction_annotation/{sample}.junction.xls",
+        log = '02.mapping/junction_annotation/{sample}.junction_annotation.txt',
+    resources:
+        **rule_resource(config, 'medium_resource', skip_queue_on_local=True, logger=logger),
+    conda:
+        workflow.source_path("../envs/rseqc.yaml"),
+    message:
+        "Calculating junction_annotation for {wildcards.sample}"
+    benchmark:
+        "benchmarks/{sample}_junction_annotation.txt"
+    params:
+        output = "02.mapping/junction_annotation/{sample}"
+    threads: 
+        1
+    shell:
+        """
+        junction_annotation.py -i {input.bam} \
+                               -r {input.bed} \
+                               -o {params.output} > {output.log}
         """
 
 rule rmats_run:

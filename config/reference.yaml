@@ -47,6 +47,7 @@ STAR_index:
       rsem_index_dir: Lactuca_sativa_V11_ncbi/RSEM_Lactuca_sativa_V11_ncbi/
       bed12: Lactuca_sativa_V11_ncbi/Lsat_Salinas_v11.bed12
       go_annotation: Lactuca_sativa_V11_ncbi/GCF_002870075.4-RS_2022_12_gene_ontology.go
+      ref_all: Lactuca_sativa_V11_ncbi/Lsat_ref_all.txt
       ploidy: 2
     Lsat_Salinas_v8:
       index: Lactuca_sativa_V8/RSEM_Lactuca_sativa_V8

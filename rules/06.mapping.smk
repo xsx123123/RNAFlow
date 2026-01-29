@@ -45,6 +45,7 @@ rule STAR_mapping:
         Aligned_bam =  temp('02.mapping/STAR/{sample}/{sample}.Aligned.sortedByCoord.out.bam'),
         Transcriptome_bam = temp('02.mapping/STAR/{sample}/{sample}.Aligned.toTranscriptome.out.bam'),
         log_final = '02.mapping/STAR/{sample}/{sample}.Log.final.out',
+        Chimeric = '02.mapping/STAR/{sample}/{sample}.Chimeric.out.junction',
     resources:
         **rule_resource(config, 'high_resource',  skip_queue_on_local=True,logger = logger),
     conda:
@@ -467,6 +468,7 @@ rule bamCoverage:
                     &> {log}
         """
 
+
 rule geneBody_coverage:
     """
     Calculate Gene Body Coverage using RSeQC.
@@ -503,6 +505,43 @@ rule geneBody_coverage:
                              &> {log}
         """
         
+
+rule read_distribution:
+    """
+    RSeQC: Read Distribution Analysis
+    
+    Function:
+        Calculates how mapped reads are distributed over genome features 
+        (CDS exons, 5'UTR exons, 3'UTR exons, Introns, Intergenic regions).
+    
+    Purpose:
+        - Check for genomic DNA contamination (High Intron/Intergenic reads).
+        - Assess library construction quality (e.g., rRNA depletion efficiency).
+    """
+    input:
+        bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
+        bed = config['STAR_index'][config['Genome_Version']]['bed12'],
+    output:
+        txt = "02.mapping/read_distribution/{sample}.read_distribution.txt"
+    resources:
+        **rule_resource(config, 'low_resource', skip_queue_on_local=True, logger=logger),
+    conda:
+        workflow.source_path("../envs/rseqc.yaml"),
+    message:
+        "Calculating read distribution statistics for {wildcards.sample}"
+    benchmark:
+        "benchmarks/read_distribution_{sample}.txt"
+    log:
+        "logs/02.mapping/RSeQC/read_distribution_{sample}.log"
+    threads: 
+        1 
+    shell:
+        """
+        read_distribution.py -i {input.bam} \
+                             -r {input.bed} \
+                             > {output.txt} 2> {log}
+        """
+
 rule mapping_report:
     """
     Aggregate all mapping QC results into a comprehensive MultiQC report.
@@ -526,6 +565,7 @@ rule mapping_report:
         tin_summary = expand('02.mapping/rseqc/tin/{sample}.summary.txt',sample=samples.keys()),
         geneBody = expand("02.mapping/bamCoverage/{sample}.geneBodyCoverage.txt",sample=samples.keys()),
         pdf  = expand("02.mapping/bamCoverage/{sample}.geneBodyCoverage.pdf",sample=samples.keys()),
+        txt = expand("02.mapping/read_distribution/{sample}.read_distribution.txt",sample=samples.keys()),
     output:
         report = "02.mapping/mapping_report/multiqc_mapping_report.html",
     resources:
