@@ -42,14 +42,9 @@ def qc_clean(samples: Dict = None, data_deliver: List = None) -> List:
 def mapping(samples: Dict = None, data_deliver: List = None, config: Dict = None) -> List:
     """
     Handle sequence alignment and related outputs.
-
-    Args:
-        samples: Dictionary of sample information
-        data_deliver: List of deliverable files to extend
-        config: Configuration dictionary containing parameters
-
-    Returns:
-        Updated list of deliverable files
+    
+    This function separates 'Core Mapping' (BAM, CRAM, Basic Stats) from 
+    'Deep QC' (RSeQC, TIN, BigWig), allowing for flexible control via config.
     """
     if samples is None:
         samples = {}
@@ -58,26 +53,46 @@ def mapping(samples: Dict = None, data_deliver: List = None, config: Dict = None
     if config is None:
         config = {}
 
-    # mapping
+    # =========================================================================
+    # [1] Core Mapping Outputs (基础核心输出)
+    # 这些文件是后续所有分析的基础，无论 config 设置如何，都必须生成。
+    # =========================================================================
+    
+    # STAR Alignment Results
     data_deliver.extend(expand("02.mapping/STAR/sort_index/{sample}.sort.bam", sample=samples.keys()))
     data_deliver.extend(expand("02.mapping/STAR/sort_index/{sample}.sort.bam.bai", sample=samples.keys()))
+    
+    # Samtools Statistics
     data_deliver.extend(expand("02.mapping/samtools_flagstat/{sample}_bam_flagstat.tsv", sample=samples.keys()))
     data_deliver.extend(expand("02.mapping/samtools_stats/{sample}_bam_stats.tsv", sample=samples.keys()))
+    
+    # Qualimap QC
     data_deliver.extend(expand("02.mapping/qualimap_report/{sample}/qualimapReport.html", sample=samples.keys()))
     data_deliver.extend(expand("02.mapping/qualimap_report/{sample}/genome_results.txt", sample=samples.keys()))
-    data_deliver.extend(expand('02.mapping/cram/{sample}.cram',sample=samples.keys()))
-    data_deliver.extend(expand('02.mapping/cram/{sample}.cram.crai',sample=samples.keys()))
-    data_deliver.extend(expand("02.mapping/read_distribution/{sample}.read_distribution.txt",sample=samples.keys()))
-    data_deliver.extend(expand("02.mapping/bamCoverage/{sample}.geneBodyCoverage.txt",sample=samples.keys()))
-    data_deliver.extend(expand('02.mapping/rseqc/tin/{sample}.summary.txt',sample=samples.keys()))
+    
+    # CRAM Compression (Archiving)
+    data_deliver.extend(expand('02.mapping/cram/{sample}.cram', sample=samples.keys()))
+    data_deliver.extend(expand('02.mapping/cram/{sample}.cram.crai', sample=samples.keys()))
     data_deliver.append('02.mapping/cram/reference_version.txt')
-    # bamcoverage - need to handle config parameter properly
-    normalize_method = config.get('parameter', {}).get('bamCoverage', {}).get('normalizeUsing', 'RPKM')
-    # Create file paths dynamically since expand doesn't support variable substitution in the middle of the string
-    for sample in samples.keys():
-        data_deliver.append(f"02.mapping/bamCoverage/{sample}_{normalize_method}.bw")
-
+    
+    # MultiQC Report for Mapping
     data_deliver.append("02.mapping/mapping_report/multiqc_mapping_report.html")
+
+    if config.get('rseqc'):
+        data_deliver.extend(expand("02.mapping/read_distribution/{sample}.read_distribution.txt", sample=samples.keys()))
+        data_deliver.extend(expand("02.mapping/bamCoverage/{sample}.geneBodyCoverage.txt", sample=samples.keys()))
+
+    if config.get('tin') or config.get('rseqc'):
+        data_deliver.extend(expand('02.mapping/tin/{sample}.tin.xls', sample=samples.keys()))
+        data_deliver.extend(expand('02.mapping/tin/{sample}.summary.txt', sample=samples.keys()))
+
+    if config.get('bamCoverage'):
+        normalize_method = config.get('parameter', {}).get('bamCoverage', {}).get('normalizeUsing', 'RPKM')
+        
+        # 动态生成 BigWig 文件路径
+        for sample in samples.keys():
+            data_deliver.append(f"02.mapping/bamCoverage/{sample}_{normalize_method}.bw")
+
     return data_deliver
 
 

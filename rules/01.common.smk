@@ -21,6 +21,7 @@ configurations, and path resolution issues.
 import os
 import glob
 import sys
+import time
 from pathlib import Path
 from typing import Dict, Union, List, Callable
 from rich import print as rich_print
@@ -35,40 +36,45 @@ _qc_warning_logged = False
 
 def DataDeliver(config: Dict = None, samples: Dict = None, all_contrasts: Dict = None) -> List[str]:
     """
-    Main data delivery orchestrator function that determines which analysis modules
-    to execute based on the pipeline configuration and returns the list of expected
-    output files.
-
-    This function serves as the central hub for the RNA-seq analysis workflow,
-    dynamically enabling/disabling analysis modules based on user configuration.
-
-    Args:
-        config (Dict): Pipeline configuration dictionary containing module flags
-        samples (Dict): Dictionary of sample information from sample sheet
-        all_contrasts (Dict): Dictionary of differential expression contrasts
-
-    Returns:
-        List[str]: List of expected output file paths that will be generated
-                  by the enabled analysis modules.
-
-    Configuration Options:
-        - only_qc: When True, runs only QC, mapping, and counting modules
-        - print_target: When True, prints the target file list using Rich
-        - Individual module flags: qc_clean, mapping, count, DEG, call_variant,
-          noval_Transcripts, rmats (set to True to enable each module)
+    Main data delivery orchestrator.
+    Controls the flow of the pipeline based on 'only_qc' and specific module flags.
     """
-    # Initialize data deliver - short-read raw-data QC result
+    # Initialize config/samples if None
+    config = config or {}
+    samples = samples or {}
+    
+    # ---------------------------------------------------------
+    # 0. 初始化基础文件列表 (MD5 Check)
+    # ---------------------------------------------------------
+    convert_md5_path = config.get('convert_md5', 'md5_check') 
     data_deliver = [
         "01.qc/md5_check.tsv",
-        os.path.join('00.raw_data', config['convert_md5']),
-        os.path.join('00.raw_data', config['convert_md5'], "raw_data_md5.json")
+        os.path.join('00.raw_data', convert_md5_path),
+        os.path.join('00.raw_data', convert_md5_path, "raw_data_md5.json")
     ]
 
-    # Define module functions and their default behavior
+    # ---------------------------------------------------------
+    # 1. 定义模块类别
+    # ---------------------------------------------------------
+    
+    # [A] 基础模块：无论如何必须运行，不需要用户在 yaml 配置
+    basic_modules = ['qc_clean', 'mapping', 'count']
+
+    # [B] 深度质控标记：属于 Mapping 内部的参数，默认开启，only_qc=True 时也保留
+    # 注意：这些 key 必须与 mapping 函数内部检查的 key 一致
+    deep_qc_flags = ['rseqc', 'bamCoverage', 'tin'] 
+
+    # [C] 下游分析模块：只有当 only_qc=False 时才尝试运行
+    downstream_modules = ['DEG', 'call_variant', 'noval_Transcripts', 'rmats']
+
+    # ---------------------------------------------------------
+    # 2. 定义执行包装器 (Wrappers)
+    # ---------------------------------------------------------
     def execute_qc_clean(samples, data_deliver):
         return qc_clean(samples, data_deliver)
 
     def execute_mapping(samples, data_deliver):
+        # 必须传入 config，因为 mapping 内部需要读取 rseqc/bamCoverage 等标记
         return mapping(samples, data_deliver, config)
 
     def execute_count(samples, data_deliver):
@@ -84,10 +90,10 @@ def DataDeliver(config: Dict = None, samples: Dict = None, all_contrasts: Dict =
         return noval_Transcripts(samples, data_deliver)
 
     def execute_rmats(samples, data_deliver, all_contrasts):
-        # Assuming ALL_CONTRASTS is available in the config or global scope
-        all_contrasts = config.get('all_contrasts', []) if config else []
-        return rmats(samples, data_deliver, all_contrasts)
+        contrasts = all_contrasts if all_contrasts else config.get('all_contrasts', [])
+        return rmats(samples, data_deliver, contrasts)
 
+    # 模块函数映射表
     module_functions: Dict[str, Callable] = {
         'qc_clean': execute_qc_clean,
         'mapping': execute_mapping,
@@ -98,33 +104,71 @@ def DataDeliver(config: Dict = None, samples: Dict = None, all_contrasts: Dict =
         'rmats': execute_rmats
     }
 
-    # Default behavior for modules (execute only if explicitly enabled in config)
-    default_config = {module: False for module in module_functions}
-    config = {**default_config, **(config or {})}
-
-    # Special case: If `only_qc` is True, enable `qc_clean`, `mapping`, and `count`, disable others
+    # ---------------------------------------------------------
+    # 3. 核心逻辑控制 (配置参数修正)
+    # ---------------------------------------------------------
     global _qc_warning_logged
-    if config.get('only_qc'):
-        if not _qc_warning_logged:
-            logger.warning(' 🦉🦉 \033[33m ONLY RUN QC ANALYSIS FOR RNA-SEQ : RAW DATA QC & MAPPING & COUNT \033[0m🐝🐝 ')
-            _qc_warning_logged = True
-        for module in module_functions:
-            if module in ['qc_clean', 'mapping', 'count']:
-                config[module] = True
-            else:
-                config[module] = False
 
-    # Execute modules based on config
+    # Step 3.1: 强制开启基础模块 (除非用户显式设为 False)
+    for module in basic_modules:
+        if config.get(module) is not False:
+            config[module] = True
+
+    # Step 3.2: 强制开启深度质控参数 (除非用户显式设为 False)
+    # 这样确保 only_qc: True 时，RSeQC 和 BamCoverage 依然被激活
+    for flag in deep_qc_flags:
+        if config.get(flag) is not False:
+            config[flag] = True
+
+    # Step 3.3: 根据 only_qc 处理下游模块
+    if config.get('only_qc'):
+        # === 模式: 仅 QC (含深度质控) ===
+        if not _qc_warning_logged:
+            logger.warning('**********************************************************************')
+            logger.warning('   [MODE] ONLY QC ENABLED                                            ')
+            logger.warning('   - Running: Raw QC, Mapping, Counting, RSeQC, BamCoverage           ')
+            logger.warning('   - Skipping: DEG, Variants, Novel Transcripts, rMATS                ')
+            logger.warning('**********************************************************************')
+            time.sleep(1)
+            _qc_warning_logged = True
+            
+        # 强制关闭下游模块
+        for module in downstream_modules:
+            config[module] = False
+            
+    else:
+        # === 模式: 全流程分析 ===
+        # 激活下游模块 (除非用户显式设为 False)
+        for module in downstream_modules:
+            if config.get(module) is not False:
+                config[module] = True
+
+    # ---------------------------------------------------------
+    # 4. 执行并收集输出文件
+    # ---------------------------------------------------------
     for module, func in module_functions.items():
-        if config.get(module, False):  # Only execute if the module is enabled in config
+        # 只有在 config 中为 True 时才运行
+        if config.get(module):
             if module == "rmats":
                 data_deliver = func(samples, data_deliver, all_contrasts)
+            elif module == "mapping":
+                # 这里传递的 config 已经包含了 rseqc=True, bamCoverage=True
+                data_deliver = func(samples, data_deliver)
             else:
                 data_deliver = func(samples, data_deliver)
-    # Print target if required
+
+    # ---------------------------------------------------------
+    # 5. 调试输出
+    # ---------------------------------------------------------
     if config.get('print_target'):
+        rich_print("[bold green]Generated Target Files:[/bold green]")
         rich_print(data_deliver)
+        
     return data_deliver
+
+
+
+
 
 def ReportData(config: dict = None) -> List[str]:
     """

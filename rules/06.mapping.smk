@@ -147,68 +147,68 @@ rule sort_index:
         samtools index -@ {threads} {output.sort_bam})  &>{log}
         """
 
-rule estimate_library_complexity:
-    """
-    Estimate library complexity using Preseq.
-
-    This rule uses Preseq to predict the complexity of the sequencing library
-    by estimating how many additional unique reads would be observed if more
-    sequencing were performed. This helps assess whether the current sequencing
-    depth is sufficient or if additional sequencing would yield diminishing returns.
-
-    Outputs two files:
-    - lc_extrap.txt: Library complexity extrapolation predictions
-    - c_curve.txt: Complexity curve showing observed vs. predicted unique reads
-    """
-    input:
-        sort_bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
-        sort_bam_bai = '02.mapping/STAR/sort_index/{sample}.sort.bam.bai',
-    output:
-        preseq = '02.mapping/preseq/{sample}.lc_extrap.txt',
-        c_curve = '02.mapping/preseq/{sample}.c_curve.txt',
-    resources:
-        **rule_resource(config, 'low_resource', skip_queue_on_local=True, logger=logger),
-    conda:
-        workflow.source_path("../envs/Preseq.yaml"),
-    message:
-        "Running Preseq for {wildcards.sample}",
-    log:
-        "logs/02.mapping/preseq_{sample}.log",
-    benchmark:
-        "benchmarks/{sample}_preseq_benchmark.txt",
-    threads:
-        1
-    shell:
-        """
-        exec 2> {log}
-        set +e  # Disable immediate exit on error for this block
-
-        # 1. Run c_curve first (Stable, based on observed data)
-        echo "Running preseq c_curve..."
-        preseq c_curve -pe -v -output {output.c_curve} -B {input.sort_bam}
-        C_CURVE_EXIT=$?
-
-        # 2. Run lc_extrap (Unstable, model fitting may fail)
-        echo "Running preseq lc_extrap..."
-        preseq lc_extrap -pe -v -output {output.preseq} -B {input.sort_bam}
-        LC_EXIT=$?
-
-        # 3. Handle lc_extrap failure gracefully
-        if [ $LC_EXIT -ne 0 ]; then
-            echo "WARNING: preseq lc_extrap failed to converge or encountered an error (Exit code: $LC_EXIT)."
-            echo "This is common for libraries with low complexity or insufficient data."
-            echo "# Preseq lc_extrap failed" > {output.preseq}
-            # We do NOT fail the rule if only lc_extrap fails, as long as c_curve worked.
-        fi
-
-        # 4. Final validation
-        if [ $C_CURVE_EXIT -ne 0 ]; then
-            echo "CRITICAL: preseq c_curve failed. This indicates a problem with the input BAM or software."
-            exit $C_CURVE_EXIT
-        fi
-
-        exit 0
-        """
+#rule estimate_library_complexity:
+#    """
+#    Estimate library complexity using Preseq.
+#
+#    This rule uses Preseq to predict the complexity of the sequencing library
+#    by estimating how many additional unique reads would be observed if more
+#    sequencing were performed. This helps assess whether the current sequencing
+#    depth is sufficient or if additional sequencing would yield diminishing returns.
+#
+#    Outputs two files:
+#    - lc_extrap.txt: Library complexity extrapolation predictions
+#    - c_curve.txt: Complexity curve showing observed vs. predicted unique reads
+#    """
+#    input:
+#        sort_bam = '02.mapping/STAR/sort_index/{sample}.sort.bam',
+#        sort_bam_bai = '02.mapping/STAR/sort_index/{sample}.sort.bam.bai',
+#    output:
+#        preseq = '02.mapping/preseq/{sample}.lc_extrap.txt',
+#        c_curve = '02.mapping/preseq/{sample}.c_curve.txt',
+#    resources:
+#        **rule_resource(config, 'low_resource', skip_queue_on_local=True, logger=logger),
+#    conda:
+#        workflow.source_path("../envs/Preseq.yaml"),
+#    message:
+#        "Running Preseq for {wildcards.sample}",
+#    log:
+#        "logs/02.mapping/preseq_{sample}.log",
+#    benchmark:
+#        "benchmarks/{sample}_preseq_benchmark.txt",
+#    threads:
+#        1
+#    shell:
+#        """
+#        exec 2> {log}
+#        set +e  # Disable immediate exit on error for this block
+#
+#        # 1. Run c_curve first (Stable, based on observed data)
+#        echo "Running preseq c_curve..."
+#        preseq c_curve -pe -v -output {output.c_curve} -B {input.sort_bam}
+#        C_CURVE_EXIT=$?
+#
+#        # 2. Run lc_extrap (Unstable, model fitting may fail)
+#        echo "Running preseq lc_extrap..."
+#        preseq lc_extrap -pe -v -output {output.preseq} -B {input.sort_bam}
+#        LC_EXIT=$?
+#
+#        # 3. Handle lc_extrap failure gracefully
+#        if [ $LC_EXIT -ne 0 ]; then
+#            echo "WARNING: preseq lc_extrap failed to converge or encountered an error (Exit code: $LC_EXIT)."
+#            echo "This is common for libraries with low complexity or insufficient data."
+#            echo "# Preseq lc_extrap failed" > {output.preseq}
+#            # We do NOT fail the rule if only lc_extrap fails, as long as c_curve worked.
+#        fi
+#
+#        # 4. Final validation
+#        if [ $C_CURVE_EXIT -ne 0 ]; then
+#            echo "CRITICAL: preseq c_curve failed. This indicates a problem with the input BAM or software."
+#            exit $C_CURVE_EXIT
+#        fi
+#
+#        exit 0
+#        """
 
 rule qualimap_qc:
     """
@@ -406,8 +406,8 @@ rule rseqc_tin:
         bai = '02.mapping/STAR/sort_index/{sample}.sort.bam.bai',
         bed =  config['STAR_index'][config['Genome_Version']]['bed12'],
     output:
-        tin_score = '02.mapping/rseqc/tin/{sample}.tin.xls',
-        tin_summary = '02.mapping/rseqc/tin/{sample}.summary.txt'
+        tin_score = '02.mapping/tin/{sample}.tin.xls',
+        tin_summary = '02.mapping/tin/{sample}.summary.txt'
     resources:
         **rule_resource(config, 'medium_resource', skip_queue_on_local=True, logger=logger),
     conda:
@@ -422,8 +422,8 @@ rule rseqc_tin:
     shell:
         """
         tin.py -i {input.bam} -r {input.bed} > {log} 2>&1
-        mv {input.bam}.tin.xls {output.tin_score}
-        mv {input.bam}.summary.txt {output.tin_summary}
+        mv {wildcards.sample}.sort.tin.xls {output.tin_score}
+        mv {wildcards.sample}.sort.summary.txt {output.tin_summary}
         """
 
 rule bamCoverage:
@@ -558,11 +558,8 @@ rule mapping_report:
         qualimap_report_txt = expand('02.mapping/qualimap_report/{sample}/genome_results.txt',sample=samples.keys()),
         samtools_flagstat = expand('02.mapping/samtools_flagstat/{sample}_bam_flagstat.tsv',sample=samples.keys()),
         samtools_stats = expand('02.mapping/samtools_stats/{sample}_bam_stats.tsv',sample=samples.keys()),
-        preseq = expand('02.mapping/preseq/{sample}.lc_extrap.txt',sample=samples.keys()),
-        c_curve = expand('02.mapping/preseq/{sample}.c_curve.txt',sample=samples.keys()),
-        rseqc_tin = expand('02.mapping/rseqc/tin/{sample}.summary.txt',sample=samples.keys()),
-        tin_score = expand('02.mapping/rseqc/tin/{sample}.tin.xls',sample=samples.keys()),
-        tin_summary = expand('02.mapping/rseqc/tin/{sample}.summary.txt',sample=samples.keys()),
+        tin_score = expand('02.mapping/tin/{sample}.tin.xls',sample=samples.keys()),
+        tin_summary = expand('02.mapping/tin/{sample}.summary.txt',sample=samples.keys()),
         geneBody = expand("02.mapping/bamCoverage/{sample}.geneBodyCoverage.txt",sample=samples.keys()),
         pdf  = expand("02.mapping/bamCoverage/{sample}.geneBodyCoverage.pdf",sample=samples.keys()),
         txt = expand("02.mapping/read_distribution/{sample}.read_distribution.txt",sample=samples.keys()),
