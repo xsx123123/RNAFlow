@@ -423,7 +423,7 @@ rule rseqc_tin:
         """
         tin.py -i {input.bam} -r {input.bed} > {log} 2>&1
         mv {wildcards.sample}.sort.tin.xls {output.tin_score}
-        mv {wildcards.ssample}.sort.summary.txt {output.tin_summary}
+        mv {wildcards.sample}.sort.summary.txt {output.tin_summary}
         """
 
 rule bamCoverage:

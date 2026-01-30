@@ -32,3 +32,5 @@ call_variant: true
 noval_Transcripts: true
 # rmats
 rmats: true
+# ---------------------------------------------------------------------- #
+loki_url: "http://122.205.67.97:3100"

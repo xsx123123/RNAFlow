@@ -40,4 +40,3 @@ r1_suffix: _R1.fq.gz        # File suffix for R1 (forward) reads
 r2_suffix: _R2.fq.gz        # File suffix for R2 (reverse) reads
 md5: MD5.txt                # MD5 checksum filename for processed data
 pipeline_version: "RNAFlow v0.1.7"  # Pipeline version for reproducibility tracking
-seq_server_url: "http://122.205.70.103:5341" # seqserver api
