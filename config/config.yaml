@@ -39,4 +39,4 @@ convert_md5: 'link_dir'     # Directory name for symbolic links to raw data
 r1_suffix: _R1.fq.gz        # File suffix for R1 (forward) reads
 r2_suffix: _R2.fq.gz        # File suffix for R2 (reverse) reads
 md5: MD5.txt                # MD5 checksum filename for processed data
-pipeline_version: "RNAFlow v0.1.7"  # Pipeline version for reproducibility tracking
+pipeline_version: "RNAFlow v0.1.8"  # Pipeline version for reproducibility tracking
