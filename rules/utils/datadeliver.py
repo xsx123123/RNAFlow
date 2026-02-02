@@ -62,6 +62,11 @@ def mapping(samples: Dict = None, data_deliver: List = None, config: Dict = None
     data_deliver.extend(expand("02.mapping/STAR/sort_index/{sample}.sort.bam", sample=samples.keys()))
     data_deliver.extend(expand("02.mapping/STAR/sort_index/{sample}.sort.bam.bai", sample=samples.keys()))
     
+
+    data_deliver.extend(expand("02.mapping/STAR/{sample}/{sample}.Signal.UniqueMultiple.str1.out.bg.gz", sample=samples.keys()))
+    data_deliver.extend(expand("02.mapping/STAR/{sample}/{sample}.Signal.UniqueMultiple.str2.out.bg.gz", sample=samples.keys()))
+    data_deliver.extend(expand("02.mapping/STAR/{sample}/{sample}.Signal.Unique.str1.out.bg.gz", sample=samples.keys()))
+    data_deliver.extend(expand("02.mapping/STAR/{sample}/{sample}.Signal.Unique.str2.out.bg.gz", sample=samples.keys()))
     # Samtools Statistics
     data_deliver.extend(expand("02.mapping/samtools_flagstat/{sample}_bam_flagstat.tsv", sample=samples.keys()))
     data_deliver.extend(expand("02.mapping/samtools_stats/{sample}_bam_stats.tsv", sample=samples.keys()))

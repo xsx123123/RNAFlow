@@ -495,9 +495,38 @@ python report/bioreport/main.py --input results_dir --output report_dir --ai
 - **Improvement**: 更新 `11.DEG_Enrichments`，整合富集分析逻辑。
 - **Optimization**: 完善 AI 解读引擎的流控与容错机制。
 
-### RNAFlow_v0.1.5
-- **Feature**: 实现智能输入数据识别，支持多种目录结构。
-- **Improvement**: 集成 `rich-loguru` 提升终端输出体验。
+
+### RNAFlow_v0.1.5 (2026-01-11)
+- **新特性**: 实现了智能输入数据识别。流程现在可以自动检测样本文件是按目录组织还是作为扁平文件存储在公共目录中，简化了样本表的准备工作。
+- **改进**: 通过集成 `rich-loguru` 增强了 CLI 输出体验，提供更好的日志记录和错误报告。
+- **文档**: 更新了目录结构和使用示例。
+
+### RNAFlow_v0.1.4 (2026-01-07)
+- 添加 rMATS 分析用于可变剪接检测
+- 添加基因融合检测模块
+- 添加富集分析功能
+- 添加对 GRCm39 参考基因组的支持
+- 修复并更新 rMATS 规则 (12.rMATS.smk)
+- 修复工作流程源路径问题
+
+### RNAFlow_v0.1.3 (2026-01-03)
+- 添加差异表达分析 (DEG) 模块
+- 添加合并 RSEM 功能
+- 更新 RSEM 工作流程
+- 添加转录本组装 (StringTie) 模块
+- 添加变异检测 (GATK) 模块
+- 各种错误修复和改进
+
+### RNAFlow_v0.1.2 (2025-12-25)
+- 修复比对模块错误 (07.mapping.smk)
+
+### RNAFlow_v0.1.1 (2025-12-24)
+- 添加 RSEM 定量模块 (08.rsem.smk)
+
+### RNAFlow_v0.1 (2025-12-24)
+- 初始发布
+- 基础 RNA-seq 分析工作流程
+- 质量控制、比对和定量模块
 
 ---
 **Author**: JZHANG | **Version**: RNAFlow_v0.1.8

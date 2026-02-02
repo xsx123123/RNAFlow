@@ -68,6 +68,7 @@ STAR_index:
       rsem_index_dir: ITAG4.1/RSEM_ITAG4.1/
       bed12: ITAG4.1/ITAG4.1_gene_models.bed12
       go_annotation: ITAG4.1/ITAG4.1_blast2go_annot.annot_deal
+      ref_all: ITAG4.1/ITAG4.1_ref_all.txt
       ploidy: 2
     TAIR10.1:
       index: TAIR10.1/RSEM_TAIR10.1
@@ -88,6 +89,7 @@ STAR_index:
       rsem_index_dir: GRCm39/RSEM_GRCm39/
       bed12: GRCm39/gencode.vM38.annotation.bed12
       go_annotation: GRCm39/mgigene_go_annotation.tsv
+      ref_all: GRCm39/GRCm39_ref_all.txt
       ploidy: 2
     hg38:
       index: HG38/RSEM_hg38

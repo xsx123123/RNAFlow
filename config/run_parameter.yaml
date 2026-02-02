@@ -39,6 +39,7 @@ parameter:
     rmats: 6                # rMATS alternative splicing analysis
     rnaflow-cli: 8          # RNAFlow delivery tool
     Report: 10              # Containerized report generation
+    compress_bg: 8
 
   # FastQ Screen Configuration
   # Parameters for contamination screening using fastq_screen
