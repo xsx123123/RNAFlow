@@ -475,6 +475,8 @@ python report/bioreport/main.py --input results_dir --output report_dir --ai
 - **Feature**: 增加`loki_url`配置项，用于配置 Loki 服务器地址以实现流程监控。
 - **Feature**: 更新`snakemake_logger_plugin_rich_loguru`插件至 0.1.4 版本，支持 Loki 日志推送。
 - **Documentation**: 添加 Grafana 监控示例截图 (见 `doc/grafana.png`)。
+- **Feature**: 增加`compress_bg`分析模块，用于`star`对比结果 `covrage` 文件压缩，节省存储空间。
+
 
 ### RNAFlow_v0.1.7
 - **Feature**: 增加`estimate_library_complexity`rule，用于评估文库复杂度。
