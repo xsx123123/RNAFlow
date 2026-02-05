@@ -80,8 +80,8 @@ rule CIRCexplorer2_run:
         Chimeric = '02.mapping/STAR/{sample}/{sample}.Chimeric.out.junction',
     output:
         Chimeric_clean = temp('02.mapping/STAR/{sample}/{sample}.Chimeric.clean.junction'),
-        back_spliced_junction = '02.mapping/STAR/{sample}/back_spliced_junction.bed',
-        circularRNA = '02.mapping/STAR/{sample}/circularRNA_known.txt',
+        back_spliced_junction = '02.mapping/CIRCexplorer2/{sample}/back_spliced_junction.bed',
+        circularRNA = '02.mapping/CIRCexplorer2/{sample}/circularRNA_known.txt',
     resources:
         **rule_resource(config, 'low_resource', skip_queue_on_local=True, logger=logger),
     threads:
@@ -98,7 +98,7 @@ rule CIRCexplorer2_run:
     shell:
         """
         (
-        awk '$1!="junction_type" && $1!~/^#/' {input.Chimeric} > {output.Chimeric_clean}
+        grep -v 'junction_type' {input.Chimeric} | grep -v '#' > {output.Chimeric_clean}
 
         CIRCexplorer2 parse -t STAR {output.Chimeric_clean} 
 

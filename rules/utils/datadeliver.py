@@ -235,7 +235,7 @@ def rmats(samples: Dict = None, data_deliver: List = None, all_contrasts: List =
     data_deliver.extend(expand("02.mapping/junction_annotation/{sample}.splice_junction.pdf",sample=samples.keys()))
     data_deliver.extend(expand('02.mapping/junction_annotation/{sample}.junction_annotation.txt',sample=samples.keys()))
     # circularRNA
-    data_deliver.extend(expand("02.mapping/STAR/{sample}/circularRNA_known.txt", sample=samples.keys()))
+    data_deliver.extend(expand("02.mapping/CIRCexplorer2/{sample}/circularRNA_known.txt", sample=samples.keys()))
     # rmats pair sample
     if all_contrasts:  # Only add contrast-related outputs if contrasts are provided
         data_deliver.extend(expand("07.AS/rmats_pair/{contrast}/summary.txt", contrast=all_contrasts))
