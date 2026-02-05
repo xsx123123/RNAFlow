@@ -107,6 +107,7 @@ rule STAR_mapping:
             --alignSJstitchMismatchNmax 5 -1 5 5  \
             --chimOutType Junctions  \
             --chimOutJunctionFormat 1  \
+            --genomeLoad LoadAndKeep \
             --chimSegmentMin 12  \
             --chimJunctionOverhangMin 12  \
             --chimMultimapScoreRange 10  \
