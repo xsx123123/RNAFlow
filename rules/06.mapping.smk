@@ -70,7 +70,7 @@ rule STAR_mapping:
         """
         ulimit -n 65535 && STAR --runMode alignReads \
             --genomeDir {input.idx_dir} \
-            --genomeLoad LoadAndKeep \
+            --genomeLoad NoSharedMemory \
             --runThreadN {threads} \
             --sjdbGTFfile {input.genome_gtf} \
             --twopassMode Basic \
