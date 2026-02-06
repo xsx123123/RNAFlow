@@ -70,7 +70,7 @@ rule STAR_mapping:
         """
         ulimit -n 65535 && STAR --runMode alignReads \
             --genomeDir {input.idx_dir} \
-            --genomeLoad NoSharedMemory  \
+            --genomeLoad LoadAndKeep \
             --runThreadN {threads} \
             --sjdbGTFfile {input.genome_gtf} \
             --twopassMode Basic \
@@ -107,7 +107,6 @@ rule STAR_mapping:
             --alignSJstitchMismatchNmax 5 -1 5 5  \
             --chimOutType Junctions  \
             --chimOutJunctionFormat 1  \
-            --genomeLoad LoadAndKeep \
             --chimSegmentMin 12  \
             --chimJunctionOverhangMin 12  \
             --chimMultimapScoreRange 10  \
