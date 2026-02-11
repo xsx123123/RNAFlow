@@ -87,9 +87,9 @@ def mapping(samples: Dict = None, data_deliver: List = None, config: Dict = None
         data_deliver.extend(expand("02.mapping/read_distribution/{sample}.read_distribution.txt", sample=samples.keys()))
         data_deliver.extend(expand("02.mapping/bamCoverage/{sample}.geneBodyCoverage.txt", sample=samples.keys()))
 
-    if config.get('tin') or config.get('rseqc'):
-        data_deliver.extend(expand('02.mapping/tin/{sample}.tin.xls', sample=samples.keys()))
-        data_deliver.extend(expand('02.mapping/tin/{sample}.summary.txt', sample=samples.keys()))
+    # if config.get('tin') or config.get('rseqc'):
+    #    data_deliver.extend(expand('02.mapping/tin/{sample}.tin.xls', sample=samples.keys()))
+    #    data_deliver.extend(expand('02.mapping/tin/{sample}.summary.txt', sample=samples.keys()))
 
     if config.get('bamCoverage'):
         normalize_method = config.get('parameter', {}).get('bamCoverage', {}).get('normalizeUsing', 'RPKM')
