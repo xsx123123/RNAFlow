@@ -486,6 +486,10 @@ python report/bioreport/main.py --input results_dir --output report_dir --ai
 
 ## 📈 版本历史
 
+### RNAFlow_v0.1.9
+- **Optimization**: 修改 `call varinat` & `enrichments` & `report` 模块可能存在的bug。
+- **Optimization**: 优化 `reference.yaml` 配置文件，并增加 `deg_enrich_wrapper` & `ploidy_setting` 配置
+
 ### RNAFlow_v0.1.8
 - **Feature**: 弃用旧的 Seq 日志监控方案，更新为 Loki + Grafana 监控系统。
 - **Feature**: 增加`loki_url`配置项，用于配置 Loki 服务器地址以实现流程监控。
