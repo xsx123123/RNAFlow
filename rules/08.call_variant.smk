@@ -227,7 +227,7 @@ rule HaplotypeCaller:
         config['parameter']['threads']['gatk']
     params:
         fasta = config['STAR_index'][config['Genome_Version']]['genome_fa'],
-        ploidy = config['STAR_index'][config['Genome_Version']]['ploidy'],
+        ploidy = config['ploidy_setting'][config['Genome_Version']]['ploidy'],
         java_opts = get_java_opts
     shell:
         """

@@ -106,8 +106,7 @@ parameter:
   Enrichments:
     PATH: ../src/src/Enrichments/go_enricher.r              # GO enrichment R script
     PATH_py: ../src/src/Enrichments/deg_enrich_wrapper.py   # Python wrapper script
-    gene_col: 'Entrez ID'   # Column name containing gene identifiers in DEG results
-    gene_regex: gene:/      # Regular expression pattern for extracting gene IDs
+    gene_regex: gene:/
 
   # RSEM Quality Control Parameters
   # Settings for RSEM result validation and quality assessment

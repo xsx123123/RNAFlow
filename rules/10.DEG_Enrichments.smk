@@ -251,7 +251,7 @@ rule Enrichments:
     params:
         obo = config['STAR_index']['GO']['obo'],
         go_annotation = config['STAR_index'][config['Genome_Version']]['go_annotation'],
-        gene_col = config['parameter']['Enrichments']['gene_col'],
+        gene_col = config['deg_enrich_wrapper'][config['Genome_Version']]['gene_col'],
         r_script = workflow.source_path(config['parameter']['Enrichments']['PATH']),
         wrapper = workflow.source_path(config['parameter']['Enrichments']['PATH_py']),
         gene_regex = config['parameter']['Enrichments']['gene_regex'],
@@ -266,7 +266,7 @@ rule Enrichments:
             -o {params.obo} \
             -a {params.go_annotation} \
             -d {output.Enrichments_dir} \
-            --gene_col {params.gene_col} \
+            --gene_col '{params.gene_col}' \
             --gene_regex '{params.gene_regex}' \
             --cutoff {params.cutoff} > {log} 2>&1
         """

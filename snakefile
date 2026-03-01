@@ -65,7 +65,10 @@ include: 'rules/13.Merge_qc.smk'
 include: 'rules/14.deliver.smk'
 include: 'rules/15.Report.smk'
 # --------- 5. Target Rule --------- #
+data_deliver = DataDeliver(config=config,samples = samples,
+                           all_contrasts = ALL_CONTRASTS)
+# Target rule to run all rules
 rule all:
     input:
-        DataDeliver(config=config,samples = samples,all_contrasts = ALL_CONTRASTS),
+        data_deliver,
         ReportData(config=config),
