@@ -33,22 +33,22 @@ can_use_genome_version:
   - GRCm39              # Mus musculus (Mouse) GRCm39
   - hg38                # Homo sapiens (Human) GRCh38/hg38
   - GO                  # Gene Ontology database
-
+    
 # STAR Index and Reference File Configuration
 # Detailed file paths for each supported genome version
 # Each entry should contain all required reference files for the pipeline modules
 STAR_index:
     Lsat_Salinas_v11:
-      index: Lactuca_sativa_V11_ncbi/RSEM_Lactuca_sativa_V11_ncbi
-      genome_fa: Lactuca_sativa_V11_ncbi/GCF_002870075.4_Lsat_Salinas_v11_genomic.fix_id.fna
-      genome_gtf: Lactuca_sativa_V11_ncbi/GCF_002870075.4_Lsat_Salinas_v11_genomic.nuclear_only.gtf
-      genome_gff: Lactuca_sativa_V11_ncbi/GCF_002870075.4_Lsat_Salinas_v11_genomic.fix_id.gff
-      rsem_index: Lactuca_sativa_V11_ncbi/RSEM_Lactuca_sativa_V11_ncbi/Lactuca_sativa_V11_ncbi
-      rsem_index_dir: Lactuca_sativa_V11_ncbi/RSEM_Lactuca_sativa_V11_ncbi/
-      bed12: Lactuca_sativa_V11_ncbi/Lsat_Salinas_v11.bed12
-      go_annotation: Lactuca_sativa_V11_ncbi/GCF_002870075.4-RS_2022_12_gene_ontology.go
-      ref_all: Lactuca_sativa_V11_ncbi/Lsat_ref_all.txt
-      ploidy: 2
+      index: Lactuca_sativa_V11_ncbi/RSEM_Lactuca_sativa_V11_ncbi                                   # STAR INDEX CREATE BY RSEM
+      genome_fa: Lactuca_sativa_V11_ncbi/GCF_002870075.4_Lsat_Salinas_v11_genomic.fix_id.fna        # GENOME FASTA FILE
+      genome_gtf: Lactuca_sativa_V11_ncbi/GCF_002870075.4_Lsat_Salinas_v11_genomic.nuclear_only.gtf # GENOME ANNOTATION FILE
+      genome_gff: Lactuca_sativa_V11_ncbi/GCF_002870075.4_Lsat_Salinas_v11_genomic.fix_id.gff       # GENOME ANNOTATION FILE
+      rsem_index: Lactuca_sativa_V11_ncbi/RSEM_Lactuca_sativa_V11_ncbi/Lactuca_sativa_V11_ncbi      # RSEM INDEX
+      rsem_index_dir: Lactuca_sativa_V11_ncbi/RSEM_Lactuca_sativa_V11_ncbi/                         # RSEM INDEX PATH
+      bed12: Lactuca_sativa_V11_ncbi/Lsat_Salinas_v11.bed12                                         # GENE RANGES FOR GENE COVERAGE ANALYSIS
+      go_annotation: Lactuca_sativa_V11_ncbi/GCF_002870075.4-RS_2022_12_gene_ontology.go            # GO TERM ANNOTATION
+      ref_all: Lactuca_sativa_V11_ncbi/Lsat_ref_all.txt                                             # gene information                                                                              
+      
     Lsat_Salinas_v8:
       index: Lactuca_sativa_V8/RSEM_Lactuca_sativa_V8
       genome_fa: Lactuca_sativa_V8/Lactuca_sativa_V8A.fasta
@@ -58,7 +58,7 @@ STAR_index:
       rsem_index_dir: Lactuca_sativa_V8/RSEM_Lactuca_sativa_V8/
       bed12: Lactuca_sativa_V8/Lactuca_sativa_V8A.bed12
       go_annotation: Lactuca_sativa_V8/Salinas_V8_eggNOG_GO.go
-      ploidy: 2
+      
     ITAG4.1:
       index: ITAG4.1/RSEM_ITAG4.1
       genome_fa: ITAG4.1/S_lycopersicum_chromosomes.4.00.fa
@@ -68,7 +68,8 @@ STAR_index:
       rsem_index_dir: ITAG4.1/RSEM_ITAG4.1/
       bed12: ITAG4.1/ITAG4.1_gene_models.bed12
       go_annotation: ITAG4.1/ITAG4.1_blast2go_annot.annot_deal
-      ploidy: 2
+      ref_all: ITAG4.1/ITAG4.1_ref_all.txt
+      
     TAIR10.1:
       index: TAIR10.1/RSEM_TAIR10.1
       genome_fa: TAIR10.1/TAIR10_chr_all.fas
@@ -77,8 +78,8 @@ STAR_index:
       rsem_index: TAIR10.1/RSEM_TAIR10.1/TAIR10.1_index
       rsem_index_dir: TAIR10.1/RSEM_TAIR10.1/
       bed12: TAIR10.1/Araport11_GTF_genes_transposons.20241001.bed12
-      go_annotation: TAIR10.1/gene_go_annotation.go
-      ploidy: 2
+      go_annotation: TAIR10.1/gene_go_annotation.go  
+      
     GRCm39:
       index: GRCm39/RSEM_GRCm39
       genome_fa: GRCm39/GRCm39.genome.fa
@@ -88,7 +89,8 @@ STAR_index:
       rsem_index_dir: GRCm39/RSEM_GRCm39/
       bed12: GRCm39/gencode.vM38.annotation.bed12
       go_annotation: GRCm39/mgigene_go_annotation.tsv
-      ploidy: 2
+      ref_all: GRCm39/GRCm39_ref_all.txt
+      
     hg38:
       index: HG38/RSEM_hg38
       genome_fa: HG38/GRCh38.p14.genome.fa
@@ -98,6 +100,35 @@ STAR_index:
       rsem_index_dir: HG38/RSEM_hg38/
       bed12: HG38/gencode.v49.annotation.bed12
       go_annotation: HG38/goa_human.go
-      ploidy: 2
+      
     GO:
       obo: go_database/go-basic.obo
+
+# GO annotation analysis by deg result
+deg_enrich_wrapper:
+  Lsat_Salinas_v11:
+    gene_col: 'Entrez ID'   # Column name for gene identifiers in deg result
+  Lsat_Salinas_v8:     
+    gene_col: 'Entrez ID'   # Column name for gene identifiers in deg result
+  ITAG4.1:
+    gene_col: 'Entrez ID'   # Column name for gene identifiers in deg result
+  TAIR10.1:
+    gene_col: 'Entrez ID'   # Column name for gene identifiers in deg result
+  GRCm39:
+    gene_col: 'ENSEMBL'   # Column name for gene identifiers in deg result
+  hg38 :
+    gene_col: 'ENSEMBL'   # Column name for gene identifiers in deg result
+
+ploidy_setting:
+  Lsat_Salinas_v11:
+    ploidy: 2  # genome ploidy
+  Lsat_Salinas_v8:     
+    ploidy: 2
+  ITAG4.1:
+    ploidy: 2
+  TAIR10.1:
+    ploidy: 2
+  GRCm39:
+    ploidy: 2
+  hg38 :
+    ploidy: 2

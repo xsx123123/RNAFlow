@@ -62,6 +62,11 @@ def mapping(samples: Dict = None, data_deliver: List = None, config: Dict = None
     data_deliver.extend(expand("02.mapping/STAR/sort_index/{sample}.sort.bam", sample=samples.keys()))
     data_deliver.extend(expand("02.mapping/STAR/sort_index/{sample}.sort.bam.bai", sample=samples.keys()))
     
+
+    data_deliver.extend(expand("02.mapping/STAR/{sample}/{sample}.Signal.UniqueMultiple.str1.out.bg.gz", sample=samples.keys()))
+    data_deliver.extend(expand("02.mapping/STAR/{sample}/{sample}.Signal.UniqueMultiple.str2.out.bg.gz", sample=samples.keys()))
+    data_deliver.extend(expand("02.mapping/STAR/{sample}/{sample}.Signal.Unique.str1.out.bg.gz", sample=samples.keys()))
+    data_deliver.extend(expand("02.mapping/STAR/{sample}/{sample}.Signal.Unique.str2.out.bg.gz", sample=samples.keys()))
     # Samtools Statistics
     data_deliver.extend(expand("02.mapping/samtools_flagstat/{sample}_bam_flagstat.tsv", sample=samples.keys()))
     data_deliver.extend(expand("02.mapping/samtools_stats/{sample}_bam_stats.tsv", sample=samples.keys()))
@@ -82,9 +87,9 @@ def mapping(samples: Dict = None, data_deliver: List = None, config: Dict = None
         data_deliver.extend(expand("02.mapping/read_distribution/{sample}.read_distribution.txt", sample=samples.keys()))
         data_deliver.extend(expand("02.mapping/bamCoverage/{sample}.geneBodyCoverage.txt", sample=samples.keys()))
 
-    if config.get('tin') or config.get('rseqc'):
-        data_deliver.extend(expand('02.mapping/tin/{sample}.tin.xls', sample=samples.keys()))
-        data_deliver.extend(expand('02.mapping/tin/{sample}.summary.txt', sample=samples.keys()))
+    # if config.get('tin') or config.get('rseqc'):
+    #    data_deliver.extend(expand('02.mapping/tin/{sample}.tin.xls', sample=samples.keys()))
+    #    data_deliver.extend(expand('02.mapping/tin/{sample}.summary.txt', sample=samples.keys()))
 
     if config.get('bamCoverage'):
         normalize_method = config.get('parameter', {}).get('bamCoverage', {}).get('normalizeUsing', 'RPKM')
@@ -230,7 +235,7 @@ def rmats(samples: Dict = None, data_deliver: List = None, all_contrasts: List =
     data_deliver.extend(expand("02.mapping/junction_annotation/{sample}.splice_junction.pdf",sample=samples.keys()))
     data_deliver.extend(expand('02.mapping/junction_annotation/{sample}.junction_annotation.txt',sample=samples.keys()))
     # circularRNA
-    data_deliver.extend(expand("02.mapping/STAR/{sample}/circularRNA_known.txt", sample=samples.keys()))
+    data_deliver.extend(expand("02.mapping/CIRCexplorer2/{sample}/circularRNA_known.txt", sample=samples.keys()))
     # rmats pair sample
     if all_contrasts:  # Only add contrast-related outputs if contrasts are provided
         data_deliver.extend(expand("07.AS/rmats_pair/{contrast}/summary.txt", contrast=all_contrasts))

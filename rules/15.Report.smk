@@ -106,15 +106,13 @@ rule generate_docker_json:
         os.makedirs(os.path.dirname(output.json_file), exist_ok=True)
         with open(output.json_file, 'w', encoding='utf-8') as f:
             json.dump(final_data, f, indent=2, ensure_ascii=False)
-
 rule Report:
     """
     Generate the final interactive HTML report using a containerized Quarto application.
 
     This rule executes the final report generation by running a Docker container
-    (via Apptainer/Singularity) that contains a Quarto-based reporting application.
-    The containerized approach ensures consistent report generation across different
-    computing environments and eliminates dependency conflicts.
+    directly. The containerized approach ensures consistent report generation
+    across different computing environments and eliminates dependency conflicts.
 
     Key features of the reporting system:
     - Interactive HTML interface with dynamic data visualization
@@ -124,11 +122,11 @@ rule Report:
     - Reproducible report generation using container technology
 
     Container execution details:
-    - Uses Apptainer's --cleanenv flag to prevent host environment variable pollution
-    - Mounts the report data directory to /data inside the container
+    - Uses docker run with --rm flag to automatically clean up the container after execution
+    - Mounts the report data directory to /data inside the container using -v
     - Mounts the project summary JSON configuration to /app/project_summary.json
     - Mounts the output report directory to /workspace/ for result storage
-    - Pulls the specified Docker image version directly using docker:// protocol
+    - Uses the specified local Docker image directly
 
     The final output is a self-contained HTML report with embedded JavaScript
     visualizations that can be easily shared with collaborators or uploaded to
@@ -159,18 +157,22 @@ rule Report:
     shell:
         """
         (
-        # 1. 创建输出目录
-        mkdir -p {params.Report_dir} && \\
+        IMAGE_NAME={params.docker_version}
 
-        # 2. 运行 Apptainer 容器
-        # 使用 docker:// 协议直接加载 Docker 镜像，Apptainer 会自动处理转换和缓存
-        # --cleanenv: 防止主机环境变量污染容器
-        # --bind: 挂载目录 (Apptainer 默认读写挂载)
+        # 1. CHECK IF DOCKER IMAGE EXISTS
+        if [ -z "$(docker images -q $IMAGE_NAME)" ]; then
+            echo "错误: 镜像 $IMAGE_NAME 不存在！请先拉取或构建该镜像。"
+            exit 1
+        else
+            echo "找到镜像: $IMAGE_NAME"
+        fi
 
-        apptainer run --cleanenv \\
-               --bind {params.data_dir}:/data \\
-               --bind {input.json_file}:/app/project_summary.json \\
-               --bind {params.Report_dir}:/workspace/ \\
-               docker://{params.docker_version}
-        ) &>{log}
+        # 2. RUN DOCKER CONTAINER WITH CORRECT MOUNTING AND USER PERMISSIO
+        mkdir -p {params.Report_dir} 
+        docker run --rm --user $(id -u):$(id -g) \
+                   -v {params.data_dir}:/data:rw \
+                   -v {params.Report_dir}:/workspace:rw \
+                   -v {input.json_file}:/app/project_summary.json:rw \
+                   {params.docker_version} 
+        ) &> {log}
         """
