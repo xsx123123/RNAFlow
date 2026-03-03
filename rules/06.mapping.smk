@@ -74,7 +74,7 @@ rule STAR_mapping:
             --runThreadN {threads} \
             --sjdbGTFfile {input.genome_gtf} \
             --twopassMode Basic \
-            --peOverlapNbasesMin 12  \
+            --peOverlapNbasesMin 0  \
             --peOverlapMMp 0.1  \
             --readFilesCommand zcat \
             --readFilesType Fastx \
@@ -91,17 +91,14 @@ rule STAR_mapping:
             --outWigNorm RPM \
             --outStd  Log  \
             --outFilterType BySJout \
-            --outFilterMismatchNmax 999 \
+            --outFilterMismatchNmax 10 \
             --outFilterMismatchNoverLmax 0.04 \
-            --outFilterMultimapNmax 20 \
             --outFilterMatchNminOverLread 0.66 \
             --outFilterIntronMotifs None \
             --outSJfilterReads All \
             --quantMode TranscriptomeSAM \
             --quantTranscriptomeSAMoutput BanSingleEnd_BanIndels_ExtendSoftclip \
             --alignIntronMin 20  \
-            --alignIntronMax 1000000  \
-            --alignMatesGapMax 1000000  \
             --alignSJoverhangMin 5  \
             --alignSJDBoverhangMin 3  \
             --alignSJstitchMismatchNmax 5 -1 5 5  \
