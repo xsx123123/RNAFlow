@@ -488,7 +488,9 @@ python report/bioreport/main.py --input results_dir --output report_dir --ai
 
 ### RNAFlow_v0.1.9
 - **Optimization**: 修改 `call varinat` & `enrichments` & `report` 模块可能存在的bug。
-- **Optimization**: 优化 `reference.yaml` 配置文件，并增加 `deg_enrich_wrapper` & `ploidy_setting` 配置
+- **Optimization**: 优化 `reference.yaml` 配置文件，并增加 `deg_enrich_wrapper` & `ploidy_setting` 配置。
+- **Debug**: 修复 `Lsat_Salinas_v8` `reference` `ref_all` 配置缺失。
+- **Optimization**: `STAR` 对比参数恢复默认参数。
 
 ### RNAFlow_v0.1.8
 - **Feature**: 弃用旧的 Seq 日志监控方案，更新为 Loki + Grafana 监控系统。
