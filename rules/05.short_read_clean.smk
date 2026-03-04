@@ -126,6 +126,8 @@ rule multiqc_trim:
         **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/multiqc.yaml"),
+    log:
+        "logs/01.short_read_trim/multiqc_trim.log",
     message:
         "Running MultiQC to aggregate fastp reports",
     benchmark:
@@ -135,8 +137,6 @@ rule multiqc_trim:
         report_dir = "01.qc/multiqc_short_read_trim/",
         report = "multiqc_short_read_trim_report.html",
         title = "short_read_trim-multiqc-report",
-    log:
-        "logs/01.short_read_trim/multiqc_trim.log",
     threads:
         config['parameter']['threads']['multiqc'],
     shell:
@@ -147,3 +147,4 @@ rule multiqc_trim:
                 -i {params.title} \
                 -n {params.report} &> {log}
         """
+# ---END--- #

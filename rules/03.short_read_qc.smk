@@ -20,7 +20,6 @@ or sample quality that may require troubleshooting or exclusion from further ana
 
 import os
 
-
 rule short_read_qc_r1:
     """
     Perform comprehensive quality control analysis on R1 reads using FastQC.
@@ -59,13 +58,13 @@ rule short_read_qc_r1:
         workflow.source_path("../envs/fastqc.yaml"),
     log:
         r1 = "logs/01.short_read_qc_r1/{sample}.r1.fastqc.log",
-    params:
-        out_dir = "01.qc/short_read_qc_r1/",
-        r1 = "00.link_dir/{sample}/{sample}_R1.fq.gz",
     message:
         "Running FastQC on {wildcards.sample} r1",
     benchmark:
         "benchmarks/{sample}_r1_fastqc_benchmark.txt",
+    params:
+        out_dir = "01.qc/short_read_qc_r1/",
+        r1 = "00.link_dir/{sample}/{sample}_R1.fq.gz",
     threads:
         config['parameter']['threads']['fastqc'],
     shell:
@@ -106,13 +105,13 @@ rule short_read_qc_r2:
         workflow.source_path("../envs/fastqc.yaml"),
     log:
         r2 = "logs/01.short_read_qc_r2/{sample}.r2.fastqc.log",
-    params:
-        out_dir = "01.qc/short_read_qc_r2",
-        r2 = "00.link_dir/{sample}/{sample}_R2.fq.gz",
     message:
         "Running FastQC on {wildcards.sample} r2",
     benchmark:
         "benchmarks/{sample}_r2_fastqc_benchmark.txt",
+    params:
+        out_dir = "01.qc/short_read_qc_r2",
+        r2 = "00.link_dir/{sample}/{sample}_R2.fq.gz",
     threads:
         config['parameter']['threads']['fastqc'],
     shell:
@@ -149,15 +148,15 @@ rule short_read_multiqc_r1:
         workflow.source_path("../envs/multiqc.yaml"),
     message:
         "Running MultiQC to aggregate R1 FastQC reports",
+    log:
+        "logs/01.multiqc/multiqc-r1.log",
+    benchmark:
+        "benchmarks/fastqc_multiqc-r1_benchmark.txt",
     params:
         fastqc_reports = "01.qc/short_read_qc_r1",
         multiqc_dir = '01.qc/short_read_r1_multiqc/',
         report = "multiqc_r1_raw-data_report.html",
         title = "r1-raw-data-multiqc-report",
-    log:
-        "logs/01.multiqc/multiqc-r1.log",
-    benchmark:
-        "benchmarks/fastqc_multiqc-r1_benchmark.txt",
     threads:
         config['parameter']['threads']['multiqc'],
     shell:
@@ -196,16 +195,16 @@ rule short_read_multiqc_r2:
         workflow.source_path("../envs/multiqc.yaml"),
     message:
         "Running MultiQC to aggregate R2 FastQC reports",
+    log:
+        "logs/01.multiqc/multiqc-r2.log",
+    benchmark:
+        "benchmarks/fastqc_multiqc-r2_benchmark.txt",
     params:
         fastqc_reports = "01.qc/short_read_qc_r2",
         report_dir = "01.qc/short_read_r2_multiqc/",
         multiqc_dir = '01.qc/short_read_r2_multiqc/',
         report = "multiqc_r2_raw-data_report.html",
         title = "r2-raw-data-multiqc-report",
-    log:
-        "logs/01.multiqc/multiqc-r2.log",
-    benchmark:
-        "benchmarks/fastqc_multiqc-r2_benchmark.txt",
     threads:
         config['parameter']['threads']['multiqc'],
     shell:

@@ -51,19 +51,20 @@ rule seq_preprocessor:
                                       config['convert_md5'],
                                       "{sample}/{sample}_R2.fq.gz"),
                                       sample=samples.keys()),
+    resources:
+        **rule_resource(config, 'high_resource',  skip_queue_on_local=True,logger = logger),
     message:
         "Running seq_preprocessor on raw data data",
     benchmark:
         "benchmarks/seq_preprocessor.txt",
-    resources:
-        **rule_resource(config, 'high_resource',  skip_queue_on_local=True,logger = logger),
+    log:
+        "logs/01.qc/seq_preprocessor.txt",
     params:
         raw_data_path = config['raw_data_path'],
         md5 = config['raw_data']['md5'],
         seq_preprocessor =  workflow.source_path(config['software']['seq_preprocessor']),
-    log:
-        "logs/01.qc/seq_preprocessor.txt",
-    threads: 1
+    threads: 
+        1
     shell:
         """
         chmod +x {params.seq_preprocessor} && \

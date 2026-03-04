@@ -46,9 +46,14 @@ rule generate_fastq_screen_conf:
         template = workflow.source_path(config['parameter']['validate_fastq_screen']['path_conf']),
     output:
         conf = "01.qc/fastq_screen.conf"
+    message:
+        "Running fastq_screen configuration convert & generation",
+    localrule: 
+        True
     params:
-        db_path = config.get("fastq_screen_db_path", "/data/jzhang/reference/"),
-    localrule: True
+        db_path = config.get("fastq_screen_db_path"),
+    threads:
+        1
     shell:
         """
         sed "s|__FASTQ_SCREEN_DB_PATH__|{params.db_path}|g" {input.template} > {output.conf}
@@ -78,10 +83,14 @@ rule check_fastq_screen_conf:
         log = "01.qc/fastq_screen_config_check.log",
     resources:
         **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
-    params:
-        validate_fastq_screen = workflow.source_path(config['parameter']['validate_fastq_screen']['path']),
+    conda:
+        workflow.source_path("../envs/py3.12.yaml"),
+    message:
+        "Checking fastq_screen configuration format",
     log:
         "logs/fastq_screen_config_check.log",
+    params:
+        validate_fastq_screen = workflow.source_path(config['parameter']['validate_fastq_screen']['path']),
     threads:
         1
     shell:
@@ -118,21 +127,21 @@ rule short_read_fastq_screen_r1:
         fastq_screen_result = "01.qc/fastq_screen_r1/{sample}_R1_screen.txt",
     resources:
         **rule_resource(config, 'high_resource',  skip_queue_on_local=True,logger = logger),
-    log:
-        "logs/01.short_read_qc_r1/{sample}.r1.fastq_screen.log",
     conda:
         workflow.source_path('../envs/fastq_screen.yaml'),
+    log:
+        "logs/01.short_read_qc_r1/{sample}.r1.fastq_screen.log",
+    message:
+        "Running fastq_screen on {wildcards.sample} r1",
+    benchmark:
+        "benchmarks/{sample}_r1_fastq_screen_benchmark.txt",
     params:
         out_dir = "01.qc/fastq_screen_r1/",
         link_r1_dir = os.path.join("00.raw_data",
                                       config['convert_md5'],
                                       "{sample}/{sample}_R1.fq.gz"),
-        subset = config['parameter'][ 'fastq_screen']['subset'],
+        subset = config['parameter']['fastq_screen']['subset'],
         aligner = config['parameter']['fastq_screen']['aligner'],
-    message:
-        "Running fastq_screen on {wildcards.sample} r1",
-    benchmark:
-        "benchmarks/{sample}_r1_fastq_screen_benchmark.txt",
     threads:
         config['parameter']['threads']['fastq_screen'],
     shell:
@@ -172,10 +181,14 @@ rule short_read_fastq_screen_r2:
         fastq_screen_result = "01.qc/fastq_screen_r2/{sample}_R2_screen.txt",
     resources:
         **rule_resource(config, 'high_resource',  skip_queue_on_local=True,logger = logger),
-    log:
-        "logs/01.short_read_qc_r2/{sample}.r2.fastq_screen.log",
     conda:
         workflow.source_path('../envs/fastq_screen.yaml'),
+    log:
+        "logs/01.short_read_qc_r2/{sample}.r2.fastq_screen.log",
+    message:
+        "Running fastq_screen on {wildcards.sample} r2",
+    benchmark:
+        "benchmarks/{sample}_r2_fastq_screen_benchmark.txt",
     params:
         out_dir = "01.qc/fastq_screen_r2/",
         subset = config['parameter'][ 'fastq_screen']['subset'],
@@ -183,10 +196,6 @@ rule short_read_fastq_screen_r2:
         link_r2_dir = os.path.join("00.raw_data",
                                       config['convert_md5'],
                                       "{sample}/{sample}_R2.fq.gz"),
-    message:
-        "Running fastq_screen on {wildcards.sample} r2",
-    benchmark:
-        "benchmarks/{sample}_r2_fastq_screen_benchmark.txt",
     threads:
         config['parameter']['threads']['fastq_screen'],
     shell:
@@ -229,15 +238,15 @@ rule fastq_screen_multiqc_r1:
         workflow.source_path("../envs/multiqc.yaml"),
     message:
         "Running MultiQC to aggregate R1 fastq screen reports",
+    log:
+        "logs/01.multiqc/multiqc-fastq-screen-r1.log",
+    benchmark:
+        "benchmarks/fastqc_multiqc-fastq-screen-r1_benchmark.txt",
     params:
         fastqc_reports = "01.qc/fastq_screen_r1",
         report_dir = "01.qc/fastq_screen_multiqc_r1/",
         report = "multiqc_r1_fastq_screen_report.html",
         title = "r1-fastq-screen-multiqc-report",
-    log:
-        "logs/01.multiqc/multiqc-fastq-screen-r1.log",
-    benchmark:
-        "benchmarks/fastqc_multiqc-fastq-screen-r1_benchmark.txt",
     threads:
         config['parameter']['threads']['multiqc'],
     shell:
@@ -278,15 +287,15 @@ rule fastq_screen_multiqc_r2:
         workflow.source_path("../envs/multiqc.yaml"),
     message:
         "Running MultiQC to aggregate R2 fastq screen reports",
+    log:
+        "logs/01.multiqc/multiqc-fastq-screen-r2.log",
+    benchmark:
+        "benchmarks/fastqc_multiqc-fastq-screen-r2_benchmark.txt",
     params:
         fastqc_reports = "01.qc/fastq_screen_r2",
         report_dir = "01.qc/fastq_screen_multiqc_r2/",
         report = "multiqc_r2_fastq_screen_report.html",
         title = "r2-fastq-screen-multiqc-report",
-    log:
-        "logs/01.multiqc/multiqc-fastq-screen-r2.log",
-    benchmark:
-        "benchmarks/fastqc_multiqc-fastq-screen-r2_benchmark.txt",
     threads:
         config['parameter']['threads']['multiqc'],
     shell:
@@ -297,3 +306,4 @@ rule fastq_screen_multiqc_r2:
                 -i {params.title} \
                 -n {params.report} &> {log}
         """
+# ---END--- #
