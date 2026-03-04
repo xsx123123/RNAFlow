@@ -447,16 +447,14 @@ python report/bioreport/main.py --input results_dir --output report_dir --ai
 
 ## 📅 开发计划 (Roadmap)
 
-### v0.1.8 迭代目标 (Target Features for v0.1.8)
-- **深度富集分析 (Deep Enrichment Analysis)**:
-    - 引入 **GSEA (Gene Set Enrichment Analysis)**，不再依赖 p-value 阈值，基于全基因排序发现微弱但协同变化的通路信号。
-    - 增加 **KEGG Pathway** 分析，提供通路图的可视化。
-- **QC 增强 (QC Enhancement)**:
-    - [已实现] 引入 **RSeQC TIN (Transcript Integrity Number)**，更精准评估 RNA 降解程度 (3' bias)。
-- **交互性升级**:
-    - 升级 MultiQC 报告，整合更多自定义内容（如 Top DEG 列表、富集气泡图）。
-
 ### v0.1.9 迭代目标 (Target Features for v0.1.9)
+- **动态网页报告生成**: 
+    - 实现不同分析流程与模块最终网页报告的动态生成。
+    - **实现逻辑**：
+        1. **模块状态感知**：在 `project_summary.json` 中记录 `DEG`、`rMATS`、`Variant` 等模块的开启状态。
+        2. **动态导航构建**：在 Quarto 渲染前，通过 Python 脚本根据模块状态动态生成 `_quarto.yml`，自动隐藏未运行分析的标签页。
+        3. **条件内容渲染**：在 `.qmd` 模板中使用 Python 逻辑判断，实现结果章节的动态加载与展示。
+
 - **WGCNA (加权基因共表达网络分析)**: 
     - 实现基因模块聚类与表型关联分析，识别核心 Hub Gene。
     - 导出网络文件，支持 Cytoscape 可视化。
