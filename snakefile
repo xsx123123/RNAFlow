@@ -43,7 +43,9 @@ logger = get_analysis_logger()
 validate_genome_version(config=config, logger=logger)
 
 # --------- 3. Workspaces & Samples --------- #
+# Redirect workspace to config['workflow'] directory 
 workdir: config["workflow"]
+logger.info(f"Redirect workspaces to {config['workflow']}") 
 
 samples = load_samples(config["sample_csv"], required_cols=["sample", "sample_name", "group"])
 ALL_CONTRASTS, CONTRAST_MAP = load_contrasts(config["paired_csv"], samples)
