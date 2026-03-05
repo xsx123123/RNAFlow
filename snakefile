@@ -61,9 +61,8 @@ include: 'rules/08.call_variant.smk'
 include: 'rules/09.Assembly.smk'
 include: 'rules/10.DEG_Enrichments.smk'
 include: 'rules/11.rMATS.smk'
-include: 'rules/13.Merge_qc.smk'
-include: 'rules/14.deliver.smk'
-include: 'rules/15.Report.smk'
+include: 'rules/13.deliver.smk'
+include: 'rules/14.Report.smk'
 # --------- 5. Target Rule --------- #
 data_deliver = DataDeliver(config=config,samples = samples,
                            all_contrasts = ALL_CONTRASTS)
