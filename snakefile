@@ -47,7 +47,10 @@ validate_genome_version(config=config, logger=logger)
 workdir: config["workflow"]
 logger.info(f"Redirect workspaces to {config['workflow']}") 
 
+# Load samples and contrasts from CSV files
 samples = load_samples(config["sample_csv"], required_cols=["sample", "sample_name", "group"])
+
+# load pair contrasts from CSV file
 ALL_CONTRASTS, CONTRAST_MAP = load_contrasts(config["paired_csv"], samples)
 
 # --------- 4. Rules Import --------- #
