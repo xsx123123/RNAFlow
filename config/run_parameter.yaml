@@ -19,27 +19,27 @@ parameter:
   # Thread Allocation for Pipeline Tools
   # Number of CPU threads to allocate for each computational tool
   threads:
-    json_md5_verifier: 40    # MD5 verification (I/O intensive)
+    json_md5_verifier: 40   # MD5 verification (I/O intensive)
     fastqc: 1               # FastQC (single-threaded by design)
-    fastp: 8                # Fastp adapter trimming and quality filtering
+    fastp: 6                # Fastp adapter trimming and quality filtering
     multiqc: 1              # MultiQC report generation (single-threaded)
     fastq_screen: 10        # Fastq_screen contamination screening
     STAR_INDEX: 40          # STAR index building (very resource intensive)
-    STAR_MAPPING: 16        # STAR alignment (memory and CPU intensive)
+    STAR_MAPPING: 15        # STAR alignment (memory and CPU intensive)
     samtools: 10            # Samtools operations (sorting, indexing, etc.)
-    samtools_flagstat: 10   # Samtools flagstat statistics
-    samtools_stats: 10      # Samtools comprehensive statistics
-    qualimap: 10            # Qualimap BAM quality control
+    samtools_flagstat: 4    # Samtools flagstat statistics
+    samtools_stats: 4       # Samtools comprehensive statistics
+    qualimap: 4             # Qualimap BAM quality control
     RSEM_INDEX: 20          # RSEM index building
-    rsem-calculate: 20      # RSEM expression quantification
-    bam2cram: 10            # BAM to CRAM compression
-    bamCoverage: 20         # BigWig coverage track generation
+    rsem-calculate: 10      # RSEM expression quantification
+    bam2cram: 6             # BAM to CRAM compression
+    bamCoverage: 6          # BigWig coverage track generation
     stringtie: 16           # StringTie transcript assembly
     gatk: 1                 # GATK variant calling (Java-based, memory managed separately)
-    rmats: 6                # rMATS alternative splicing analysis
+    rmats: 4                # rMATS alternative splicing analysis
     rnaflow-cli: 8          # RNAFlow delivery tool
     Report: 10              # Containerized report generation
-    compress_bg: 8
+    compress_bg: 4
 
   # FastQ Screen Configuration
   # Parameters for contamination screening using fastq_screen

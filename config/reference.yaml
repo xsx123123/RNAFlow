@@ -80,6 +80,7 @@ STAR_index:
       rsem_index_dir: TAIR10.1/RSEM_TAIR10.1/
       bed12: TAIR10.1/Araport11_GTF_genes_transposons.20241001.bed12
       go_annotation: TAIR10.1/gene_go_annotation.go  
+      ref_all: TAIR10.1/TAIR10.1_ref_all.txt
       
     GRCm39:
       index: GRCm39/RSEM_GRCm39
