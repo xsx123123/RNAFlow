@@ -489,6 +489,13 @@ python report/bioreport/main.py --input results_dir --output report_dir --ai
 - **Optimization**: 优化 `reference.yaml` 配置文件，并增加 `deg_enrich_wrapper` & `ploidy_setting` 配置。
 - **Debug**: 修复 `Lsat_Salinas_v8` `reference` `ref_all` 配置缺失。
 - **Optimization**: `STAR` 对比参数恢复默认参数。
+- **Debug**: 修复 `snakefile` 版本号不一致问题 (v0.1.7 -&gt; v0.1.9)。
+- **Critical Debug**: 修复 `judge_star_index` 函数中 STAR 索引文件 " Genome" 拼写错误 (多余空格)。
+- **Debug**: 修复 `01.common.smk` 中 mapping 函数调用时 config 参数未传递的问题。
+- **Optimization**: 更新 `config.schema.yaml`，添加 hg38 到 Genome_Version 的 enum 列表。
+- **Optimization**: 完善 `config.schema.yaml` 配置验证，添加 loki_url、only_qc、bam_remove 等缺失配置项。
+- **Optimization**: 为 `TAIR10.1` 和 `hg38` 参考基因组配置添加缺失的 ref_all 字段。
+- **Cleanup**: 删除 envs/ 目录中重复的 `fastq-screen.yaml` 文件。
 
 ### RNAFlow_v0.1.8
 - **Feature**: 弃用旧的 Seq 日志监控方案，更新为 Loki + Grafana 监控系统。
@@ -551,4 +558,4 @@ python report/bioreport/main.py --input results_dir --output report_dir --ai
 - 质量控制、比对和定量模块
 
 ---
-**Author**: JZHANG | **Version**: RNAFlow_v0.1.8
+**Author**: JZHANG | **Version**: RNAFlow_v0.1.9

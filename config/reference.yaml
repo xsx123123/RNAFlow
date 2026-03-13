@@ -79,7 +79,8 @@ STAR_index:
       rsem_index: TAIR10.1/RSEM_TAIR10.1/TAIR10.1_index
       rsem_index_dir: TAIR10.1/RSEM_TAIR10.1/
       bed12: TAIR10.1/Araport11_GTF_genes_transposons.20241001.bed12
-      go_annotation: TAIR10.1/gene_go_annotation.go  
+      go_annotation: TAIR10.1/gene_go_annotation.go
+      ref_all: TAIR10.1/TAIR10_ref_all.txt  
       
     GRCm39:
       index: GRCm39/RSEM_GRCm39
@@ -101,6 +102,7 @@ STAR_index:
       rsem_index_dir: HG38/RSEM_hg38/
       bed12: HG38/gencode.v49.annotation.bed12
       go_annotation: HG38/goa_human.go
+      ref_all: HG38/hg38_ref_all.txt
       
     GO:
       obo: go_database/go-basic.obo

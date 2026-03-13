@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # *---utf-8---*
-# Version: RNAFlow v0.1.7
+# Version: RNAFlow v0.1.9
 # Author : JZHANG
 
 import sys
@@ -54,7 +54,6 @@ samples = load_samples(config["sample_csv"], required_cols=["sample", "sample_na
 ALL_CONTRASTS, CONTRAST_MAP = load_contrasts(config["paired_csv"], samples)
 
 # --------- 4. Rules Import --------- #
-include: 'rules/00.log.smk'
 include: 'rules/01.common.smk'
 include: 'rules/02.file_convert_md5.smk'
 include: 'rules/03.short_read_qc.smk'
