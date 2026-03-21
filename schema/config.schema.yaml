@@ -57,16 +57,20 @@ properties:
     default: "fr-firststrand"
   call_variant:
     type: "boolean"
-    description: "Whether to call variants for RNA-seq"
+    description: "Whether to call variants from RNA-seq data"
     default: false
-  noval_Transcripts:
+  detect_novel_transcripts:
     type: "boolean"
-    description: "Whether to detect novel transcripts by stringtie"
+    description: "Whether to detect novel transcripts using StringTie"
     default: false
   rmats:
     type: "boolean"
     description: "Whether to run rmats analysis"
     default: true
+  gene_fusion:
+    type: "boolean"
+    description: "Whether to run gene fusion detection using Arriba"
+    default: false
   deg:
     type: "boolean"
     description: "Whether to run deg analysis"

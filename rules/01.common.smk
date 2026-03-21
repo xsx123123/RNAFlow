@@ -25,7 +25,7 @@ import time
 from pathlib import Path
 from typing import Dict, Union, List, Callable
 from rich import print as rich_print
-from utils.datadeliver import qc_clean,mapping,count,Deg,call_variant,noval_Transcripts,rmats
+from utils.datadeliver import qc_clean,mapping,count,Deg,call_variant,detect_novel_transcripts,rmats,gene_fusion
 
 
 try:

@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import Dict, List, Union
 from snakemake.io import expand
 
-
 def qc_clean(samples: Dict = None, data_deliver: List = None) -> List:
     """
     Handle quality control and cleaning steps.
@@ -182,7 +181,7 @@ def call_variant(samples: Dict = None, data_deliver: List = None) -> List:
     return data_deliver
 
 
-def noval_Transcripts(samples: Dict = None, data_deliver: List = None) -> List:
+def detect_novel_transcripts(samples: Dict = None, data_deliver: List = None) -> List:
     """
     Handle novel transcript discovery.
 
@@ -200,6 +199,30 @@ def noval_Transcripts(samples: Dict = None, data_deliver: List = None) -> List:
 
     data_deliver.append("05.assembly/filter/novel_transcripts.gtf")
     data_deliver.append("05.assembly/filter/final_Novel_Isoforms.gtf")
+    return data_deliver
+
+
+def gene_fusion(samples: Dict = None, data_deliver: List = None) -> List:
+    """
+    Handle gene fusion detection using Arriba.
+
+    Args:
+        samples: Dictionary of sample information
+        data_deliver: List of deliverable files to extend
+
+    Returns:
+        Updated list of deliverable files
+    """
+    if samples is None:
+        samples = {}
+    if data_deliver is None:
+        data_deliver = []
+
+    # Arriba fusion detection results
+    data_deliver.extend(expand("06.fusion/arriba/{sample}_fusions.tsv", sample=samples.keys()))
+    data_deliver.extend(expand("06.fusion/arriba/{sample}_fusions.discarded.tsv", sample=samples.keys()))
+    data_deliver.extend(expand("06.fusion/arriba/{sample}_fusions.pdf", sample=samples.keys()))
+
     return data_deliver
 
 

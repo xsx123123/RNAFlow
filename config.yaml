@@ -18,19 +18,22 @@ execution_mode: local #local,cluster
 queue_id: default
 # Fragment Library Types
 Library_Types: fr-firststrand # fr-unstranded,fr-firststrand,fr-secondstrand
-# only run QC for RNA-seq
+# Analysis Module Switches (all use snake_case naming convention)
+# Only run QC for RNA-seq
 only_qc: true
-# wheather generate HTML report for RNA-seq
+# Whether to generate HTML report for RNA-seq
 report: true
-# wheather deg for RNA-seq
+# Whether to run DEG (Differential Expression Gene) analysis
 deg: true
-# wheather fastq_screen for RNA-seq
+# Whether to run FastQ Screen for contamination check
 fastq_screen: true
-# wheather call variant for RNA-seq
+# Whether to call variants from RNA-seq data
 call_variant: true
-# Detech Noval Transcripts by stringtie
-noval_Transcripts: true
-# rmats
+# Whether to detect novel transcripts using StringTie
+detect_novel_transcripts: true
+# Whether to run rMATS for alternative splicing analysis
 rmats: true
+# Whether to run gene fusion detection using Arriba
+gene_fusion: true
 # ---------------------------------------------------------------------- #
 loki_url: "http://122.205.67.97:3100"

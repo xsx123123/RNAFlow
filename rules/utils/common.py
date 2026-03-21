@@ -42,7 +42,7 @@ def DataDeliver(config: Dict = None, samples: Dict = None, all_contrasts: Dict =
     deep_qc_flags = ['rseqc', 'bamCoverage', 'tin'] 
 
     # [C] 下游分析模块：只有当 only_qc=False 时才尝试运行
-    downstream_modules = ['DEG', 'call_variant', 'noval_Transcripts', 'rmats']
+    downstream_modules = ['DEG', 'call_variant', 'detect_novel_transcripts', 'rmats', 'gene_fusion']
 
     # ---------------------------------------------------------
     # 2. 定义执行包装器 (Wrappers)
@@ -63,11 +63,14 @@ def DataDeliver(config: Dict = None, samples: Dict = None, all_contrasts: Dict =
         return call_variant(samples, data_deliver)
 
     def execute_novel_transcripts(samples, data_deliver):
-        return noval_Transcripts(samples, data_deliver)
+        return detect_novel_transcripts(samples, data_deliver)
 
     def execute_rmats(samples, data_deliver, all_contrasts):
         contrasts = all_contrasts if all_contrasts else config.get('all_contrasts', [])
         return rmats(samples, data_deliver, contrasts)
+
+    def execute_gene_fusion(samples, data_deliver):
+        return gene_fusion(samples, data_deliver)
 
     # 模块函数映射表
     module_functions: Dict[str, Callable] = {
@@ -76,8 +79,9 @@ def DataDeliver(config: Dict = None, samples: Dict = None, all_contrasts: Dict =
         'count': execute_count,
         'DEG': execute_deg,
         'call_variant': execute_call_variant,
-        'noval_Transcripts': execute_novel_transcripts,
-        'rmats': execute_rmats
+        'detect_novel_transcripts': execute_novel_transcripts,
+        'rmats': execute_rmats,
+        'gene_fusion': execute_gene_fusion
     }
 
     # ---------------------------------------------------------
