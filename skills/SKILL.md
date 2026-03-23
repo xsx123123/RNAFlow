@@ -1,6 +1,6 @@
 ---
 name: bio-workflows-rnaflow
-description: Complete RNA-seq analysis using RNAFlow pipeline - from raw FASTQ to interactive HTML report with AI interpretation. Covers QC, STAR mapping, RSEM quantification, DEG analysis (DESeq2), variant calling, alternative splicing (rMATS), gene fusion detection, and automated reporting. Use when running full RNA-seq analysis with RNAFlow.
+description: RNA-seq analysis using RNAFlow pipeline - complete workflow from raw FASTQ to interactive HTML report. Use whenever user asks for RNA-seq analysis, transcriptomics, gene expression analysis, RNA sequencing, differential expression (DEG), quality control (QC), transcriptome analysis, etc. Covers QC, STAR mapping, RSEM quantification, DESeq2 DEG, variant calling, rMATS alternative splicing, gene fusion detection, and automated reporting with AI interpretation.
 tool_type: mixed
 primary_tool: Snakemake
 workflow: true

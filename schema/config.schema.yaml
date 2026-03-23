@@ -31,8 +31,7 @@ properties:
     minLength: 1
   paired_csv:
     type: "string"
-    description: "Path to paired samples CSV file"
-    minLength: 1
+    description: "Path to paired samples CSV file (required for DEG analysis, optional for QC-only mode)"
   workflow:
     type: "string"
     description: "Path to workflow directory"
