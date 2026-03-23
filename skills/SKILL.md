@@ -118,8 +118,14 @@ deg: true
 call_variant: true
 detect_novel_transcripts: true
 rmats: true
+gene_fusion: true     # Enable fusion detection (Arriba)
 fastq_screen: true
 report: true
+
+# === Resource Recommendations ===
+# Standard Mode: 4-8 cores/sample, 32GB+ RAM
+# Complete Mode (GATK/Fusion): 8+ cores/sample, 64GB+ RAM
+# Cluster: Recommended for >10 samples
 
 # === Optional Monitoring ===
 loki_url: "http://your-loki-server:3100"

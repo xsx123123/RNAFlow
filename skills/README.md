@@ -9,6 +9,11 @@ skills/
 ├── SKILL.md              # Main skill definition for AI agents
 ├── usage-guide.md        # Detailed usage guide
 ├── README.md             # This file
+├── install_skills.sh     # Generic installation script
+├── install_claude_skills.sh # Dedicated Claude Code installer
+├── install_codex_skills.sh  # Dedicated Codex installer
+├── start_rnaflow.sh      # Enhanced startup script
+├── path_config.yaml      # Path configuration
 └── examples/             # Example configuration files
     ├── config_complete.yaml      # Complete analysis (all modules)
     ├── config_qc_only.yaml       # QC-only mode (fast screening)

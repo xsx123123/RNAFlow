@@ -2,7 +2,14 @@
 
 ## 快速安装
 
-### 为 Claude Code / OpenCode 安装
+### 为 Claude Code 安装
+
+```bash
+cd /home/zj/pipeline/RNAFlow/skills
+./install_claude_skills.sh
+```
+
+### 为 OpenCode 安装 (通用脚本)
 
 ```bash
 cd /home/zj/pipeline/RNAFlow/skills
