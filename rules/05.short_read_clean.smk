@@ -126,6 +126,8 @@ rule multiqc_trim:
         **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/multiqc.yaml"),
+    log:
+        "logs/01.short_read_trim/multiqc_trim.log",
     message:
         "Running MultiQC to aggregate fastp reports",
     benchmark:
@@ -135,8 +137,6 @@ rule multiqc_trim:
         report_dir = "01.qc/multiqc_short_read_trim/",
         report = "multiqc_short_read_trim_report.html",
         title = "short_read_trim-multiqc-report",
-    log:
-        "logs/01.short_read_trim/multiqc_trim.log",
     threads:
         config['parameter']['threads']['multiqc'],
     shell:
@@ -147,3 +147,52 @@ rule multiqc_trim:
                 -i {params.title} \
                 -n {params.report} &> {log}
         """
+
+rule mapping_report:
+    """
+    Aggregate all alignment QC reports across all samples using MultiQC.
+
+    This rule collects results from Qualimap, Flagstat, Samtools stats, and 
+    Mosdepth to create a single, interactive dashboard for project-wide QC.
+
+    The MultiQC Report enables:
+    - Comparison of mapping rates across the entire cohort
+    - Detection of outliers with unusual insert sizes or coverage
+    - Batch effect identification via visualization of depth and GC bias
+    - Validation of the alignment stage before proceeding to variant calling
+    """
+    input:
+        qualimap_report_html =  expand('02.mapping/qualimap_report/{sample}/qualimapReport.html',sample=samples.keys()),
+        qualimap_report_txt =  expand('02.mapping/qualimap_report/{sample}/genome_results.txt',sample=samples.keys()),
+        samtools_flagstat = expand('02.mapping/samtools_flagstat/{sample}_dup_bam_flagstat.tsv',sample=samples.keys()),
+        samtools_stats = expand('02.mapping/samtools_stats/{sample}_dup_bam_stats.tsv',sample=samples.keys()),
+        dist = expand("02.mapping/mosdepth_coverage/{sample}.sort.Dup.global.dist.txt",sample=samples.keys()),
+        summary = expand("02.mapping/mosdepth_coverage/{sample}.sort.Dup.mosdepth.summary.txt",sample=samples.keys()),
+    output:
+        report = "02.mapping/mapping_report/multiqc_mapping_report.html",
+    resources:
+        **rule_resource(config, 'low_resource',skip_queue_on_local=True,logger = logger),
+    conda:
+        workflow.source_path("../envs/multiqc.yaml"),
+    message:
+        "Running MultiQC to aggregate mapping reports",
+    log:
+        "logs/02.mapping/multiqc_mapping_report.log",
+    benchmark:
+        "benchmarks/multiqc_mapping_report_benchmark.txt",
+    params:
+        fastqc_reports = "02.mapping/",
+        report_dir = '02.mapping/mapping_report',
+        report = "multiqc_mapping_report.html",
+        title = "mapping_report",
+    threads:
+        config['parameter']['threads']['multiqc'],
+    shell:
+        """
+        multiqc {params.fastqc_reports} \
+                --force \
+                --outdir {params.report_dir} \
+                -i {params.title} \
+                -n {params.report} &> {log}
+        """
+# ---END--- #

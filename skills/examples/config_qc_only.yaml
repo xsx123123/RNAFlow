@@ -1,0 +1,46 @@
+# RNAFlow QC-Only Configuration
+# Version: RNAFlow_v0.1.9
+# Use this for quick data quality assessment
+
+# === Basic Project Information ===
+project_name: 'PRJNA_QC_Screen'
+Genome_Version: "GRCm39"
+species: 'Mus musculus'
+client: 'Research_Lab'
+
+# === Data Path Configuration ===
+raw_data_path:
+  - /project/00.raw_data
+sample_csv: /project/01.workflow/samples.csv
+workflow: /project/01.workflow
+data_deliver: /project/02.data_deliver
+
+# === Execution Parameters ===
+execution_mode: local
+Library_Types: fr-firststrand
+
+# === Analysis Module Switches ===
+# QC-only mode - skips all downstream analysis
+only_qc: true
+deg: false
+call_variant: false
+detect_novel_transcripts: false
+rmats: false
+fastq_screen: true
+report: true
+
+# === Notes ===
+# This configuration runs:
+# - MD5 Checksum Validation
+# - FastQC Quality Control
+# - fastp Trimming & Adapter Removal
+# - FastQ Screen Contamination Check
+# - STAR Mapping (for mapping statistics)
+# - MultiQC Report
+# - BioReport HTML Report (QC-focused)
+#
+# Use this for:
+# - Initial data quality screening
+# - Quick contamination checks
+# - Library quality assessment
+# - Before committing to full analysis

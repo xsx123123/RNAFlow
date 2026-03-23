@@ -102,6 +102,7 @@ STAR_index:
       rsem_index_dir: HG38/RSEM_hg38/
       bed12: HG38/gencode.v49.annotation.bed12
       go_annotation: HG38/goa_human.go
+      ref_all: HG38/hg38_ref_all.txt
       
     GO:
       obo: go_database/go-basic.obo

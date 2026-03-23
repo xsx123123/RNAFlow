@@ -1,0 +1,48 @@
+# RNAFlow Complete Analysis Configuration
+# Version: RNAFlow_v0.1.9
+# Use this for comprehensive transcriptome analysis
+
+# === Basic Project Information ===
+project_name: 'PRJNA_Complete_Analysis'
+Genome_Version: "GRCm39"
+species: 'Mus musculus'
+client: 'Research_Lab'
+
+# === Data Path Configuration ===
+raw_data_path:
+  - /project/00.raw_data
+sample_csv: /project/01.workflow/samples.csv
+paired_csv: /project/01.workflow/contrasts.csv
+workflow: /project/01.workflow
+data_deliver: /project/02.data_deliver
+
+# === Execution Parameters ===
+execution_mode: local
+Library_Types: fr-firststrand
+
+# === Analysis Module Switches ===
+# All modules enabled for complete analysis
+only_qc: false
+deg: true
+call_variant: true
+detect_novel_transcripts: true
+rmats: true
+fastq_screen: true
+report: true
+
+# === Optional Monitoring Configuration ===
+# Uncomment to enable Loki + Grafana monitoring
+# loki_url: "http://loki-server:3100"
+
+# === Notes ===
+# This configuration runs:
+# - QC & Trimming (FastQC + fastp)
+# - Contamination Check (FastQ Screen)
+# - STAR Mapping (2-pass mode)
+# - RSEM Quantification
+# - DESeq2 DEG + GO/KEGG Enrichment
+# - GATK Variant Calling
+# - StringTie Novel Transcripts
+# - rMATS Alternative Splicing
+# - Arriba Gene Fusion Detection
+# - MultiQC + BioReport HTML Report

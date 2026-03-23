@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # *---utf-8---*
-# Version: RNAFlow v0.1.7
+# Version: RNAFlow v0.1.9
 # Author : JZHANG
 
 import sys
@@ -43,13 +43,17 @@ logger = get_analysis_logger()
 validate_genome_version(config=config, logger=logger)
 
 # --------- 3. Workspaces & Samples --------- #
+# Redirect workspace to config['workflow'] directory 
 workdir: config["workflow"]
+logger.info(f"Redirect workspaces to {config['workflow']}") 
 
+# Load samples and contrasts from CSV files
 samples = load_samples(config["sample_csv"], required_cols=["sample", "sample_name", "group"])
+
+# load pair contrasts from CSV file
 ALL_CONTRASTS, CONTRAST_MAP = load_contrasts(config["paired_csv"], samples)
 
 # --------- 4. Rules Import --------- #
-include: 'rules/00.log.smk'
 include: 'rules/01.common.smk'
 include: 'rules/02.file_convert_md5.smk'
 include: 'rules/03.short_read_qc.smk'
@@ -61,9 +65,9 @@ include: 'rules/08.call_variant.smk'
 include: 'rules/09.Assembly.smk'
 include: 'rules/10.DEG_Enrichments.smk'
 include: 'rules/11.rMATS.smk'
-include: 'rules/13.Merge_qc.smk'
-include: 'rules/14.deliver.smk'
-include: 'rules/15.Report.smk'
+include: 'rules/12.GeneFusion.smk'
+include: 'rules/13.deliver.smk'
+include: 'rules/14.Report.smk'
 # --------- 5. Target Rule --------- #
 data_deliver = DataDeliver(config=config,samples = samples,
                            all_contrasts = ALL_CONTRASTS)
