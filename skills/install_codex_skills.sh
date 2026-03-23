@@ -19,10 +19,16 @@ echo "Target: $TARGET_DIR"
 echo ""
 
 # Check if .codex directory exists
-if [ ! -d "$CODEX_SKILLS_DIR" ]; then
-    echo "Error: Codex skills directory not found: $CODEX_SKILLS_DIR"
+if [ ! -d "$HOME/.codex" ]; then
+    echo "Error: Codex directory not found: $HOME/.codex"
     echo "Please make sure Codex is installed and initialized."
     exit 1
+fi
+
+# Create skills directory if it doesn't exist
+if [ ! -d "$CODEX_SKILLS_DIR" ]; then
+    echo "Creating Codex skills directory: $CODEX_SKILLS_DIR"
+    mkdir -p "$CODEX_SKILLS_DIR"
 fi
 
 # Ask for confirmation
