@@ -147,52 +147,67 @@ rule multiqc_trim:
                 -i {params.title} \
                 -n {params.report} &> {log}
         """
-
-rule mapping_report:
+rule merge_qc_report:
     """
-    Aggregate all alignment QC reports across all samples using MultiQC.
+    Aggregate all preprocessing quality control reports into a comprehensive summary.
 
-    This rule collects results from Qualimap, Flagstat, Samtools stats, and 
-    Mosdepth to create a single, interactive dashboard for project-wide QC.
+    This rule collects all quality control outputs from the preprocessing pipeline
+    and synthesizes them into a single interactive HTML report using MultiQC.
+    This comprehensive report provides a unified view of data quality across all
+    samples and all preprocessing steps, from raw data through cleaning and
+    initial quality assessment.
 
-    The MultiQC Report enables:
-    - Comparison of mapping rates across the entire cohort
-    - Detection of outliers with unusual insert sizes or coverage
-    - Batch effect identification via visualization of depth and GC bias
-    - Validation of the alignment stage before proceeding to variant calling
+    Key quality control metrics aggregated in this report include:
+    - Raw read quality statistics from FastQC (both R1 and R2 reads)
+    - Trimming statistics and quality improvements from Fastp
+    - Adapter content and trimming efficiency
+    - Read length distributions after quality filtering
+    - Overall quality metrics before and after preprocessing
+    - Sample-to-sample comparison of all quality metrics
+
+    The aggregated report enables rapid identification of:
+    - Outlier samples with quality issues at any preprocessing step
+    - Systematic biases affecting multiple samples
+    - Batch effects or plate-based quality patterns
+    - Overall success of the preprocessing pipeline
+    - Trends in quality improvements through the pipeline
+
+    This comprehensive preprocessing QC summary is essential for quality assurance,
+    providing a clear audit trail of data quality improvements and ensuring that
+    only high-quality, properly processed data proceeds to downstream analysis
+    steps including read alignment and peak calling. The report also serves as
+    valuable documentation for publication and reproducibility.
     """
     input:
-        qualimap_report_html =  expand('02.mapping/qualimap_report/{sample}/qualimapReport.html',sample=samples.keys()),
-        qualimap_report_txt =  expand('02.mapping/qualimap_report/{sample}/genome_results.txt',sample=samples.keys()),
-        samtools_flagstat = expand('02.mapping/samtools_flagstat/{sample}_dup_bam_flagstat.tsv',sample=samples.keys()),
-        samtools_stats = expand('02.mapping/samtools_stats/{sample}_dup_bam_stats.tsv',sample=samples.keys()),
-        dist = expand("02.mapping/mosdepth_coverage/{sample}.sort.Dup.global.dist.txt",sample=samples.keys()),
-        summary = expand("02.mapping/mosdepth_coverage/{sample}.sort.Dup.mosdepth.summary.txt",sample=samples.keys()),
+        md5_check = "01.qc/md5_check.tsv",
+        fastqc_files_r1 = expand("01.qc/short_read_qc_r1/{sample}_R1_fastqc.zip", sample=samples.keys()),
+        fastqc_files_r2 = expand("01.qc/short_read_qc_r2/{sample}_R2_fastqc.zip", sample=samples.keys()),
+        r1_trimmed = expand("01.qc/short_read_trim/{sample}.R1.trimed.fq.gz", sample=samples.keys()),
+        r2_trimmed = expand("01.qc/short_read_trim/{sample}.R2.trimed.fq.gz", sample=samples.keys()),
+        fastp_report = expand("01.qc/short_read_trim/{sample}.trimed.html", sample=samples.keys()),
     output:
-        report = "02.mapping/mapping_report/multiqc_mapping_report.html",
+        report = '01.qc/multiqc_merge_qc/multiqc_merge_qc_report.html',
     resources:
-        **rule_resource(config, 'low_resource',skip_queue_on_local=True,logger = logger),
+        **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/multiqc.yaml"),
-    message:
-        "Running MultiQC to aggregate mapping reports",
-    log:
-        "logs/02.mapping/multiqc_mapping_report.log",
-    benchmark:
-        "benchmarks/multiqc_mapping_report_benchmark.txt",
     params:
-        fastqc_reports = "02.mapping/",
-        report_dir = '02.mapping/mapping_report',
-        report = "multiqc_mapping_report.html",
-        title = "mapping_report",
+        search_dir = "01.qc",
+        out_dir = "01.qc/multiqc_merge_qc",
+        report_name = "multiqc_merge_qc_report.html",
+        title = "merge qc report",
+    log:
+        "logs/01.qc/multiqc_merge_qc.log",
     threads:
         config['parameter']['threads']['multiqc'],
     shell:
         """
-        multiqc {params.fastqc_reports} \
+        mkdir -p {params.out_dir}
+        multiqc ./{params.search_dir} \
                 --force \
-                --outdir {params.report_dir} \
-                -i {params.title} \
-                -n {params.report} &> {log}
+                --outdir {params.out_dir} \
+                --title "{params.title}" \
+                --filename {params.report_name} \
+                &> {log}
         """
 # ---END--- #

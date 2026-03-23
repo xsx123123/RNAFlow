@@ -336,9 +336,10 @@ cd /home/zj/pipeline/RNAFlow/skills
 "帮我设置一个RNAFlow分析项目"
 "运行RNAFlow的QC-only模式检查数据质量"
 "使用RNAFlow做差异基因表达分析"
-"帮我配置RNAFlow并运行完整分析"
+"帮我配置RNAFlow并运行完整分析" 
 ```
-
+使用ai进行分析示例命令：
+我有一批数据在 `/data/jzhang/project/Temp/rna_skills_analysis/00.raw_data` 下,帮我使用rnaflow skill分析呀,基因组使用生菜v8,仅进行qc分析呀,可以使用`activate_snakemake` `alias`命令激活已经配置好的snakemake环境。
 ### 4. 增强版启动脚本特性
 
 `start_rnaflow.sh` 提供了安全的分析启动流程：

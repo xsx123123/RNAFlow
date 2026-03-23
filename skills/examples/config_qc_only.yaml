@@ -12,6 +12,8 @@ client: 'Research_Lab'
 raw_data_path:
   - /project/00.raw_data
 sample_csv: /project/01.workflow/samples.csv
+# Note: paired_csv is required even for QC-only mode (create an empty contrasts.csv if no contrasts needed)
+paired_csv: /project/01.workflow/contrasts.csv
 workflow: /project/01.workflow
 data_deliver: /project/02.data_deliver
 

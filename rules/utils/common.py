@@ -12,6 +12,8 @@ from pathlib import Path
 from typing import Dict, Union, List, Callable
 from rich import print as rich_print
 
+from utils.datadeliver import qc_clean,mapping,count,Deg,call_variant,detect_novel_transcripts,rmats,gene_fusion
+
 # Global flag for QC warning
 _qc_warning_logged = False
 
@@ -67,8 +69,8 @@ def DataDeliver(
     def execute_qc_clean(samples, data_deliver):
         return qc_clean(samples, data_deliver)
 
-    def execute_mapping(samples, data_deliver):
-        return mapping(samples, data_deliver, config)
+    def execute_mapping(samples, data_deliver,config):
+        return mapping(samples, data_deliver,config)
 
     def execute_count(samples, data_deliver):
         return count(samples, data_deliver)
