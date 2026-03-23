@@ -74,7 +74,7 @@ echo "This may take several hours depending on data size."
 echo ""
 
 snakemake \
-    --cores=60 \
+    --cores=40 \
     -p \
     --conda-frontend=mamba \
     --use-conda \
