@@ -299,6 +299,7 @@ RNAFlow/
 RNAFlow 提供了专门的 AI Skills，可以让你通过自然语言与 Claude Code、Codex 等 AI 编程助手交互，轻松完成 RNA-seq 分析。
 
 ### 1. 安装 Skills
+> NOTE: 由于分析流程与`skill`分离架构，在安装`skills`前，请修改`path_config.yaml`文件夹中的路径为你的实际路径。例如：`RNAFLOW_ROOT` & `complete` & `standard_deg`等配置
 
 RNAFlow Skills 位于 `skills/` 目录下，支持自动安装到 Claude Code 或 Codex：
 
