@@ -123,6 +123,8 @@ STAR_index:
 deg_enrich_wrapper:
   Lsat_Salinas_v11:
     gene_col: 'Entrez ID'   # Column name for gene identifiers in deg result
+  Lsat_Salinas_v11_wx:
+    gene_col: 'Entrez ID'   # Column name for gene identifiers in deg result
   Lsat_Salinas_v8:     
     gene_col: 'Entrez ID'   # Column name for gene identifiers in deg result
   ITAG4.1:
@@ -137,6 +139,8 @@ deg_enrich_wrapper:
 ploidy_setting:
   Lsat_Salinas_v11:
     ploidy: 2  # genome ploidy
+  Lsat_Salinas_v11_wx:
+    ploidy: 2
   Lsat_Salinas_v8:     
     ploidy: 2
   ITAG4.1:
