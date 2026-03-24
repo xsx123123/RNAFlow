@@ -41,3 +41,6 @@ dependencies:
   - zstd=1.5.7=hb78ec9c_6
   - pip:
     - rnaflow-deliver-tool==0.1.1
+    - rich==14.3.3
+    - loguru==0.7.3
+    - rich-click==1.9.5

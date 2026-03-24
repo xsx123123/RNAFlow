@@ -10,7 +10,7 @@ properties:
   Genome_Version:
     type: "string"
     description: "Genome version to use for analysis"
-    enum: ["Lsat_Salinas_v8", "Lsat_Salinas_v11", "ITAG4.1", "TAIR10.1", "GRCm39", "hg38"]
+    enum: ["Lsat_Salinas_v8", "Lsat_Salinas_v11", "ITAG4.1", "TAIR10.1", "GRCm39", "hg38","Lsat_Salinas_v11_wx"]
   species:
     type: "string"
     description: "Species name"
