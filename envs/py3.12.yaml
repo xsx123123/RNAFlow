@@ -46,8 +46,8 @@ dependencies:
     - jinja2>=3.0.0
     - markdown>=3.3
     - boto3
-    - pyjwt[crypto]>=2.4.0
-    - rnaflow-deliver-tool==0.1.1
     - rich==14.3.3
     - loguru==0.7.3
     - rich-click==1.9.5
+    - pyjwt[crypto]>=2.4.0
+    - rnaflow-deliver-tool==0.1.1
