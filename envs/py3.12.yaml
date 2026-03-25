@@ -48,3 +48,6 @@ dependencies:
     - boto3
     - pyjwt[crypto]>=2.4.0
     - rnaflow-deliver-tool==0.1.1
+    - rich==14.3.3
+    - loguru==0.7.3
+    - rich-click==1.9.5

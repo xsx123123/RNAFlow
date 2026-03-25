@@ -27,6 +27,7 @@ fastq_screen_db_path: /data/jzhang/reference/fastq_screen_database
 # List of genome versions that are officially supported by this pipeline configuration
 can_use_genome_version:
   - Lsat_Salinas_v11    # Lactuca sativa (Lettuce) Salinas v11
+  - Lsat_Salinas_v11_wx # Lactuca sativa (Lettuce) Salinas v11
   - Lsat_Salinas_v8     # Lactuca sativa (Lettuce) Salinas v8
   - ITAG4.1             # Solanum lycopersicum (Tomato) ITAG4.1
   - TAIR10.1            # Arabidopsis thaliana TAIR10.1
@@ -49,6 +50,17 @@ STAR_index:
       go_annotation: Lactuca_sativa_V11_ncbi/GCF_002870075.4-RS_2022_12_gene_ontology.go            # GO TERM ANNOTATION
       ref_all: Lactuca_sativa_V11_ncbi/Lsat_ref_all.txt                                             # gene information                                                                              
       
+    Lsat_Salinas_v11_wx:
+      index: Lsat_Salinas_v11_wx/RSEM_Lactuca_sativa_V11_wx                                     # STAR INDEX CREATE BY RSEM
+      genome_fa: Lsat_Salinas_v11_wx/Lsat_Salinas_v11.genome.fasta                              # GENOME FASTA FILE
+      genome_gtf: Lsat_Salinas_v11_wx/Lsat_Salinas_v11.genome.gtf                               # GENOME ANNOTATION FILE
+      genome_gff: Lsat_Salinas_v11_wx/Lsat_Salinas_v11.genome.gff                               # GENOME ANNOTATION FILE
+      rsem_index: Lsat_Salinas_v11_wx/RSEM_Lactuca_sativa_V11_wx/Lactuca_sativa_V11_wx          # RSEM INDEX
+      rsem_index_dir: Lsat_Salinas_v11_wx/RSEM_Lactuca_sativa_V11_wx/                           # RSEM INDEX PATH
+      bed12: Lsat_Salinas_v11_wx/Lsat_Salinas_v11.genome.bed12                                  # GENE RANGES FOR GENE COVERAGE ANALYSIS
+      go_annotation: Lsat_Salinas_v11_wx/GCF_002870075.4-RS_2022_12_gene_ontology.go            # GO TERM ANNOTATION
+      ref_all: Lsat_Salinas_v11_wx/Lsat_Salinas_v11.genome.wx_all.txt                           # gene information      
+
     Lsat_Salinas_v8:
       index: Lactuca_sativa_V8/RSEM_Lactuca_sativa_V8
       genome_fa: Lactuca_sativa_V8/Lactuca_sativa_V8A.fasta
@@ -111,6 +123,8 @@ STAR_index:
 deg_enrich_wrapper:
   Lsat_Salinas_v11:
     gene_col: 'Entrez ID'   # Column name for gene identifiers in deg result
+  Lsat_Salinas_v11_wx:
+    gene_col: 'Entrez ID'   # Column name for gene identifiers in deg result
   Lsat_Salinas_v8:     
     gene_col: 'Entrez ID'   # Column name for gene identifiers in deg result
   ITAG4.1:
@@ -125,6 +139,8 @@ deg_enrich_wrapper:
 ploidy_setting:
   Lsat_Salinas_v11:
     ploidy: 2  # genome ploidy
+  Lsat_Salinas_v11_wx:
+    ploidy: 2
   Lsat_Salinas_v8:     
     ploidy: 2
   ITAG4.1:
