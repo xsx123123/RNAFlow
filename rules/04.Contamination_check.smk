@@ -84,7 +84,7 @@ rule check_fastq_screen_conf:
     resources:
         **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
     conda:
-        workflow.source_path("../envs/py3.12.yaml"),
+        workflow.source_path("../envs/python3.yaml"),
     message:
         "Checking fastq_screen configuration format",
     log:
