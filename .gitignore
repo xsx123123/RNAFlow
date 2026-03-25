@@ -24,3 +24,8 @@ results
 data-deliver
 __pycache__
 *_trace.txt%
+
+# MCP Server
+mcp/.venv
+mcp/data/*.db
+mcp/logs/

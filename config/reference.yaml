@@ -34,6 +34,31 @@ can_use_genome_version:
   - GRCm39              # Mus musculus (Mouse) GRCm39
   - hg38                # Homo sapiens (Human) GRCh38/hg38
   - GO                  # Gene Ontology database
+
+# MCP Genome Version
+# Unified genome version configuration for MCP server
+mcp_genome_version: 
+  Lsat_Salinas_v11:
+    name: Lsat_Salinas_v11
+    description: Lettuce reference genome (v11)
+  Lsat_Salinas_v11_wx:
+    name: Lsat_Salinas_v11_wx
+    description: Lettuce reference genome (v11) power by wang xing
+  Lsat_Salinas_v8:
+    name: Lsat_Salinas_v8
+    description: Lettuce reference genome (v8)
+  ITAG4.1:
+    name: ITAG4.1
+    description: Tomato reference genome (ITAG4.1)
+  TAIR10.1:
+    name: TAIR10.1
+    description: Arabidopsis reference genome (TAIR10.1)
+  GRCm39:
+    name: GRCm39
+    description: Mouse reference genome (GRCm39)
+  hg38:
+    name: hg38
+    description: Human reference genome (GRCh38/hg38)
     
 # STAR Index and Reference File Configuration
 # Detailed file paths for each supported genome version

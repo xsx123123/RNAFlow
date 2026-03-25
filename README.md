@@ -298,6 +298,62 @@ RNAFlow/
 
 RNAFlow 提供了专门的 AI Skills，可以让你通过自然语言与 Claude Code、Codex 等 AI 编程助手交互，轻松完成 RNA-seq 分析。
 
+## 🔌 MCP Server 使用指南
+
+RNAFlow 还提供了基于 [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) 的 MCP 服务器，使用 **[uv](https://docs.astral.sh/uv/)** 进行现代化的环境管理。
+
+### MCP Server 功能特性
+
+- **基因组查询**：列出系统支持的参考基因组（从 `config/reference.yaml` 的 `mcp_genome_version` 读取）。
+- **配置生成**：自动化生成 `config.yaml`, `samples.csv`, `contrasts.csv`。
+- **系统资源监控**：实时检查 CPU、内存、磁盘使用情况，任务提交前预警。
+- **项目运行管理**：使用 SQLite 数据库记录每次运行信息，支持查询和统计。
+- **项目冲突检测**：启动任务前检查项目名称冲突，避免重复。
+- **异步运行**：后台启动 Snakemake，不阻塞 AI。
+- **详细日志**：所有操作记录到 `mcp/logs/mcp/` 目录，含时间戳和详细运行信息。
+- **环境隔离**：使用 `uv` 确保依赖库与分析环境互不干扰。
+- **双模式支持**：本地 stdio 模式 + 远程部署能力。
+
+### 前置要求
+
+使用 MCP Server 前，需要确保服务器上已安装：
+- Python 3.13+
+- **uv (包管理器)** - 必须先在服务器上安装
+- conda/mamba (用于运行 Snakemake)
+- Node.js (可选，用于 MCP Inspector 测试)
+
+### 安装 uv（如果服务器未安装）
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+### 快速开始
+
+1. **安装 MCP 依赖**：
+```bash
+cd /home/zj/pipeline/RNAFlow/mcp
+uv sync
+```
+
+2. **可选：安装系统资源监控依赖（推荐）**：
+```bash
+uv add psutil
+```
+
+3. **测试运行**：
+```bash
+./start.sh test
+```
+
+### 在 AI 客户端中使用
+
+详细的使用说明和配置方法请参考：`mcp/README.md`
+
+- 本地使用配置
+- 远程 SSH 隧道配置
+- 生产环境部署方案
+
 ### 1. 安装 Skills
 > NOTE: 由于分析流程与`skill`分离架构，在安装`skills`前，请修改`path_config.yaml`文件夹中的路径为你的实际路径。例如：`RNAFLOW_ROOT` & `complete` & `standard_deg`等配置
 

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "rnaflow": {
+      "command": "ssh",
+      "args": [
+        "zj@192.168.5.9",
+        "cd", "/home/zj/pipeline/RNAFlow/mcp", "&&",
+        "/home/zj/.pyenv/shims/uv", "run", "python", "server.py"
+      ]
+    }
+  }
+}
