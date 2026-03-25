@@ -33,7 +33,6 @@ can_use_genome_version:
   - TAIR10.1            # Arabidopsis thaliana TAIR10.1
   - GRCm39              # Mus musculus (Mouse) GRCm39
   - hg38                # Homo sapiens (Human) GRCh38/hg38
-  - GO                  # Gene Ontology database
 
 # MCP Genome Version
 # Unified genome version configuration for MCP server

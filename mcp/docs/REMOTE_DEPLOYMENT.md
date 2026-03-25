@@ -18,10 +18,10 @@
 ```bash
 # 1. 启动本地 MCP 服务
 cd /home/zj/pipeline/RNAFlow/mcp
-uv run python server.py
+uv run python main.py
 
 # 2. 或者使用 nohup 在后台运行
-nohup uv run python server.py > mcp_server.log 2>&1 &
+nohup uv run python main.py > mcp_server.log 2>&1 &
 ```
 
 ### 客户端操作（本地机器）
@@ -39,7 +39,7 @@ ssh -L 9999:localhost:9999 user@your-server-ip
       "args": [
         "user@your-server-ip",
         "cd", "/home/zj/pipeline/RNAFlow/mcp", "&&",
-        "uv", "run", "python", "server.py"
+        "uv", "run", "python", "main.py"
       ]
     }
   }
