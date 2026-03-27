@@ -133,7 +133,7 @@ npx @modelcontextprotocol/inspector uv --directory mcp run server.py
       "args": [
         "-p", "4567",
         "zj@your-server-ip",
-        "cd", "/home/zj/pipeline/RNAFlow/mcp", "&&",
+        "cd", "/home/jzhang/pipeline/RNAFlow", "&&",
         "/home/zj/.pyenv/versions/prefect/bin/uv", "run", "python", "server.py"
       ]
     }
