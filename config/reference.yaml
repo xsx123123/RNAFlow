@@ -43,13 +43,8 @@ mcp_genome_version:
   Lsat_Salinas_v11_wx:
     name: Lsat_Salinas_v11_wx
     description: Lettuce reference genome (v11) power by wang xing
-<<<<<<< HEAD
-  Lsat_Salinas_v8_wx :
-    name: Lsat_Salinas_v8_wx 
-=======
   Lsat_Salinas_v8_wx:
     name: Lsat_Salinas_v8_wx
->>>>>>> 56ff83133fd4b9a14b59130c180980598482649d
     description: Lettuce reference genome (v8) power by wang xing
   ITAG4.1:
     name: ITAG4.1

@@ -526,13 +526,8 @@ Host rnaflow-server
       "args": [
         "-p", "4567",
         "zj@your-server-ip",
-<<<<<<< HEAD
         "cd", "/home/jzhang/pipeline/RNAFlow", "&&",
         "/home/zj/.pyenv/versions/prefect/bin/uv", "run", "python", "server.py"
-=======
-        "cd", "/home/zj/pipeline/RNAFlow/mcp", "&&",
-        "/home/zj/.pyenv/versions/prefect/bin/uv", "run", "python", "main.py"
->>>>>>> 56ff83133fd4b9a14b59130c180980598482649d
       ]
     }
   }
