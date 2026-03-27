@@ -12,7 +12,7 @@ case "${1:-local}" in
     local)
         echo "🚀 启动 RNAFlow MCP 本地模式..."
         echo "RNAFlow Root: $(dirname "$SCRIPT_DIR")"
-        uv run python server.py
+        uv run python main.py
         ;;
     
     test)
@@ -22,13 +22,13 @@ case "${1:-local}" in
             echo "请先安装: https://nodejs.org/"
             exit 1
         fi
-        npx @modelcontextprotocol/inspector uv --directory "$SCRIPT_DIR" run server.py
+        npx @modelcontextprotocol/inspector uv --directory "$SCRIPT_DIR" run main.py
         ;;
     
     background)
         echo "📦 在后台启动 RNAFlow MCP..."
         LOG_FILE="$SCRIPT_DIR/mcp_server.log"
-        nohup uv run python server.py > "$LOG_FILE" 2>&1 &
+        nohup uv run python main.py > "$LOG_FILE" 2>&1 &
         PID=$!
         echo "服务已启动 (PID: $PID)"
         echo "日志文件: $LOG_FILE"

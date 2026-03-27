@@ -2,10 +2,17 @@
 # 如果你的 conda 或 snakemake 不在系统环境变量中，请在此指定绝对路径
 
 # Conda 的二进制文件路径 (例如: /home/user/miniconda3/bin/conda)
+<<<<<<< HEAD
 conda_path: "/home/jzhang/software/miniconda3/bin/conda"
 
 # Snakemake 的二进制文件路径 (例如: /home/user/miniconda3/envs/rnaflow/bin/snakemake)
 snakemake_path: "/home/jzhang/software/miniconda3/envs/snakemake"
+=======
+conda_path: "/home/zj/miniconda3/bin/conda"
+
+# Snakemake 的二进制文件路径 (例如: /home/user/miniconda3/envs/rnaflow/bin/snakemake)
+snakemake_path: "/home/zj/miniconda3/envs/snakemake/bin/snakemake"
+>>>>>>> 56ff83133fd4b9a14b59130c180980598482649d
 
 # 默认激活的 conda 环境名称
 default_env: "snakemake"

@@ -2,6 +2,38 @@
 
 这是一个基于 [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) 构建的服务端，使用 **[uv](https://docs.astral.sh/uv/)** 进行现代化的环境管理。
 
+---
+
+## ⚠️ 重要：部署前必须配置
+
+**在部署到新服务器前，请务必修改以下配置文件中的参数：**
+
+### 1. 核心配置文件：`mcp_config.yaml`
+```yaml
+# Conda 的二进制文件路径（根据新服务器环境修改）
+conda_path: "conda"  # "conda" 或绝对路径如 "/home/user/miniconda3/bin/conda"
+
+# Snakemake 的二进制文件路径（根据新服务器环境修改）
+snakemake_path: "snakemake"  # 或绝对路径如 "/home/user/miniconda3/envs/rnaflow/bin/snakemake"
+
+# 默认激活的 conda 环境名称
+default_env: "snakemake9"  # 修改为你的环境名称
+```
+
+### 2. 客户端配置：Claude Desktop 的 `claude_desktop_config.json`
+- SSH 用户和服务器 IP
+- 项目路径
+- uv 的绝对路径（如需要）
+
+### 3. 检查清单
+- [ ] 确认 conda/mamba 已正确安装
+- [ ] 确认 snakemake 环境已创建
+- [ ] 确认 `mcp_config.yaml` 中的路径配置正确
+- [ ] 运行 `uv sync` 安装依赖
+- [ ] 测试本地运行：`uv run python main.py`
+
+---
+
 ## 🌟 功能特性
 
 - **基因组查询**：列出系统支持的参考基因组（从 `config/reference.yaml` 的 `mcp_genome_version` 读取）。
@@ -13,6 +45,237 @@
 - **详细日志**：所有操作记录到 `logs/mcp/` 目录，含时间戳和详细运行信息。
 - **环境隔离**：使用 `uv` 确保依赖库与分析环境互不干扰。
 - **双模式支持**：本地 stdio 模式 + 远程部署能力。
+
+---
+
+## 🏗️ 架构设计与文件结构
+
+本项目采用**模块化分层架构**，便于维护和扩展。如果你要创建类似的 MCP（如 ATAC-seq、ChIP-seq 等），可以直接参考此结构！
+
+### 整体架构图
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     main.py (入口层)                      │
+│  - FastMCP 实例初始化                                       │
+│  - 工具/资源/提示词注册                                      │
+│  - 向后兼容工具别名                                         │
+└────────────────────┬────────────────────────────────────────┘
+                     │
+         ┌───────────┼───────────┐
+         │           │           │
+         ▼           ▼           ▼
+    ┌─────────┐  ┌────────┐  ┌─────────┐
+    │  core/  │  │models/ │  │   db/   │
+    │ (基础层) │  │(数据层)│  │(数据层) │
+    └─────────┘  └────────┘  └─────────┘
+         │           │           │
+         └───────────┼───────────┘
+                     │
+                     ▼
+              ┌──────────────┐
+              │  services/   │
+              │  (业务层)    │
+              └──────────────┘
+```
+
+### 目录结构详解
+
+```
+mcp/
+├── main.py                 # ⭐ 核心入口（只负责 FastMCP 初始化和工具注册）
+│                           #    参考要点：保持简洁，不包含业务逻辑
+│
+├── core/                   # 📦 核心基础模块（所有 MCP 通用）
+│   ├── __init__.py
+│   ├── config.py           # 路径定义、配置加载 (MCP_PATHS, load_mcp_config)
+│   │                       #    参考要点：集中管理所有路径和配置
+│   └── logger.py           # 日志配置 (setup_logging)
+│                           #    参考要点：统一的日志格式和输出位置
+│
+├── models/                 # 📊 数据模型层（Pydantic 模型）
+│   ├── __init__.py
+│   └── schemas.py          # Pydantic 数据模型 (ProjectConfig)
+│                           #    参考要点：
+│                           #      - 定义完整的配置结构
+│                           #      - 添加字段验证（如基因组版本枚举）
+│                           #      - 支持动态加载验证规则（从配置文件）
+│
+├── db/                     # 🗄️ 数据库层
+│   ├── __init__.py
+│   ├── database.py         # 数据库连接和初始化 (init_database, get_db_connection)
+│   │                       #    参考要点：
+│   │                       #      - 统一的数据库连接管理
+│   │                       #      - 自动创建表结构
+│   └── crud.py             # 纯粹的数据库增删改查
+│                           #    参考要点：
+│                           #      - 只做数据操作，不包含业务逻辑
+│                           #      - 每个函数只做一件事
+│
+├── services/               # 🛠️ 业务逻辑层（核心功能实现）
+│   ├── __init__.py
+│   │
+│   ├── project_mgr.py      # 项目管理服务
+│   │                       #    功能：
+│   │                       #      - 创建项目结构
+│   │                       #      - 生成配置文件 (config.yaml)
+│   │                       #      - 生成 CSV 文件 (samples.csv, contrasts.csv)
+│   │                       #      - 配置验证
+│   │                       #    参考要点：按功能域划分服务
+│   │
+│   ├── snakemake.py        # Snakemake 执行服务
+│   │                       #    功能：
+│   │                       #      - 命令拼接
+│   │                       #      - Dry Run 逻辑
+│   │                       #      - 异步/后台进程管理
+│   │                       #    参考要点：
+│   │                       #      - 分离 dry_run 和实际运行
+│   │                       #      - 使用后台进程避免阻塞
+│   │
+│   └── system.py           # 系统服务
+│                           #    功能：
+│                           #      - 环境检查 (Conda)
+│                           #      - 系统资源监控 (CPU/内存/磁盘)
+│                           #      - 运行记录查询
+│                           #    参考要点：
+│                           #      - 封装系统调用
+│                           #      - 提供友好的错误提示
+│
+├── docs/                   # 📚 旧文件备份（归档用）
+│   ├── USAGE_EXAMPLES.md
+│   ├── TEST_AND_DEPLOY.md
+│   └── ...
+│
+├── skills/                 # 🎯 MCP Skills（AI 提示词模板）
+├── test/                   # 🧪 测试文件
+├── data/                   # 💾 数据库文件存放
+├── logs/                   # 📝 日志文件存放
+│
+├── README.md               # 📖 本文档
+├── start.sh                # 🚀 便捷启动脚本
+├── mcp_config.yaml         # ⚙️ MCP 服务配置
+├── pyproject.toml          # 📦 uv 项目配置
+└── uv.lock                 # 🔒 依赖锁定文件
+```
+
+### 各模块职责说明
+
+| 模块 | 职责 | 可复用性 |
+|------|------|---------|
+| `core/config.py` | 路径管理、配置加载 | ⭐⭐⭐⭐⭐ 完全通用 |
+| `core/logger.py` | 日志系统配置 | ⭐⭐⭐⭐⭐ 完全通用 |
+| `models/schemas.py` | 数据模型定义 | ⭐⭐⭐⭐ 需根据分析类型修改 |
+| `db/database.py` | 数据库初始化 | ⭐⭐⭐⭐⭐ 完全通用 |
+| `db/crud.py` | 数据库操作 | ⭐⭐⭐⭐ 基本通用，表结构可能调整 |
+| `services/project_mgr.py` | 项目结构、配置生成 | ⭐⭐⭐ 需根据分析类型修改 |
+| `services/snakemake.py` | Snakemake 执行 | ⭐⭐⭐⭐ 基本通用 |
+| `services/system.py` | 系统检查、运行查询 | ⭐⭐⭐⭐⭐ 完全通用 |
+| `main.py` | 工具注册、入口 | ⭐⭐⭐⭐ 基本通用，工具列表需调整 |
+
+### 创建新 MCP（如 ATACFlow）的步骤
+
+#### 1. 复制框架
+```bash
+# 复制整个 mcp/ 目录为新的项目
+cp -r RNAFlow/mcp ATACFlow/mcp
+```
+
+#### 2. 修改核心配置
+- 更新 `pyproject.toml` 中的项目名称
+- 更新 `mcp_config.yaml`（如需要）
+- 修改 `core/config.py` 中的路径引用（如需要）
+
+#### 3. 定制数据模型
+编辑 `models/schemas.py`：
+- 修改 `ProjectConfig` 类，添加 ATAC-seq 特有的配置字段
+- 调整 `Genome_Version` 验证（或保持动态加载机制）
+
+#### 4. 修改业务逻辑
+编辑 `services/project_mgr.py`：
+- 修改 `setup_complete_project()` 中的默认配置
+- 更新生成的配置文件模板
+- 调整 CSV 文件结构（如需要）
+
+#### 5. 更新入口
+编辑 `main.py`：
+- 更新 FastMCP 名称（如 `"ATACFlow"`）
+- 确保所有工具都正确注册
+- 更新提示词（Prompts）
+
+#### 6. 测试验证
+- 运行 `uv sync` 安装依赖
+- 使用 `./start.sh test` 测试
+- 验证所有工具功能正常
+
+### 关键设计原则
+
+1. **单一职责**：每个模块/函数只做一件事
+2. **依赖倒置**：业务层依赖抽象，不依赖具体实现
+3. **配置驱动**：尽可能从配置文件读取，避免硬编码
+4. **向后兼容**：保留旧工具名称作为别名，避免破坏现有集成
+5. **动态验证**：从 `config/reference.yaml` 动态加载支持的基因组版本
+
+---
+
+## 💡 使用示例
+
+### 快速开始 - 推荐方式
+
+#### 方式一：使用 setup_complete_project 一键设置（最简单）
+
+```python
+# 一站式设置 - 自动创建目录结构、配置文件、样本表
+setup_complete_project(
+    project_root="/data/jzhang/project/Temp/rna_skills_analysis",
+    project_name="lettuce_rnaseq_qc",
+    genome_version="Lsat_Salinas_v8",
+    species="Lactuca sativa",
+    analysis_mode="qc_only",  # 或 "standard" 或 "complete"
+    client="Research_Lab",
+    library_types="fr-firststrand"
+)
+```
+
+这会自动创建：
+- `/data/jzhang/project/Temp/rna_skills_analysis/00.raw_data/`
+- `/data/jzhang/project/Temp/rna_skills_analysis/01.workflow/`
+- `/data/jzhang/project/Temp/rna_skills_analysis/02.data_deliver/`
+- `config.yaml`
+- `samples.csv` (模板)
+- `contrasts.csv` (模板)
+
+#### 方式二：分步设置
+
+```python
+# Step 1: 创建目录结构
+create_project_structure("/data/jzhang/project/Temp/rna_skills_analysis")
+
+# Step 2: 获取配置模板
+get_config_template("qc_only")
+
+# Step 3: 生成完整配置
+# (需要先创建 ProjectConfig 对象，或使用 setup_complete_project)
+```
+
+### 工具名称对照
+
+| 新工具名 (蛇形) | 旧工具名 (驼峰) |
+|-----------------|-----------------|
+| `generate_config_file` | `rnaflowGenerateConfigFile` |
+| `create_project_structure` | `createProjectStructure` |
+| `setup_complete_project` | `setupCompleteProject` |
+| `create_sample_csv` | `createSampleCsv` |
+| `create_contrasts_csv` | `createContrastsCsv` |
+
+两种命名方式都支持！
+
+### 分析模式说明
+
+| 模式 | 说明 |
+|------|------|
+| `qc_only` | 仅做质量控制（最快） |
+| `standard` | 标准 DEG 分析（推荐） |
+| `complete` | 完整分析（包含变异检测、可变剪接等） |
 
 ---
 
@@ -58,12 +321,142 @@ uv sync --extra full
 
 #### 方式二：手动使用 MCP Inspector
 ```bash
-npx @modelcontextprotocol/inspector uv --directory mcp run server.py
+npx @modelcontextprotocol/inspector uv --directory mcp run main.py
 ```
 
 ---
 
+## 🔌 MCP 连接方式说明
+
+### 重要理解：MCP stdio 模式的工作原理
+
+RNAFlow MCP 使用 **stdio 模式**（标准输入输出），这意味着：
+- ❌ **不能像传统 Web 服务那样独立后台运行**
+- ✅ **需要由客户端（如 Claude Desktop）直接启动进程**
+- ✅ **客户端通过 stdin/stdout 与 MCP 服务器通信**
+
+---
+
+### start.sh 脚本使用说明
+
+| 命令 | 用途 | 适用场景 |
+|------|------|---------|
+| `./start.sh local` | 前台运行本地模式 | 开发调试 |
+| `./start.sh test` | 启动 MCP Inspector 测试 | 功能测试 |
+| `./start.sh background` | 后台运行（不推荐用于 stdio 模式） | - |
+
+⚠️ **注意**：`./start.sh background` 对于 stdio 模式没有实际意义，因为 MCP 需要客户端主动连接。
+
+---
+
 ## 🤖 在 AI 客户端中使用
+
+### 实际使用方案
+
+#### 方案一：本地使用（最简单）
+
+如果你的 AI 客户端（如 Claude Desktop）和 RNAFlow MCP 在同一台机器上：
+
+**配置 `claude_desktop_config.json`：**
+```json
+{
+  "mcpServers": {
+    "rnaflow": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/home/zj/pipeline/RNAFlow/mcp",
+        "run",
+        "main.py"
+      ]
+    }
+  }
+}
+```
+
+**工作原理**：
+- Claude Desktop 每次启动时会自动运行这个命令
+- MCP 进程由 Claude Desktop 管理
+- 不需要手动后台运行
+
+---
+
+#### 方案二：远程使用（推荐用于服务器部署）
+
+如果 RNAFlow MCP 在远程服务器上，使用 SSH 隧道方式：
+
+**配置 `claude_desktop_config.json`（本地机器）：**
+```json
+{
+  "mcpServers": {
+    "rnaflow": {
+      "command": "ssh",
+      "args": [
+        "-p", "4567",
+        "zj@your-server-ip",
+        "cd", "/home/zj/pipeline/RNAFlow/mcp", "&&",
+        "/home/zj/.pyenv/versions/prefect/bin/uv", "run", "python", "main.py"
+      ]
+    }
+  }
+}
+```
+
+**工作原理**：
+- Claude Desktop 通过 SSH 连接到远程服务器
+- 在远程服务器上启动 MCP 进程
+- stdio 通过 SSH 隧道传输
+- 每次使用时自动连接，不需要手动后台保持
+
+**优点**：
+- ✅ 安全（SSH 加密）
+- ✅ 简单（不需要额外配置服务）
+- ✅ 按需启动（不使用时不占用资源）
+
+---
+
+#### 方案三：长期保持连接（可选）
+
+如果你希望 MCP 进程长期保持，可以使用 SSH 的 ControlMaster 功能：
+
+**在本地 `~/.ssh/config` 中添加：**
+```ssh
+Host rnaflow-server
+    HostName your-server-ip
+    Port 4567
+    User zj
+    ControlMaster auto
+    ControlPath ~/.ssh/cm-%r@%h:%p
+    ControlPersist 1h
+```
+
+然后在 `claude_desktop_config.json` 中使用：
+```json
+{
+  "mcpServers": {
+    "rnaflow": {
+      "command": "ssh",
+      "args": [
+        "rnaflow-server",
+        "cd", "/home/zj/pipeline/RNAFlow/mcp", "&&",
+        "uv", "run", "python", "main.py"
+      ]
+    }
+  }
+}
+```
+
+这样 SSH 连接会保持 1 小时，减少重复连接的开销。
+
+---
+
+### 验证连接
+
+配置完成后，重启 Claude Desktop，你应该能在可用工具列表中看到 RNAFlow 的工具！
+
+---
+
+## 🚀 快速开始
 
 ### 场景一：本地使用（服务端和客户端在同一台机器）
 
@@ -77,7 +470,7 @@ npx @modelcontextprotocol/inspector uv --directory mcp run server.py
         "--directory",
         "/home/zj/pipeline/RNAFlow/mcp",
         "run",
-        "server.py"
+        "main.py"
       ]
     }
   }
@@ -99,7 +492,7 @@ npx @modelcontextprotocol/inspector uv --directory mcp run server.py
       "args": [
         "zj@your-server-ip",
         "cd", "/home/zj/pipeline/RNAFlow/mcp", "&&",
-        "uv", "run", "python", "server.py"
+        "uv", "run", "python", "main.py"
       ]
     }
   }
@@ -116,7 +509,7 @@ npx @modelcontextprotocol/inspector uv --directory mcp run server.py
       "args": [
         "zj@your-server-ip",
         "cd", "/home/zj/pipeline/RNAFlow/mcp", "&&",
-        "uv", "run", "python", "server.py"
+        "uv", "run", "python", "main.py"
       ]
     }
   }
@@ -133,8 +526,13 @@ npx @modelcontextprotocol/inspector uv --directory mcp run server.py
       "args": [
         "-p", "4567",
         "zj@your-server-ip",
+<<<<<<< HEAD
         "cd", "/home/jzhang/pipeline/RNAFlow", "&&",
         "/home/zj/.pyenv/versions/prefect/bin/uv", "run", "python", "server.py"
+=======
+        "cd", "/home/zj/pipeline/RNAFlow/mcp", "&&",
+        "/home/zj/.pyenv/versions/prefect/bin/uv", "run", "python", "main.py"
+>>>>>>> 56ff83133fd4b9a14b59130c180980598482649d
       ]
     }
   }
@@ -152,7 +550,7 @@ npx @modelcontextprotocol/inspector uv --directory mcp run server.py
         "zj@your-server-ip",
         "export PATH=\"/home/zj/.pyenv/versions/prefect/bin:$PATH\"", "&&",
         "cd", "/home/zj/pipeline/RNAFlow/mcp", "&&",
-        "uv", "run", "python", "server.py"
+        "uv", "run", "python", "main.py"
       ]
     }
   }
@@ -333,13 +731,26 @@ get_snakemake_log(run_id="MyProject_20260325_000015", lines=100)
 
 | 文件/目录 | 说明 |
 |-----------|------|
-| `server.py` | MCP 服务器核心代码 |
+| `main.py` | MCP 服务器核心入口（FastMCP 实例初始化、工具注册） |
+| `core/` | 核心模块 |
+| `core/config.py` | 路径定义、MCP_PATHS 和 load_mcp_config |
+| `core/logger.py` | setup_logging 日志配置 |
+| `models/` | 数据模型 |
+| `models/schemas.py` | Pydantic 数据模型 (ProjectConfig) |
+| `db/` | 数据库模块 |
+| `db/database.py` | 数据库连接和初始化 |
+| `db/crud.py` | 数据库增删改查操作 |
+| `services/` | 业务逻辑服务 |
+| `services/project_mgr.py` | 项目结构生成、CSV/YAML 生成逻辑 |
+| `services/snakemake.py` | Snakemake 命令拼接、异步调用、Dry Run 逻辑 |
+| `services/system.py` | 环境检查 (Conda)、系统资源监控 |
 | `start.sh` | 便捷启动脚本 |
 | `mcp_config.yaml` | 服务配置文件（路径、网络等） |
 | `pyproject.toml` | uv 项目配置（依赖定义） |
 | `uv.lock` | 依赖锁定文件，确保环境可复现 |
 | `data/rnaflow_runs.db` | SQLite 数据库，存储项目运行记录 |
 | `logs/mcp/` | MCP 服务器运行日志目录 |
+| `server.py.old` | 旧版本服务器代码（已备份） |
 | `TEST_AND_DEPLOY.md` | 详细的测试与部署指南 |
 | `README.md` | 本文档 |
 

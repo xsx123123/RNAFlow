@@ -1,0 +1,51 @@
+# RNAFlow Standard DEG Analysis Configuration
+# Version: RNAFlow_v0.1.9
+# Use this for routine differential gene expression analysis
+
+# === Basic Project Information ===
+project_name: 'PRJNA_Standard_DEG'
+Genome_Version: "GRCm39"
+species: 'Mus musculus'
+client: 'Research_Lab'
+
+# === Data Path Configuration ===
+raw_data_path:
+  - /project/00.raw_data
+sample_csv: /project/01.workflow/samples.csv
+paired_csv: /project/01.workflow/contrasts.csv
+workflow: /project/01.workflow
+data_deliver: /project/02.data_deliver
+
+# === Execution Parameters ===
+execution_mode: local
+Library_Types: fr-firststrand
+
+# === Analysis Module Switches ===
+# Standard DEG analysis - skips time-consuming modules
+only_qc: false
+deg: true
+call_variant: false
+detect_novel_transcripts: false
+rmats: false
+fastq_screen: true
+report: true
+
+# === Notes ===
+# This configuration runs:
+# - QC & Trimming (FastQC + fastp)
+# - Contamination Check (FastQ Screen)
+# - STAR Mapping (2-pass mode)
+# - RSEM Quantification
+# - DESeq2 DEG + GO/KEGG Enrichment
+# - MultiQC + BioReport HTML Report
+#
+# Skips (to save time):
+# - GATK Variant Calling
+# - StringTie Novel Transcripts
+# - rMATS Alternative Splicing
+# - Arriba Gene Fusion Detection
+#
+# Use this for:
+# - Routine gene expression studies
+# - When only DEG + enrichment is needed
+# - Faster turnaround times

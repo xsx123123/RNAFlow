@@ -16,13 +16,13 @@ uv sync
 #### 方式 A：使用 MCP Inspector 测试（推荐）
 ```bash
 # 需要先安装 Node.js
-npx @modelcontextprotocol/inspector uv --directory /home/zj/pipeline/RNAFlow/mcp run server.py
+npx @modelcontextprotocol/inspector uv --directory /home/zj/pipeline/RNAFlow/mcp run main.py
 ```
 
 #### 方式 B：直接运行测试
 ```bash
 # 测试基本运行
-uv run python server.py
+uv run python main.py
 ```
 
 ---
@@ -47,7 +47,7 @@ uv run python server.py
       "args": [
         "zj@your-server-ip",
         "cd", "/home/zj/pipeline/RNAFlow/mcp", "&&",
-        "uv", "run", "python", "server.py"
+        "uv", "run", "python", "main.py"
       ]
     }
   }
