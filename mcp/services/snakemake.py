@@ -126,8 +126,20 @@ async def run_rnaflow(
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     run_id = f"{project_name}_{timestamp}"
 
+    # 获取 Conda 路径和环境名称
+    conda_bin = MCP_PATHS.get("conda_path", "conda")
+    env_name = MCP_PATHS.get("default_env", "snakemake")
     snakemake_bin = MCP_PATHS.get("snakemake_path", "snakemake")
-    cmd = [snakemake_bin]
+
+    # 构建基础命令：使用 conda run 确保环境已激活
+    # --no-capture-output 确保 stdout/stderr 实时流向重定向的文件
+    cmd = [conda_bin, "run", "--no-capture-output", "-n", env_name]
+    
+    # 如果 snakemake_path 指向的是一个具体的文件，则使用它，否则直接用 "snakemake"
+    if Path(snakemake_bin).is_file():
+        cmd.append(snakemake_bin)
+    else:
+        cmd.append("snakemake")
 
     if dry_run:
         cmd.extend(["-n", "--quiet"])
