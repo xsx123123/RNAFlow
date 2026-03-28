@@ -12,6 +12,7 @@ from typing import Optional, Dict, Any
 
 from core.logger import logger, current_log_file
 from core.config import RNAFLOW_ROOT, MCP_PATHS
+from db.session import get_db_connection
 from db.crud import record_run_start, get_run_info, update_run_status_in_db
 
 
@@ -152,25 +153,34 @@ async def run_rnaflow(
             logger.info("执行 Dry Run...")
             logger.info(f"Dry Run 命令: {' '.join(cmd)}")
 
-            process = await asyncio.create_subprocess_exec(
-                *cmd,
-                cwd=str(RNAFLOW_ROOT),
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
-            stdout, stderr = await process.communicate()
+            # Add timeout protection for dry run
+            try:
+                process = await asyncio.create_subprocess_exec(
+                    *cmd,
+                    cwd=str(RNAFLOW_ROOT),
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                )
+                stdout, stderr = await asyncio.wait_for(
+                    process.communicate(),
+                    timeout=60.0  # 60 second timeout for dry run
+                )
 
-            output = f"Dry Run Command: {' '.join(cmd)}\n\n"
-            if stdout:
-                output += f"Stdout:\n{stdout.decode()}\n"
-                logger.debug(f"Dry Run Stdout:\n{stdout.decode()}")
-            if stderr:
-                output += f"Stderr:\n{stderr.decode()}\n"
-                logger.warning(f"Dry Run Stderr:\n{stderr.decode()}")
+                output = f"Dry Run Command: {' '.join(cmd)}\n\n"
+                if stdout:
+                    output += f"Stdout:\n{stdout.decode()}\n"
+                    logger.debug(f"Dry Run Stdout:\n{stdout.decode()}")
+                if stderr:
+                    output += f"Stderr:\n{stderr.decode()}\n"
+                    logger.warning(f"Dry Run Stderr:\n{stderr.decode()}")
 
-            logger.info("Dry Run 完成")
-            logger.info("=== 工具完成: run_rnaflow ===")
-            return output
+                logger.info("Dry Run 完成")
+                logger.info("=== 工具完成: run_rnaflow ===")
+                return output
+            except asyncio.TimeoutError:
+                error_msg = "Dry run timed out after 60 seconds"
+                logger.error(error_msg)
+                return f"Error: {error_msg}"
         else:
             logger.info("启动后台运行...")
             log_file = config_file.parent / "rnaflow_run.log"

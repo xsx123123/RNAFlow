@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import Optional, List, Dict, Any
 
 from core.logger import logger
-from db.database import get_db_connection
+from db.session import get_db_connection
 
 
 def record_run_start(
