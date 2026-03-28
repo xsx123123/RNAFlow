@@ -1,7 +1,6 @@
 # RNAFlow - RNA-seq Analysis Pipeline
 
 RNAFlow 是一个基于 Snakemake 的全自动化 RNA-seq 分析流程。它实现了从**原始测序数据 (Raw Data)** 到**标准化生物信息报告 (Interactive Report)**，再到 **AI 智能结果解读** 的端到端闭环分析。
-> **声明**：RNAFlow 现阶段仅在课题组内部使用，尚未正式对外开源。
 
 ## 📖 目录
 - [核心特性](#-核心特性)
