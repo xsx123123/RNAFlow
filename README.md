@@ -4,7 +4,6 @@
 
 RNAFlow is a fully automated RNA-seq analysis pipeline based on Snakemake. It implements an end-to-end closed-loop analysis from **Raw Data** to **Standardized Bioinformatics Reports (Interactive Report)**, and finally to **AI-powered results interpretation**.
 
-> **Disclaimer**: RNAFlow is currently for internal use within the research group and has not been officially open-sourced.
 
 ## 📖 Table of Contents
 - [Core Features](#-core-features)
