@@ -54,7 +54,7 @@ default_env: "snakemake"          # 默认运行环境
   "mcpServers": {
     "rnaflow": {
       "command": "uv",
-      "args": ["--directory", "/home/zj/pipeline/RNAFlow/mcp", "run", "main.py"]
+      "args": ["--directory", "<mcp path>", "run", "main.py"]
     }
   }
 }
@@ -68,9 +68,9 @@ default_env: "snakemake"          # 默认运行环境
     "rnaflow": {
       "command": "ssh",
       "args": [
-        "-p", "22",
+        "-p", "<port>",
         "zj@your-server-ip",
-        "cd /home/zj/pipeline/RNAFlow/mcp && /home/zj/.local/bin/uv run python main.py"
+        "cd <mcp path> && < uv path > run python main.py"
       ]
     }
   }
