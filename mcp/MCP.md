@@ -123,6 +123,7 @@ list_supported_genomes()           # 列出支持的参考基因组
 get_config_template(mode)          # 获取配置模板
 setup_project(root, name, ...)     # 一键初始化项目结构+配置
 validate_config(config_path)       # 校验配置文件
+scan_samples(directory)            # 智能扫描目录并提取样本表
 
 # ===== Execution 类 =====
 run_pipeline(config_path, ...)     # 异步提交流程，返回 job_id
@@ -509,6 +510,19 @@ class RNAseqProjectConfig(BaseProjectConfig):
 create_sample_csv(sample_data, output_path)
 create_contrasts_csv(contrasts, output_path)
 get_deg_summary(job_id)               # 差异基因数量摘要
+
+#### 样本识别与命名规范 (Mandatory)
+1. **智能去噪**：扫描时必须剔除 `_R1/_R2`、`_raw`、`.RAW` 等下机干扰后缀。
+2. **ID 缩写提取**：提取具有表达性的 ID 缩写作为 `sample_name`。
+   - *示例*：`L1MLA1700058-PI_L18_1` -> `PI_L18_1`。
+3. **Group 逻辑**：
+   - **QC 模式**：`group` 默认等于 `sample_name`。
+   - **配对分析**：必须遵循实验设计的 group 名称；若无特别指定，则使用 `sample_name`。
+
+#### 核心配置手动确认 SOP
+1. **生成预览**：生成 `config.yaml`, `samples.csv`, `contrasts.csv` 后展示预览。
+2. **停顿询问**：明确告知用户“核心配置已就绪，请手动确认无误后调用 run_pipeline”。
+3. **禁止越权**：未经用户明确回复“确认”前，禁止自动提交任务。
 ```
 
 

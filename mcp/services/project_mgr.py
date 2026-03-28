@@ -5,12 +5,63 @@ Project management services for RNAFlow MCP
 
 import csv
 import yaml
+import re
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 from core.logger import logger
 from core.config import CONFIG_DIR, EXAMPLES_DIR
 from models.schemas import ProjectConfig
+
+
+def scan_fastq_directory(raw_data_dir: Path) -> List[Dict[str, str]]:
+    """
+    扫描目录以提取样本信息。
+    
+    逻辑：
+    1. 识别 R1/R2/RAW 后缀并提取基础 sample ID。
+    2. 提取 sample_name (缩写)：针对 PI_L18_1 这种具有表达性的 ID 进行提取。
+    3. group 默认对齐 sample_name。
+    """
+    logger.info(f"扫描目录: {raw_data_dir}")
+    fastq_patterns = ["*.fastq.gz", "*.fq.gz", "*.fastq", "*.fq"]
+    files = []
+    for pattern in fastq_patterns:
+        files.extend(list(raw_data_dir.glob(pattern)))
+    
+    if not files:
+        return []
+
+    # 剔除后缀的正则：_R1, _R2, _1, _2, _raw, .raw 等
+    strip_regex = re.compile(r"(_R[12]|_raw|[._][12]|_RAW)(\.fastq|\.fq)?(\.gz)?$", re.IGNORECASE)
+    ext_regex = re.compile(r"(\.fastq|\.fq)(\.gz)?$", re.IGNORECASE)
+
+    samples_map = {}
+    for f in sorted(files):
+        filename = f.name
+        # 1. 提取 sample (去除后缀)
+        sample_id = strip_regex.sub("", filename)
+        if sample_id == filename:
+            sample_id = ext_regex.sub("", filename)
+            
+        if sample_id in samples_map:
+            continue
+            
+        # 2. 提取具有表达性的 sample_name
+        # 逻辑：如果包含 '-'，通常后半部分是真正的样本标识 (如 L1MLA1700058-PI_L18_1 -> PI_L18_1)
+        sample_name = sample_id
+        if "-" in sample_id:
+            parts = sample_id.split("-")
+            if len(parts) > 1:
+                sample_name = parts[-1]
+        
+        samples_map[sample_id] = {
+            "sample": sample_id,
+            "sample_name": sample_name,
+            "group": sample_name  # 初始默认 group
+        }
+        
+    return list(samples_map.values())
 
 
 def list_supported_genomes() -> List[Dict[str, str]]:

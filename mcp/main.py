@@ -43,6 +43,7 @@ from services.project_mgr import (
     get_project_structure,
     setup_complete_project,
     run_simple_qc_analysis,
+    scan_fastq_directory,
 )
 from services.snakemake import run_rnaflow
 from services.system import (
@@ -466,6 +467,22 @@ async def get_snakemake_log_tool(run_id: str, lines: int = 50) -> Dict[str, Any]
     )
 
 
+@mcp.tool()
+async def scan_samples_tool(directory_path: str) -> List[Dict[str, str]]:
+    """
+    扫描指定目录下的 FASTQ 文件并自动提取样本信息。
+    
+    遵守以下规范：
+    1. sample: 去除 R1/R2/RAW/fastq 等后缀后的名称。
+    2. sample_name: 具有表达性的 ID 缩写 (如 L1MLA1700058-PI_L18_1 -> PI_L18_1)。
+    3. group: 默认初始化为 sample_name。
+    """
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(
+        None, scan_fastq_directory, Path(directory_path)
+    )
+
+
 # ========== Legacy Configuration Support ==========
 
 
@@ -631,21 +648,31 @@ async def get_skill_documentation() -> str:
 @mcp.prompt()
 def setup_new_project(project_name: str = "My_RNA_Project") -> str:
     """
-    Guide AI to set up a new RNAFlow analysis project
-
-    Use this prompt when starting a new RNA-seq analysis.
+    引导 AI 创建新的 RNAFlow 项目，并严格遵守样本命名、分组和确认规范。
     """
-    return f"""I want to start a new RNA-seq analysis project named "{project_name}" using RNAFlow.
+    return f"""我想开始一个名为 "{project_name}" 的 RNA-seq 分析项目。
 
-Please follow these steps:
-1. First, use `list_supported_genomes_tool` to show me which reference genomes are available.
-2. Check if my environment is ready using `check_conda_environment_tool`.
-3. Explain the recommended project structure using `get_project_structure_tool`.
-4. Ask me for the following details:
-   - Species name
-   - Absolute path to raw FASTQ data
-   - Desired output directory
-5. Once I provide those, use `generate_config_file_tool` to create the configuration.
+请严格执行以下标准化操作程序 (SOP)：
+
+1. 【样本扫描与识别】：
+   - 当我提供原始数据目录时，你**必须**先调用 `scan_samples_tool`。
+   - 准备 `samples.csv` 时，必须包含：`sample`, `sample_name`, `group` 三列。
+   - **命名规则**：
+     - `sample`: 去除 R1, R2, RAW, .fastq.gz 等后缀。
+     - `sample_name`: 提取具有表达性的 ID 缩写。例如：`L1MLA1700058-PI_L18_1` 应提取为 `PI_L18_1`。
+     - `group` 逻辑：
+       - 若仅进行 QC 分析 (`only_qc: true`)，`group` 默认使用 `sample_name`。
+       - 若我提供了样本配对/分组信息，请务必使用我提供的 group 名称。
+       - 默认情况下使用 `sample_name`。
+
+2. 【核心配置准备】：
+   - 确认基因组版本。
+   - 自动生成 `config.yaml`, `samples.csv` 和 `contrasts.csv`。
+
+3. 【停顿与手动确认】：
+   - **核心步骤**：在生成上述三个核心文件后，请向我展示它们的预览摘要。
+   - 明确询问：“核心配置已生成（config.yaml, samples.csv, contrasts.csv），请手动确认无误后，再调用 run_rnaflow 开始分析。”
+   - **严禁**在未得到我明确确认（如“确认”或“开始”）的情况下启动 `run_rnaflow`。
 """
 
 
@@ -663,6 +690,24 @@ Please help me debug by:
 2. Checking if there are any common issues like "Command not found" or "Out of memory".
 3. Using `validate_config_tool` to ensure my config.yaml is still valid.
 4. Suggesting a fix or explaining the error message in simple terms.
+"""
+
+
+@mcp.prompt()
+def analyze_data_directory(directory_path: str) -> str:
+    """
+    针对特定数据目录的快速分析引导词。
+    """
+    return f"""请对目录 "{directory_path}" 下的数据进行分析准备。
+
+你的任务流水线：
+1. 立即调用 `scan_samples_tool` 扫描该目录。
+2. 按照规范生成样本表：
+   - 列：sample, sample_name, group。
+   - 智能提取 ID 缩写（例：`L1MLA1700058-PI_L18_1` -> `PI_L18_1`）。
+   - 分组逻辑：QC 模式默认用 `sample_name`；若有配对信息或 DEG 需求，请根据实际情况设置 group。
+3. 自动生成 `config.yaml` 和 `contrasts.csv`。
+4. **汇报并等待确认**：列出配置详情，告知我你已准备好，并等待我的手动确认指令后再开始 `run_rnaflow`。
 """
 
 

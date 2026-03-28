@@ -93,6 +93,17 @@ git clone --recurse-submodules git@github.com:xsx123123/RNAFlow.git
 
 ### Step 2: Create Project Config (config.yaml)
 
+**⚠️ 重要规范 (SOP)：**
+1. **样本识别**：必须使用 `scan_samples_tool` 扫描原始数据。
+2. **命名规范**：
+   - `sample`: 去除 R1/R2/RAW 等后缀后的原始 ID。
+   - `sample_name`: 具有表达性的 ID 缩写 (例：`L1MLA1700058-PI_L18_1` -> `PI_L18_1`)。
+3. **Group 逻辑**：
+   - 仅 QC 分析时，`group` 默认等于 `sample_name`。
+   - 若用户提供配对/分组信息，则使用提供的名称。
+   - 默认情况下使用 `sample_name`。
+4. **手动确认**：生成 `config.yaml`, `samples.csv`, `contrasts.csv` 后，**必须停止**并请求用户手动确认，严禁直接运行分析。
+
 ```yaml
 # === Basic Project Info ===
 project_name: 'PRJNA1224991'
