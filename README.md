@@ -4,7 +4,7 @@
 
 RNAFlow is a fully automated RNA-seq analysis pipeline based on Snakemake. It implements an end-to-end closed-loop analysis from **Raw Data** to **Standardized Bioinformatics Reports (Interactive Report)**, and finally to **AI-powered results interpretation**.
 
-> **Disclaimer**: RNAFlow is currently for internal use within the research group and has not been officially open-sourced.
+> **License**: RNAFlow is open-source software released under the MIT License. See [LICENSE](./LICENSE) for details.
 
 ## 📖 Table of Contents
 - [Core Features](#-core-features)
@@ -279,8 +279,6 @@ RNAFlow/
 ## 🚀 Installation Guide
 
 1.  **Clone the Repository**:
-    > [!IMPORTANT] 
-    > **Disclaimer**: RNAFlow is currently for internal use within the research group and has not been officially open-sourced.
     ```bash
     git clone --recurse-submodules git@github.com:xsx123123/RNAFlow.git
     cd RNAFlow
@@ -300,7 +298,7 @@ RNAFlow/
    pip install snakemake_logger_plugin_rich_loguru==0.1.4
    ```
    > [!NOTE]
-   > **Note**: This plugin is currently for internal use only and has not been publicly released.
+   > **Note**: The enhanced logger plugin is available via PyPI and will be automatically installed with the pipeline.
 
 ## 🐳 Container Image Builder (New in v0.1.9+)
 
@@ -866,8 +864,8 @@ snakemake --cores 60 --use-conda --config analysisyaml=config.yaml
 #### 2. Independent Operation Mode (Modular Call)
 The report module can also be used as an independent tool, facilitating re-rendering or AI interpretation on existing data. Using a Docker image is recommended:
 
-> [!NOTE]
-> **Note**: The Docker image is currently for internal use only. Please contact developers for access or more info.
+> [!TIP]
+> **Tip**: You can build the Docker image locally using the `container_env/Flowcontainer` tool. See [Container Image Builder](#-container-image-builder-new-in-v019) for details.
 
 ```bash
 docker run -it --rm \

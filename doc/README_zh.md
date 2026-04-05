@@ -1,7 +1,7 @@
 # RNAFlow - RNA-seq Analysis Pipeline
 
 RNAFlow 是一个基于 Snakemake 的全自动化 RNA-seq 分析流程。它实现了从**原始测序数据 (Raw Data)** 到**标准化生物信息报告 (Interactive Report)**，再到 **AI 智能结果解读** 的端到端闭环分析。
-> **声明**：RNAFlow 现阶段仅在课题组内部使用，尚未正式对外开源。
+> **开源协议**：RNAFlow 采用 MIT 协议开源。详情请参见 [LICENSE](../LICENSE)。
 
 ## 📖 目录
 - [核心特性](#-核心特性)
@@ -271,8 +271,6 @@ RNAFlow/
 ## 🚀 安装指南
 
 1.  **克隆仓库**：
-    > [!IMPORTANT] 
-    > **声明**：RNAFlow 现阶段仅在课题组内部使用，尚未正式对外开源。
     ```bash
     git clone --recurse-submodules git@github.com:xsx123123/RNAFlow.git
     cd RNAFlow
@@ -292,7 +290,7 @@ RNAFlow/
    pip install snakemake_logger_plugin_rich_loguru==0.1.4
    ```
    > [!NOTE]
-   > **Note**: This plugin is currently for internal use only and has not been publicly released.
+   > **说明**：增强型日志插件可通过 PyPI 获取，执行流程时将自动安装。
 
 ## 🤖 AI Skills 使用指南
 
@@ -768,8 +766,8 @@ snakemake --cores 60 --use-conda --config analysisyaml=config.yaml
 #### 2. 独立运行模式 (模块化调用)
 报告模块也可以作为独立工具使用，便于在已有数据的基础上重新渲染或进行 AI 解读。建议使用 Docker 镜像以避免环境配置问题：
 
-> [!NOTE]
-> **注意**：Docker 镜像目前仅供内部使用。如需获取镜像或了解更多信息，请联系开发者。
+> [!TIP]
+> **提示**：您可以使用 `container_env/Flowcontainer` 工具在本地构建 Docker 镜像。详情请参见 [容器镜像构建器](#-容器镜像构建器-v019新增)。
 
 ```bash
 docker run -it --rm \
