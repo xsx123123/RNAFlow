@@ -57,7 +57,8 @@ _qc_warning_logged = False
 from utils.common import (
     DataDeliver, ReportData, get_sample_data_dir, 
     get_all_input_dirs, judge_bwa_index, 
-    judge_star_index, check_gene_version
+    judge_star_index, check_gene_version,
+    get_docker_image
 )
 
 # --------------------- #

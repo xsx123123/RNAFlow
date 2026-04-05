@@ -17,6 +17,31 @@ from utils.datadeliver import qc_clean,mapping,count,Deg,call_variant,detect_nov
 # Global flag for QC warning
 _qc_warning_logged = False
 
+def get_docker_image(config:dict = None,
+                     image_key:str = None,
+                     use_prefix=True) -> str:
+    """
+    Extracts the full Docker URI from the config using the image key (e.g., 'rnaflow-rsem').
+    
+    Args:
+        image_key (str): The key name of the image, e.g., "rnaflow-rsem".
+        use_prefix (bool): Whether to automatically add the "docker://" prefix. 
+                           Defaults to True (Snakemake standard).
+    """
+    try:
+        # Extract the URI from the global config dictionary
+        uri = config["images"][image_key]["full_image_uri"]
+        
+        # Format and return the path
+        if use_prefix:
+            return f"docker://{uri}"
+        else:
+            return uri
+            
+    except KeyError:
+        # Provide a clear error message to prevent silent workflow crashes due to typos
+        raise ValueError(f"\n[Hajimi Error]: Cannot find the image '{image_key}' in the configuration. Please check your spelling or verify the yaml file!\n")
+
 
 def DataDeliver(
     config: Dict = None, samples: Dict = None, all_contrasts: Dict = None

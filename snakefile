@@ -22,7 +22,11 @@ configfile: "config/config.yaml"
 configfile: "config/reference.yaml"
 configfile: "config/run_parameter.yaml"
 configfile: "config/cluster_config.yaml" 
-# configfile: "config.yaml"
+# load container_env config
+configfile: "container_env/container_env.yaml"
+
+# set container image for all rules
+container: "docker://continuumio/miniconda3:latest"
 
 # Load CLI argument config (Highest Priority)
 load_user_config(config, cmd_arg_name='analysisyaml')

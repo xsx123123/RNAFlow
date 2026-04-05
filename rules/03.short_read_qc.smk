@@ -193,6 +193,8 @@ rule short_read_multiqc_r2:
         **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
     conda:
         workflow.source_path("../envs/multiqc.yaml"),
+    # container:
+    #     get_docker_image(config = config, container = "rnaflow-rsem")
     message:
         "Running MultiQC to aggregate R2 FastQC reports",
     log:
