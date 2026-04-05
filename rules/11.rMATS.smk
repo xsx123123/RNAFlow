@@ -335,8 +335,8 @@ rule merge_rmats_summary:
     shell:
         """
         chmod +x {params.path}
-        python3 {params.path} -i {params.rmats_dir}  --mode summary  -o  {output.sumarry} &>{log}
-        python3 {params.path} -i {params.rmats_dir}  --mode details  -o  {output.detail} &>{log}
+        python3 {params.path} -i {params.rmats_dir}  --mode summary  -o  {output.sumarry} >>{log} 2>&1
+        python3 {params.path} -i {params.rmats_dir}  --mode details  -o  {output.detail} >>{log} 2>&1
         """
 
 rule rmats_single_run:
@@ -449,7 +449,7 @@ rule merge_rmats_single_summary:
     shell:
         """
         chmod +x {params.path}
-        python3 {params.path} -i {params.rmats_dir}  --mode summary  -o  {output.sumarry} &> {log}
-        python3 {params.path} -i {params.rmats_dir}  --mode details  -o  {output.detail} &> {log}
+        python3 {params.path} -i {params.rmats_dir}  --mode summary  -o  {output.sumarry} >> {log} 2>&1
+        python3 {params.path} -i {params.rmats_dir}  --mode details  -o  {output.detail} >> {log} 2>&1
         """
 # ----- rule ----- #

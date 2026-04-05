@@ -356,9 +356,9 @@ rule bcftools_stats_raw:
     params:
         fasta = config['STAR_index'][config['Genome_Version']]['genome_fa'],
     log:
-        "logs/04.variant/gatk/bcftools_stats/{sample}.log"
+        "logs/04.variant/gatk/bcftools_stats_raw/{sample}.log"
     benchmark:
-        "benchmarks/04.variant/gatk/bcftools_stats/{sample}.txt"
+        "benchmarks/04.variant/gatk/bcftools_stats_raw/{sample}.txt"
     threads:
         5
     shell:
@@ -390,9 +390,9 @@ rule bcftools_stats_pass:
     params:
         fasta = config['STAR_index'][config['Genome_Version']]['genome_fa'],
     log:
-        "logs/04.variant/gatk/bcftools_stats/{sample}.log"
+        "logs/04.variant/gatk/bcftools_stats_pass/{sample}.log"
     benchmark:
-        "benchmarks/04.variant/gatk/bcftools_stats/{sample}.txt"
+        "benchmarks/04.variant/gatk/bcftools_stats_pass/{sample}.txt"
     threads:
         5
     shell:
