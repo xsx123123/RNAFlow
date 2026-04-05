@@ -38,7 +38,7 @@ RNAFlow covers the standard whole process of transcriptome analysis:
 2.  **Contamination Check**: Detection of species contamination (FastQ Screen).
 3.  **Mapping**: STAR high-performance alignment -> Qualimap/Samtools statistics -> Preseq library complexity / RSeQC integrity assessment.
     *   **STAR Parameter Optimization**:
-        *   `--peOverlapNbasesMin 12`: Allows merging of paired-end reads when there is a 12bp overlap, significantly improving alignment accuracy for short-fragment libraries.
+        *   `--peOverlapNbasesMin 0`: Uses default overlap threshold for paired-end reads merging (disabled by default).
         *   `--peOverlapMMp 0.1`: Allows 10% mismatch in the overlap area, increasing the merging success rate in the presence of sequencing errors or SNPs.
         *   `--twopassMode Basic`: Enables two-pass mapping mode. Splice sites discovered in the first pass are used to guide the second pass, greatly improving the identification accuracy of junctions.
         *   `--outFilterMismatchNoverLmax 0.04`: Limits the mismatch rate to within 4% (only 6 mismatches allowed for 150bp), much stricter than the default 30%, effectively reducing false positive alignments.
@@ -633,7 +633,7 @@ Besides project-specific configs, the `config/` directory contains default setti
   - **FastQ Screen Database**: Added `fastq_screen_db_path`, pointing to the root directory of the contamination source database (must include subdirectories like hg38, GRCm39, fastq_screen_database). For migration, simply copy the directory and update the path in the configuration.
 - **`config/run_parameter.yaml`**: Tool execution parameter settings, including specific command-line parameters for various software (e.g., STAR alignment thresholds, RSEM model parameters).
   - **STAR Parameter Details**:
-    - `--peOverlapNbasesMin 12` (Current) vs `0` (Default): PE Overlap merging enabled.
+    - `--peOverlapNbasesMin 0` (Default): PE Overlap merging disabled (default behavior).
     - `--peOverlapMMp 0.1` (Current) vs `0.01` (Default): Merging mismatch tolerance relaxed.
     - `--twopassMode Basic` (Current) vs `None` (Default): Two-pass mapping enabled.
     - `--outFilterMismatchNoverLmax 0.04` (Current) vs `0.3` (Default): Mismatch filtering strengthened.

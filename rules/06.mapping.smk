@@ -348,9 +348,9 @@ rule samtools_stats:
     message:
         "Running stats for MarkDuplicates of BAM : {input.bam}",
     log:
-        "logs/02.mapping/bam_dup_stats_{sample}.log",
+        "logs/02.mapping/samtools_stats_{sample}.log",
     benchmark:
-        "benchmarks/{sample}_Dup_bam_stats_benchmark.txt",
+        "benchmarks/{sample}_samtools_stats_benchmark.txt",
     threads:
         config['parameter']['threads']['samtools_stats'],
     params:
@@ -386,9 +386,9 @@ rule bam2cram:
     message:
         "Running bam compress of BAM : {input.bam}",
     log:
-        "logs/02.mapping/bam_dup_stats_{sample}.log",
+        "logs/02.mapping/bam2cram_{sample}.log",
     benchmark:
-        "benchmarks/{sample}_Dup_bam_stats_benchmark.txt",
+        "benchmarks/{sample}_bam2cram_benchmark.txt",
     threads:
         config['parameter']['threads']['bam2cram'],
     params:

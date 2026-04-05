@@ -28,8 +28,9 @@ from rich import print as rich_print
 from utils.datadeliver import qc_clean,mapping,count,Deg,call_variant,detect_novel_transcripts,rmats,gene_fusion
 
 
+# Import logger with fallback chain
 try:
-    # 1. 优先尝试导入你写的 Snakemake 自定义插件
+    # 1. 优先尝试导入 Snakemake 自定义插件
     from snakemake_logger_plugin_rich_loguru import get_analysis_logger
     logger = get_analysis_logger()
     logger_type = "Custom Plugin"
@@ -47,10 +48,6 @@ except ImportError:
         logger.warning("Neither custom plugin nor loguru found. Using built-in logging.")
         logger_type = "Built-in Logging"
 
-# Import logger for consistent logging
-from snakemake_logger_plugin_rich_loguru import get_analysis_logger
-logger = get_analysis_logger()
-
 # Flag to track if the QC warning has already been displayed
 _qc_warning_logged = False
 
@@ -61,4 +58,4 @@ from utils.common import (
     get_docker_image
 )
 
-# --------------------- #
+# ---------------------

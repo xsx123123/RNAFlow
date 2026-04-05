@@ -290,7 +290,7 @@ RNAFlow uses optimized STAR parameters:
 ```yaml
 # From config/run_parameter.yaml
 star_params:
-  --peOverlapNbasesMin: 12
+  --peOverlapNbasesMin: 0
   --peOverlapMMp: 0.1
   --twopassMode: Basic
   --outFilterMismatchNoverLmax: 0.04

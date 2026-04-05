@@ -34,7 +34,7 @@ RNAFlow 涵盖了标准的转录组分析全过程：
 2.  **Contamination Check**: 检测物种污染（FastQ Screen）。
 3.  **Mapping**: STAR 高性能比对 -> Qualimap/Samtools 统计 -> Preseq 文库复杂度 / RSeQC 完整性评估。
     *   **STAR 参数优化**:
-        *   `--peOverlapNbasesMin 12`: 允许双端 Read 在有 12bp 重叠时进行合并，显著提升短片段文库的比对准确性。
+        *   `--peOverlapNbasesMin 0`: 使用默认阈值进行双端 Read 重叠合并（默认禁用）。
         *   `--peOverlapMMp 0.1`: 允许重叠区域存在 10% 的错配，提高了在有测序误差或 SNP 存在时的合并成功率。
         *   `--twopassMode Basic`: 开启两轮比对模式，第一轮发现的剪接位点会用于指导第二轮比对，极大提升了拼接位点（Junctions）的识别精度。
         *   `--outFilterMismatchNoverLmax 0.04`: 将错配率限制在 4% 以内（150bp 仅允许 6 个错配），比默认的 30% 严格得多，有效减少假阳性比对。
@@ -535,7 +535,7 @@ Wo408,CKX2
   - **FastQ Screen 数据库**：新增配置 `fastq_screen_db_path`，指向污染源数据库根目录（需包含 hg38, GRCm39, fastq_screen_database 等子目录）。迁移时只需拷贝该目录并在配置中更新路径即可，无需修改代码。
 - **`config/run_parameter.yaml`**: 工具运行参数设置，包括各软件的具体命令行参数（如 STAR 的比对阈值、RSEM 的模型参数等）。
   - **STAR 参数详解**:
-    - `--peOverlapNbasesMin 12` (当前配置) vs `0` (默认参数): 开启 PE Overlap 合并：允许双端 Read 在有 12bp 重叠时进行合并，显著提升短片段文库的比对准确性。
+    - `--peOverlapNbasesMin 0` (默认参数): PE Overlap 合并禁用（默认行为）。
     - `--peOverlapMMp 0.1` (当前配置) vs `0.01` (默认参数): 放宽合并错配容忍度：允许重叠区域存在 10% 的错配，提高了在有测序误差或 SNP 存在时的合并成功率。
     - `--twopassMode Basic` (当前配置) vs `None` (默认参数): 开启两轮比对模式：第一轮发现的剪接位点会用于指导第二轮比对，极大提升了拼接位点（Junctions）的识别精度。
     - `--outFilterMismatchNoverLmax 0.04` (当前配置) vs `0.3` (默认参数): 强化错配过滤：将错配率限制在 4% 以内（150bp 仅允许 6 个错配），比默认的 30% 严格得多，有效减少假阳性比对。

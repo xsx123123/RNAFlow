@@ -2,6 +2,38 @@ $schema: "http://json-schema.org/draft-07/schema#"
 title: "RNAFlow Main Configuration Schema"
 description: "Schema for validating the main RNAFlow pipeline configuration file (config.yaml)"
 type: "object"
+
+definitions:
+  genomeConfig:
+    type: "object"
+    description: "Genome configuration for a specific genome version"
+    properties:
+      index:
+        type: "string"
+        description: "Path to STAR index"
+      genome_fa:
+        type: "string"
+        description: "Path to genome FASTA file"
+      genome_gtf:
+        type: "string"
+        description: "Path to genome GTF file"
+      genome_gff:
+        type: "string"
+        description: "Path to genome GFF file"
+      rsem_index:
+        type: "string"
+        description: "Path to RSEM index"
+      rsem_index_dir:
+        type: "string"
+        description: "Path to RSEM index directory"
+      bed12:
+        type: "string"
+        description: "Path to BED12 file"
+      ploidy:
+        type: "number"
+        description: "Ploidy value"
+    required: ["index", "genome_fa", "genome_gtf", "genome_gff", "rsem_index", "rsem_index_dir", "bed12", "ploidy"]
+
 properties:
   project_name:
     type: "string"
@@ -117,149 +149,19 @@ properties:
         description: "STAR index configuration for different genome versions"
         properties:
           Lsat_Salinas_v11:
-            type: "object"
+            $ref: "#/definitions/genomeConfig"
             description: "Lsat Salinas v11 genome configuration"
-            properties:
-              index:
-                type: "string"
-                description: "Path to STAR index"
-              genome_fa:
-                type: "string"
-                description: "Path to genome FASTA file"
-              genome_gtf:
-                type: "string"
-                description: "Path to genome GTF file"
-              genome_gff:
-                type: "string"
-                description: "Path to genome GFF file"
-              rsem_index:
-                type: "string"
-                description: "Path to RSEM index"
-              rsem_index_dir:
-                type: "string"
-                description: "Path to RSEM index directory"
-              bed12:
-                type: "string"
-                description: "Path to BED12 file"
-              ploidy:
-                type: "number"
-                description: "Ploidy value"
-            required: ["index", "genome_fa", "genome_gtf", "genome_gff", "rsem_index", "rsem_index_dir", "bed12", "ploidy"]
           Lsat_Salinas_v8:
-            type: "object"
+            $ref: "#/definitions/genomeConfig"
             description: "Lsat Salinas v8 genome configuration"
-            properties:
-              index:
-                type: "string"
-                description: "Path to STAR index"
-              genome_fa:
-                type: "string"
-                description: "Path to genome FASTA file"
-              genome_gtf:
-                type: "string"
-                description: "Path to genome GTF file"
-              genome_gff:
-                type: "string"
-                description: "Path to genome GFF file"
-              rsem_index:
-                type: "string"
-                description: "Path to RSEM index"
-              rsem_index_dir:
-                type: "string"
-                description: "Path to RSEM index directory"
-              bed12:
-                type: "string"
-                description: "Path to BED12 file"
-              ploidy:
-                type: "number"
-                description: "Ploidy value"
-            required: ["index", "genome_fa", "genome_gtf", "genome_gff", "rsem_index", "rsem_index_dir", "bed12", "ploidy"]
           ITAG4.1:
-            type: "object"
+            $ref: "#/definitions/genomeConfig"
             description: "ITAG4.1 genome configuration"
-            properties:
-              index:
-                type: "string"
-                description: "Path to STAR index"
-              genome_fa:
-                type: "string"
-                description: "Path to genome FASTA file"
-              genome_gtf:
-                type: "string"
-                description: "Path to genome GTF file"
-              genome_gff:
-                type: "string"
-                description: "Path to genome GFF file"
-              rsem_index:
-                type: "string"
-                description: "Path to RSEM index"
-              rsem_index_dir:
-                type: "string"
-                description: "Path to RSEM index directory"
-              bed12:
-                type: "string"
-                description: "Path to BED12 file"
-              ploidy:
-                type: "number"
-                description: "Ploidy value"
-            required: ["index", "genome_fa", "genome_gtf", "genome_gff", "rsem_index", "rsem_index_dir", "bed12", "ploidy"]
           TAIR10.1:
-            type: "object"
+            $ref: "#/definitions/genomeConfig"
             description: "TAIR10.1 genome configuration"
-            properties:
-              index:
-                type: "string"
-                description: "Path to STAR index"
-              genome_fa:
-                type: "string"
-                description: "Path to genome FASTA file"
-              genome_gtf:
-                type: "string"
-                description: "Path to genome GTF file"
-              genome_gff:
-                type: "string"
-                description: "Path to genome GFF file"
-              rsem_index:
-                type: "string"
-                description: "Path to RSEM index"
-              rsem_index_dir:
-                type: "string"
-                description: "Path to RSEM index directory"
-              bed12:
-                type: "string"
-                description: "Path to BED12 file"
-              ploidy:
-                type: "number"
-                description: "Ploidy value"
-            required: ["index", "genome_fa", "genome_gtf", "genome_gff", "rsem_index", "rsem_index_dir", "bed12", "ploidy"]
           GRCm39:
-            type: "object"
+            $ref: "#/definitions/genomeConfig"
             description: "GRCm39 genome configuration"
-            properties:
-              index:
-                type: "string"
-                description: "Path to STAR index"
-              genome_fa:
-                type: "string"
-                description: "Path to genome FASTA file"
-              genome_gtf:
-                type: "string"
-                description: "Path to genome GTF file"
-              genome_gff:
-                type: "string"
-                description: "Path to genome GFF file"
-              rsem_index:
-                type: "string"
-                description: "Path to RSEM index"
-              rsem_index_dir:
-                type: "string"
-                description: "Path to RSEM index directory"
-              bed12:
-                type: "string"
-                description: "Path to BED12 file"
-              ploidy:
-                type: "number"
-                description: "Ploidy value"
-            required: ["index", "genome_fa", "genome_gtf", "genome_gff", "rsem_index", "rsem_index_dir", "bed12", "ploidy"]
     additionalProperties: true
 additionalProperties: true
