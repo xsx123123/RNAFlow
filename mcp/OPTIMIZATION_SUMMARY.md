@@ -1,7 +1,7 @@
 # RNAFlow MCP Server 优化完成报告
 
 **执行时间:** 2026-03-27
-**版本:** v0.2.0 (Optimized)
+**版本:** RNAFlow-MCP v0.2.0
 
 ---
 

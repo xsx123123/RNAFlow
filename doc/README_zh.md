@@ -788,6 +788,19 @@ docker run -it --rm \
 python report/bioreport/main.py --input results_dir --output report_dir --ai
 ```
 
+## 📌 版本号体系说明
+
+RNAFlow 采用**多组件独立版本**策略，各主要组件拥有独立的版本号，以反映其各自的迭代周期：
+
+| 组件 | 当前版本 | 说明 |
+|------|---------|------|
+| **RNAFlow Pipeline** | `v0.1.9` | 核心 Snakemake 分析流程（QC、比对、定量、差异分析等） |
+| **RNAFlow-MCP Server** | `v0.2.0` | AI 助手集成的 MCP 服务端（独立迭代） |
+| **rnaflow-cli (交付工具)** | `v0.2.0` | Rust 加速的数据交付 CLI（独立迭代） |
+| **BioReport** | 与 Pipeline 一致 | 报告生成系统，版本随 Pipeline 同步 |
+
+> **注意**：Pipeline 版本（`v0.1.9`）是整体分析流程的权威版本号。MCP Server 和交付工具的版本号可能不同，因为它们采用独立的发布节奏。
+
 ## 📅 开发计划 (Roadmap)
 
 ### v0.1.9 迭代目标 (Target Features for v0.1.9)

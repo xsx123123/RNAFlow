@@ -1,4 +1,4 @@
-# RNAFlow MCP Server (v0.2.0 Optimized)
+# RNAFlow-MCP Server (v0.2.0)
 
 这是一个基于 [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) 构建的高性能组学分析服务端，专门为 RNA-seq 分析流程设计。本项目通过 **[uv](https://docs.astral.sh/uv/)** 进行环境管理，采用模块化分层架构，支持本地 Stdio 和远程部署模式。
 
@@ -15,7 +15,7 @@
 
 ---
 
-## 🌟 关键优化 (v0.2.0)
+## 🌟 关键优化 (RNAFlow-MCP v0.2.0)
 
 - **工具集精简**: 工具数量从 40+ 整合至 23 个，显著降低 LLM 上下文压力。
 - **异步安全**: 所有 I/O 密集型操作（文件读写、系统调用）均在 `executor` 中运行，不阻塞事件循环。

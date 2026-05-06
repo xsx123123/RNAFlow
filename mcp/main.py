@@ -756,7 +756,7 @@ Please:
 def _print_startup_info():
     """Print server startup information"""
     logger.info("=" * 60)
-    logger.info("RNAFlow MCP Server v0.2.0 (Optimized)")
+    logger.info("RNAFlow-MCP Server v0.2.0")
     logger.info("=" * 60)
     logger.info(f"RNAFlow Root: {RNAFLOW_ROOT}")
     logger.info(f"配置文件: {MCP_CONFIG_FILE}")

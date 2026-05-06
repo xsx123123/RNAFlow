@@ -886,6 +886,19 @@ If the environment is configured locally, navigate to the `report` directory and
 python report/bioreport/main.py --input results_dir --output report_dir --ai
 ```
 
+## 📌 Versioning Strategy
+
+RNAFlow adopts a **multi-component independent versioning** strategy. Each major component has its own version number to reflect its independent iteration cycle:
+
+| Component | Current Version | Description |
+|-----------|----------------|-------------|
+| **RNAFlow Pipeline** | `v0.1.9` | Core Snakemake workflow (QC, mapping, quantification, DEG, etc.) |
+| **RNAFlow-MCP Server** | `v0.2.0` | MCP server for AI assistant integration (independent release cycle) |
+| **rnaflow-cli (Deliver Tool)** | `v0.2.0` | Rust-accelerated data delivery CLI (independent release cycle) |
+| **BioReport** | Same as Pipeline | Report generation system, version aligned with Pipeline |
+
+> **Note**: The Pipeline version (`v0.1.9`) is the authoritative version for the overall analysis workflow. MCP Server and Deliver Tool versions may differ as they are released on separate schedules.
+
 ## 📅 Development Roadmap
 
 ### v0.1.9 Iteration Targets
