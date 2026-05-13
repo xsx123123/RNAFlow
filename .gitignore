@@ -15,7 +15,7 @@
 .ruff_cache/
 .claude/
 ./log
-./logs
+./logs*
 *.log
 *.csv
 .gitignore
