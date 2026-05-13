@@ -622,6 +622,9 @@ GRCm39/
 1. Copy the entire `GRCm39/` directory to your `reference_path` (e.g., `/home/user/reference/RNAFlow_reference/`).
 2. Open `GRCm39_RNAFlow_Index_reference.yaml` and paste each section into the corresponding area of `config/reference.yaml`.
 3. Set `Genome_Version: GRCm39` in your project's `config.yaml`.
+4. **(If schema validation is enabled)** Add the new genome version to `schema/config.schema.yaml`:
+   - Append the version name to `Genome_Version.enum` (e.g., `"GRCm39"`).
+   - Add a corresponding entry under `parameter.star_index.properties` (optional, as `additionalProperties: true` allows extra keys).
 
 ## ⚙️ Configuration Guide
 

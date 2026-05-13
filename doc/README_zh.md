@@ -384,6 +384,9 @@ GRCm39/
 1. 将整个 `GRCm39/` 目录复制到你的 `reference_path` 下（例如 `/home/user/reference/RNAFlow_reference/`）。
 2. 打开 `GRCm39_RNAFlow_Index_reference.yaml`，将其中的各个段落分别粘贴到 `config/reference.yaml` 的对应区域。
 3. 在项目 `config.yaml` 中设置 `Genome_Version: GRCm39`。
+4. **（如启用了 schema 校验）** 将新基因组版本同步添加到 `schema/config.schema.yaml`：
+   - 在 `Genome_Version.enum` 中追加版本名称（如 `"GRCm39"`）。
+   - 在 `parameter.star_index.properties` 下添加对应的版本配置（可选，因为 `additionalProperties: true` 已允许额外键值）。
 
 ## 🤖 AI Skills 使用指南
 
