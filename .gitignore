@@ -12,6 +12,7 @@
 ./incremental
 ./Compile_release
 .snakemake
+.ruff_cache/
 ./log
 ./logs
 *.log
