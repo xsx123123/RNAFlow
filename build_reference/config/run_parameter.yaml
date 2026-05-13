@@ -1,0 +1,23 @@
+# RNAFlow Pipeline - Runtime Parameter Configuration
+#
+# This file contains detailed runtime parameters for individual pipeline tools and modules.
+# It defines software-specific settings, thread allocations, quality thresholds, and
+# other configurable parameters that control the behavior of each analysis step.
+#
+# Key Configuration Sections:
+# - threads: CPU thread allocation for each tool/module
+# - software_paths: Paths to custom scripts and executables
+# - tool_parameters: Tool-specific configuration parameters and thresholds
+# - analysis_settings: Biological/analysis-specific parameters (e.g., ploidy, filtering thresholds)
+#
+# Note: These parameters should be adjusted based on your specific experimental design,
+# data quality, and computational resources. Default values are optimized for typical
+# RNA-seq experiments but may need tuning for specific use cases.
+
+# Runtime Parameters Configuration
+parameter:
+  # Thread Allocation for Pipeline Tools
+  # Number of CPU threads to allocate for each computational tool
+  threads:
+    build_index: 40
+    

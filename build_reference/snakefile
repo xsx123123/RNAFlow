@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# Version: RNAFlow v0.1.9
+# Author : JZHANG
+
+import sys
+import os
+from snakemake.utils import min_version, validate
+
+# Lock Snakemake Version
+min_version("9.9.0")
+
+# --------- 1. Config Loading --------- #
+# Load default configs
+configfile: "config.yaml"
+configfile: "config/run_parameter.yaml"
+
+# Get logger instance for validation
+from snakemake_logger_plugin_rich_loguru import get_analysis_logger
+logger = get_analysis_logger()
+
+# --------- 2. Workspaces --------- #
+# Redirect workspace to config['workflow'] directory
+workflow_dir = config["Reference"]["info"]["workflow"]
+workdir: workflow_dir
+logger.info(f"Redirect workspaces to {workflow_dir}")
+
+# --------- 3. Target Helper --------- #
+def build_reference_targets(config):
+    """Generate target file list for reference building workflow."""
+    import os
+    prefix = config["Reference"]["info"]["prefix"]
+    data_dir = config["Reference"]["data_dir"]
+    return [
+        f"{prefix}/Genome",
+        f"{prefix}/{prefix}.transcripts.fa",
+        f"{prefix}/{prefix}.idx.fa",
+        f"{prefix}.bed12",
+        f"{prefix}_ref_all.txt",
+        f"{prefix}_reference.yaml",
+        os.path.basename(data_dir["fa"]),
+        os.path.basename(data_dir["gtf"]),
+        os.path.basename(data_dir["gff"]),
+        os.path.basename(data_dir["go"]),
+    ]
+
+# --------- 4. Rules Import --------- #
+include: "rules/00.copy_reference.smk"
+include: "rules/01.index.smk"
+include: "rules/02.annotation.smk"
+include: "rules/03.build_yaml.smk"
+
+# --------- 5. Target Rule --------- #
+rule all:
+    input:
+        build_reference_targets(config),

@@ -1,0 +1,30 @@
+# Author : JZHANG
+# Date   : 2023-05-13
+# Version: 1.0
+
+# Genome version for validation (must be in can_use_genome_version)
+Genome_Version: GRCm39
+
+# Supported genome versions list
+# Add your custom version here to pass validation
+can_use_genome_version:
+  - GRCm39
+
+# DEG enrichment gene identifier column
+# Common values: 'Entrez ID', 'ENSEMBL', 'SYMBOL'
+gene_col: 'ENSEMBL'
+
+# Genome ploidy for variant calling
+ploidy: 2
+
+Reference:
+  info:
+    name: GRCm39
+    prefix: GRCm39_RNAFlow_Index
+    description: Mouse reference genome (GRCm39)
+    workflow: /home/zj/temp/RNAFlow_reference/GRCm39
+  data_dir:
+    fa: /home/zj/temp/GRCm39/GRCm39.genome.fa
+    gff: /home/zj/temp/GRCm39/gencode.vM38.annotation.gff3
+    gtf: /home/zj/temp/GRCm39/gencode.vM38.annotation.gtf
+    go: /home/zj/temp/GRCm39/mgigene_go_annotation.tsv

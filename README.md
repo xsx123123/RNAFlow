@@ -14,6 +14,7 @@ RNAFlow is a fully automated RNA-seq analysis pipeline based on Snakemake. It im
 - [Directory Structure](#-directory-structure)
 - [Installation Guide](#-installation-guide)
 - [Container Image Builder](#-container-image-builder-new-in-v019)
+- [Reference Genome Builder](#-reference-genome-builder)
 - [AI Skills Usage Guide](#-ai-skills-usage-guide)
 - [Configuration Guide](#-configuration-guide)
 - [Usage Instructions](#-usage-instructions)
@@ -529,6 +530,98 @@ For detailed installation and usage instructions, please refer to:
 - `skills/INSTALL.md` - Complete installation guide
 - `skills/usage-guide.md` - Usage guide
 - `skills/README.md` - Skills documentation
+
+## 🧬 Reference Genome Builder
+
+RNAFlow now provides an independent sub-workflow for building reference genome indexes. This design decouples index construction from the main analysis pipeline, enabling:
+
+- **Simplified Migration**: Build indexes once and migrate the entire reference directory to other servers.
+- **Custom Genomes**: Easily build indexes for any species using your own reference FASTA and annotation files.
+- **Auto-Generated Config**: Automatically produces a `reference.yaml` snippet ready to paste into the main pipeline config.
+
+### Directory Structure
+
+```
+build_reference/
+├── config/
+│   └── run_parameter.yaml     # Thread allocation and runtime parameters
+├── config.yaml                # Reference genome metadata and file paths
+├── envs/
+│   ├── rsem.yaml              # Conda env for RSEM/STAR index building
+│   └── ucsc_gff.yaml          # Conda env for UCSC annotation tools
+├── rules/
+│   ├── 00.copy_reference.smk  # Copy original ref files to workflow dir
+│   ├── 01.index.smk           # Build STAR + RSEM indexes
+│   ├── 02.annotation.smk      # Build bed12 and ref_all tables
+│   └── 03.build_yaml.smk      # Generate reference.yaml config snippet
+└── snakefile                  # Entry point
+```
+
+### Configuration (`build_reference/config.yaml`)
+
+```yaml
+# Genome version for validation (must be in can_use_genome_version)
+Genome_Version: GRCm39
+
+# Supported genome versions list
+can_use_genome_version:
+  - GRCm39
+
+# DEG enrichment gene identifier column
+gene_col: 'ENSEMBL'
+
+# Genome ploidy for variant calling
+ploidy: 2
+
+Reference:
+  info:
+    name: GRCm39
+    prefix: GRCm39_RNAFlow_Index          # Index directory name
+    description: Mouse reference genome (GRCm39)
+    workflow: /path/to/reference/GRCm39   # Output directory for all reference files
+  data_dir:
+    fa: /path/to/GRCm39.genome.fa
+    gff: /path/to/gencode.vM38.annotation.gff3
+    gtf: /path/to/gencode.vM38.annotation.gtf
+    go: /path/to/mgigene_go_annotation.tsv
+```
+
+### Running the Builder
+
+```bash
+cd build_reference
+
+# Dry run check
+snakemake --use-conda --cores 40 --dry-run
+
+# Execute build
+snakemake --use-conda --cores 40
+```
+
+### Build Outputs
+
+After completion, the `workflow` directory contains everything needed for the main pipeline:
+
+```
+GRCm39/
+├── GRCm39.genome.fa                    # Copied from data_dir
+├── gencode.vM38.annotation.gtf         # Copied from data_dir
+├── gencode.vM38.annotation.gff3        # Copied from data_dir
+├── mgigene_go_annotation.tsv           # Copied from data_dir
+├── GRCm39_RNAFlow_Index/               # STAR + RSEM indexes
+│   ├── Genome
+│   ├── GRCm39_RNAFlow_Index.transcripts.fa
+│   └── GRCm39_RNAFlow_Index.idx.fa
+├── GRCm39_RNAFlow_Index.bed12
+├── GRCm39_RNAFlow_Index_ref_all.txt
+└── GRCm39_RNAFlow_Index_reference.yaml  # Ready to paste into config/reference.yaml
+```
+
+### Integrating into the Main Pipeline
+
+1. Copy the entire `GRCm39/` directory to your `reference_path` (e.g., `/home/user/reference/RNAFlow_reference/`).
+2. Open `GRCm39_RNAFlow_Index_reference.yaml` and paste each section into the corresponding area of `config/reference.yaml`.
+3. Set `Genome_Version: GRCm39` in your project's `config.yaml`.
 
 ## ⚙️ Configuration Guide
 
