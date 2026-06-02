@@ -67,6 +67,12 @@ mcp = FastMCP("RNAFlow")
 # ========== Helper Functions ==========
 
 
+async def _run_sync(func, *args, **kwargs):
+    """Run a synchronous function in an executor without blocking the event loop."""
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, lambda: func(*args, **kwargs))
+
+
 @functools.lru_cache(maxsize=8)
 def _read_template(path: Path) -> str:
     """
@@ -127,10 +133,7 @@ async def create_project_structure_tool(project_root: str) -> Dict[str, Any]:
     Returns:
         Dict with success status and created directories
     """
-    loop = asyncio.get_event_loop()
-    return await loop.run_in_executor(
-        None, create_project_structure, project_root
-    )
+    return await _run_sync(create_project_structure, project_root)
 
 
 @mcp.tool()
@@ -189,10 +192,7 @@ async def validate_config_tool(config_path: str) -> Dict[str, Any]:
     Returns:
         Dict with validity, errors, and warnings
     """
-    loop = asyncio.get_event_loop()
-    return await loop.run_in_executor(
-        None, validate_config, config_path
-    )
+    return await _run_sync(validate_config, config_path)
 
 
 @mcp.tool()
@@ -234,9 +234,7 @@ async def setup_complete_project_tool(
     Returns:
         Dict with success status and file paths
     """
-    loop = asyncio.get_event_loop()
-    return await loop.run_in_executor(
-        None,
+    return await _run_sync(
         setup_complete_project,
         project_root,
         project_name,
@@ -273,9 +271,7 @@ async def run_simple_qc_analysis_tool(
     Returns:
         Dict with setup status and next steps
     """
-    loop = asyncio.get_event_loop()
-    return await loop.run_in_executor(
-        None,
+    return await _run_sync(
         run_simple_qc_analysis,
         project_root,
         genome_version,
@@ -333,10 +329,7 @@ async def check_conda_environment_tool(env_name: Optional[str] = None) -> Dict[s
     Returns:
         Dict with availability status and environment details
     """
-    loop = asyncio.get_event_loop()
-    return await loop.run_in_executor(
-        None, check_conda_environment, env_name
-    )
+    return await _run_sync(check_conda_environment, env_name)
 
 
 @mcp.tool()
@@ -348,10 +341,7 @@ async def check_system_resources_tool() -> Dict[str, Any]:
         Dict with CPU, memory, and disk status information
         Includes warnings if resources are insufficient
     """
-    loop = asyncio.get_event_loop()
-    return await loop.run_in_executor(
-        None, check_system_resources
-    )
+    return await _run_sync(check_system_resources)
 
 
 @mcp.tool()
@@ -369,10 +359,7 @@ async def list_runs_tool(
     Returns:
         List of run record dictionaries
     """
-    loop = asyncio.get_event_loop()
-    return await loop.run_in_executor(
-        None, list_runs, project_name, status, limit
-    )
+    return await _run_sync(list_runs, project_name, status, limit)
 
 
 @mcp.tool()
@@ -386,10 +373,7 @@ async def get_run_details_tool(run_id: str) -> Dict[str, Any]:
     Returns:
         Run details dictionary or error message
     """
-    loop = asyncio.get_event_loop()
-    return await loop.run_in_executor(
-        None, get_run_details, run_id
-    )
+    return await _run_sync(get_run_details, run_id)
 
 
 @mcp.tool()
@@ -406,10 +390,7 @@ async def get_run_statistics_tool(
     Returns:
         Statistics dictionary with counts and summaries
     """
-    loop = asyncio.get_event_loop()
-    return await loop.run_in_executor(
-        None, get_run_statistics, start_date, end_date
-    )
+    return await _run_sync(get_run_statistics, start_date, end_date)
 
 
 @mcp.tool()
@@ -423,10 +404,7 @@ async def check_project_name_conflict_tool(project_name: str) -> Dict[str, Any]:
     Returns:
         Dict indicating if conflict exists and listing existing runs
     """
-    loop = asyncio.get_event_loop()
-    return await loop.run_in_executor(
-        None, check_project_name_conflict, project_name
-    )
+    return await _run_sync(check_project_name_conflict, project_name)
 
 
 @mcp.tool()
@@ -443,10 +421,7 @@ async def check_snakemake_status_tool(run_id: str = None) -> Dict[str, Any]:
     Returns:
         Dict with run status, process state, and recent logs
     """
-    loop = asyncio.get_event_loop()
-    return await loop.run_in_executor(
-        None, check_snakemake_status, run_id
-    )
+    return await _run_sync(check_snakemake_status, run_id)
 
 
 @mcp.tool()
@@ -461,10 +436,7 @@ async def get_snakemake_log_tool(run_id: str, lines: int = 50) -> Dict[str, Any]
     Returns:
         Dict with log content and metadata
     """
-    loop = asyncio.get_event_loop()
-    return await loop.run_in_executor(
-        None, get_snakemake_log, run_id, lines
-    )
+    return await _run_sync(get_snakemake_log, run_id, lines)
 
 
 @mcp.tool()
@@ -477,10 +449,7 @@ async def scan_samples_tool(directory_path: str) -> List[Dict[str, str]]:
     2. sample_name: 具有表达性的 ID 缩写 (如 L1MLA1700058-PI_L18_1 -> PI_L18_1)。
     3. group: 默认初始化为 sample_name。
     """
-    loop = asyncio.get_event_loop()
-    return await loop.run_in_executor(
-        None, scan_fastq_directory, Path(directory_path)
-    )
+    return await _run_sync(scan_fastq_directory, Path(directory_path))
 
 
 # ========== Legacy Configuration Support ==========
@@ -564,10 +533,7 @@ def rnaflow_validate_config_old(config_path: str) -> Dict[str, Any]:
 @mcp.tool(name="createProjectStructure")
 async def create_project_structure_backward(project_root: str) -> Dict[str, Any]:
     """Backward compatibility alias for camelCase usage"""
-    loop = asyncio.get_event_loop()
-    return await loop.run_in_executor(
-        None, create_project_structure, project_root
-    )
+    return await _run_sync(create_project_structure, project_root)
 
 
 @mcp.tool(name="setupCompleteProject")
@@ -581,9 +547,7 @@ async def setup_complete_project_backward(
     library_types: str = "fr-firststrand",
 ) -> Dict[str, Any]:
     """Backward compatibility alias for camelCase usage"""
-    loop = asyncio.get_event_loop()
-    return await loop.run_in_executor(
-        None,
+    return await _run_sync(
         setup_complete_project,
         project_root,
         project_name,

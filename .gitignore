@@ -27,5 +27,7 @@ __pycache__
 
 # MCP Server
 mcp/.venv
+mcp/**/__pycache__/
+mcp/**/*.pyc
 mcp/data/*.db
 mcp/logs/

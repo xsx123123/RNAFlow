@@ -10,16 +10,21 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PATH_CONFIG="${SCRIPT_DIR}/path_config.yaml"
 
-# Default values
-RNAFLOW_ROOT="/home/zj/pipeline/RNAFlow"
-DEFAULT_CONDA_ENV="rnaflow"
+# Auto-detect RNAFLOW_ROOT based on script location
+SCRIPT_PARENT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+RNAFLOW_ROOT="$SCRIPT_PARENT_DIR"
+DEFAULT_CONDA_ENV="snakemake"
 AUTO_ACTIVATE=false
 
 # Load config from YAML if available
 if [ -f "$PATH_CONFIG" ]; then
     echo "Loading configuration from $PATH_CONFIG"
     # Parse YAML (simple parsing, no external dependencies)
-    RNAFLOW_ROOT=$(grep '^RNAFLOW_ROOT:' "$PATH_CONFIG" | cut -d' ' -f2 | tr -d '"')
+    CONFIG_ROOT=$(grep '^RNAFLOW_ROOT:' "$PATH_CONFIG" | cut -d' ' -f2 | tr -d '"')
+    # Only override auto-detected root if config explicitly sets a non-empty value
+    if [ -n "$CONFIG_ROOT" ]; then
+        RNAFLOW_ROOT="$CONFIG_ROOT"
+    fi
     DEFAULT_CONDA_ENV=$(grep '^  DEFAULT_ENV_NAME:' "$PATH_CONFIG" | cut -d' ' -f4 | tr -d '"')
     AUTO_ACTIVATE=$(grep '^  AUTO_ACTIVATE:' "$PATH_CONFIG" | cut -d' ' -f4)
 fi

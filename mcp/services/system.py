@@ -154,7 +154,7 @@ def check_system_resources() -> Dict[str, Any]:
 
 
 def list_runs(
-    project_name: str = None, status: str = None, limit: int = 50
+    project_name: Optional[str] = None, status: Optional[str] = None, limit: int = 50
 ) -> List[Dict[str, Any]]:
     """List RNAFlow project run records"""
     logger.info("=== 调用工具: list_runs ===")
@@ -187,7 +187,7 @@ def get_run_details(run_id: str) -> Dict[str, Any]:
         return {"error": str(e)}
 
 
-def get_run_statistics(start_date: str = None, end_date: str = None) -> Dict[str, Any]:
+def get_run_statistics(start_date: Optional[str] = None, end_date: Optional[str] = None) -> Dict[str, Any]:
     """Get run statistics for a period"""
     logger.info("=== 调用工具: get_run_statistics ===")
     try:

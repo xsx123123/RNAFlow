@@ -3,15 +3,10 @@
 Pydantic data models for RNAFlow MCP
 """
 
-import sys
 import yaml
 from pathlib import Path
 from typing import Optional, List
 from pydantic import BaseModel, Field, field_validator
-
-
-# Add parent directory to path to access config
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 
 # Load supported genome versions from config/reference.yaml

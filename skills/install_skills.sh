@@ -7,71 +7,73 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RNAFLOW_SKILLS_DIR="$SCRIPT_DIR"
 
-# Determine target directory - check standard locations
-TARGET_DIR=""
-SKILLS_TYPE=""
-
-# Priority 1: .claude/skills (Claude Code)
-if [ -d "$HOME/.claude/skills" ]; then
-    TARGET_DIR="$HOME/.claude/skills/RNAFlow"
-    SKILLS_TYPE="Claude Code"
-    echo "Found Claude Code skills directory"
-fi
-
-# Priority 2: .codex/skills (Codex)
-if [ -z "$TARGET_DIR" ] && [ -d "$HOME/.codex/skills" ]; then
-    TARGET_DIR="$HOME/.codex/skills/RNAFlow"
-    SKILLS_TYPE="Codex"
-    echo "Found Codex skills directory"
-fi
-
-# Priority 3: .config/opencode/skills (OpenCode)
-if [ -z "$TARGET_DIR" ] && [ -d "$HOME/.config/opencode" ]; then
-    TARGET_DIR="$HOME/.config/opencode/skills/RNAFlow"
-    SKILLS_TYPE="OpenCode"
-    echo "Found OpenCode config directory"
-fi
-
-# If no standard directory found, ask user
+# Determine target directory
+# Allow external override via environment variables (used by wrapper scripts)
 if [ -z "$TARGET_DIR" ]; then
-    echo "Could not find standard skills directory."
-    echo "Available options:"
-    echo "  1. Claude Code: $HOME/.claude/skills"
-    echo "  2. Codex: $HOME/.codex/skills"
-    echo "  3. Custom directory"
-    echo ""
-    read -p "Please select (1-3): " CHOICE
-    
-    case $CHOICE in
-        1)
-            if [ ! -d "$HOME/.claude/skills" ]; then
-                mkdir -p "$HOME/.claude/skills"
-            fi
-            TARGET_DIR="$HOME/.claude/skills/RNAFlow"
-            SKILLS_TYPE="Claude Code"
-            ;;
-        2)
-            if [ ! -d "$HOME/.codex/skills" ]; then
-                mkdir -p "$HOME/.codex/skills"
-            fi
-            TARGET_DIR="$HOME/.codex/skills/RNAFlow"
-            SKILLS_TYPE="Codex"
-            ;;
-        3)
-            echo "Please enter the target directory for installing RNAFlow skills:"
-            read -p "Target directory: " USER_TARGET
-            if [ -z "$USER_TARGET" ]; then
-                echo "Error: No target directory specified"
+    SKILLS_TYPE=""
+
+    # Priority 1: .claude/skills (Claude Code)
+    if [ -d "$HOME/.claude/skills" ]; then
+        TARGET_DIR="$HOME/.claude/skills/RNAFlow"
+        SKILLS_TYPE="Claude Code"
+        echo "Found Claude Code skills directory"
+    fi
+
+    # Priority 2: .codex/skills (Codex)
+    if [ -z "$TARGET_DIR" ] && [ -d "$HOME/.codex/skills" ]; then
+        TARGET_DIR="$HOME/.codex/skills/RNAFlow"
+        SKILLS_TYPE="Codex"
+        echo "Found Codex skills directory"
+    fi
+
+    # Priority 3: .config/opencode/skills (OpenCode)
+    if [ -z "$TARGET_DIR" ] && [ -d "$HOME/.config/opencode" ]; then
+        TARGET_DIR="$HOME/.config/opencode/skills/RNAFlow"
+        SKILLS_TYPE="OpenCode"
+        echo "Found OpenCode config directory"
+    fi
+
+    # If no standard directory found, ask user
+    if [ -z "$TARGET_DIR" ]; then
+        echo "Could not find standard skills directory."
+        echo "Available options:"
+        echo "  1. Claude Code: $HOME/.claude/skills"
+        echo "  2. Codex: $HOME/.codex/skills"
+        echo "  3. Custom directory"
+        echo ""
+        read -p "Please select (1-3): " CHOICE
+        
+        case $CHOICE in
+            1)
+                if [ ! -d "$HOME/.claude/skills" ]; then
+                    mkdir -p "$HOME/.claude/skills"
+                fi
+                TARGET_DIR="$HOME/.claude/skills/RNAFlow"
+                SKILLS_TYPE="Claude Code"
+                ;;
+            2)
+                if [ ! -d "$HOME/.codex/skills" ]; then
+                    mkdir -p "$HOME/.codex/skills"
+                fi
+                TARGET_DIR="$HOME/.codex/skills/RNAFlow"
+                SKILLS_TYPE="Codex"
+                ;;
+            3)
+                echo "Please enter the target directory for installing RNAFlow skills:"
+                read -p "Target directory: " USER_TARGET
+                if [ -z "$USER_TARGET" ]; then
+                    echo "Error: No target directory specified"
+                    exit 1
+                fi
+                TARGET_DIR="$USER_TARGET/RNAFlow"
+                SKILLS_TYPE="Custom"
+                ;;
+            *)
+                echo "Invalid choice"
                 exit 1
-            fi
-            TARGET_DIR="$USER_TARGET/RNAFlow"
-            SKILLS_TYPE="Custom"
-            ;;
-        *)
-            echo "Invalid choice"
-            exit 1
-            ;;
-    esac
+                ;;
+        esac
+    fi
 fi
 
 echo "=========================================="

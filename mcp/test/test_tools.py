@@ -10,7 +10,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 try:
-    from server import mcp
+    from main import mcp
 
     print("✅ MCP 服务器导入成功！")
     print()

@@ -199,15 +199,19 @@ async def run_rnaflow(
             logger.info(f"流程日志文件: {log_file}")
             logger.info(f"执行命令: {' '.join(cmd)}")
 
-            with open(log_file, "w") as f:
-                process = subprocess.Popen(
+            # 使用线程池包装阻塞的 subprocess.Popen，避免阻塞事件循环
+            loop = asyncio.get_event_loop()
+            process = await loop.run_in_executor(
+                None,
+                lambda: subprocess.Popen(
                     cmd,
                     cwd=str(RNAFLOW_ROOT),
-                    stdout=f,
+                    stdout=open(log_file, "w", encoding="utf-8"),
                     stderr=subprocess.STDOUT,
                     start_new_session=True,
-                )
-                logger.info(f"后台进程已启动，PID: {process.pid}")
+                ),
+            )
+            logger.info(f"后台进程已启动，PID: {process.pid}")
 
             record_success = record_run_start(
                 run_id=run_id,
