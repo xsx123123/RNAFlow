@@ -3,6 +3,7 @@
 *.RData
 *.h5ad
 *.fasta
+todo.md
 *.fq
 *.fastq
 *.gz
