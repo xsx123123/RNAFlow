@@ -24,8 +24,10 @@ rule copy_reference_files:
         reference_dir = config["Reference"]["info"]["workflow"],
     shell:
         """
-        cp -r {input.fa} {params.reference_dir} && \
-        cp -r {input.gtf} {params.reference_dir} && \
-        cp -r {input.gff} {params.reference_dir} && \
-        cp -r {input.go} {params.reference_dir} > {log} 2>&1
+        {{
+            cp -r {input.fa} {params.reference_dir} && \
+            cp -r {input.gtf} {params.reference_dir} && \
+            cp -r {input.gff} {params.reference_dir} && \
+            cp -r {input.go} {params.reference_dir}
+        }} > {log} 2>&1
         """

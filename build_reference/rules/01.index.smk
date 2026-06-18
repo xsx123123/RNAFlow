@@ -3,8 +3,8 @@
 
 rule build_index:
     input:
-        gtf = config["Reference"]["data_dir"]["gtf"],
-        fa = config["Reference"]["data_dir"]["fa"],
+        gtf = rules.copy_reference_files.output.gtf,
+        fa = rules.copy_reference_files.output.fa,
     output:
         STAR_index = f"{config['Reference']['info']['prefix']}/Genome",
         rsem_index_transcripts = f"{config['Reference']['info']['prefix']}/{config['Reference']['info']['prefix']}.transcripts.fa",

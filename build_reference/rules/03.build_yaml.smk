@@ -25,6 +25,7 @@ rule generate_reference_yaml:
         "Generating reference.yaml configuration snippet for {params.name}",
     run:
         import os
+        import yaml
 
         name = params.name
         prefix = params.prefix
@@ -33,42 +34,57 @@ rule generate_reference_yaml:
         def rel(path):
             return os.path.join(workflow_base, os.path.basename(path))
 
-        lines = [
-            "# ------------------------------------------------------------------------",
-            "# Paste the following sections into config/reference.yaml",
-            "# ------------------------------------------------------------------------",
-            "",
-            "# 1. Append to 'can_use_genome_version:' list",
-            "can_use_genome_version:",
-            f"  - {name}",
-            "# 2. Append to 'mcp_genome_version:' section",
-            "mcp_genome_version:",
-            f"  {name}:",
-            f"    name: {name}",
-            f"    description: '{params.description}'",
-            "# 3. Append to 'STAR_index:' section",
-            "STAR_index:",
-            f"    {name}:",
-            f"      index: {workflow_base}/{prefix}",
-            f"      genome_fa: {rel(input.genome_fa)}",
-            f"      genome_gtf: {rel(input.genome_gtf)}",
-            f"      genome_gff: {rel(input.genome_gff)}",
-            f"      rsem_index: {workflow_base}/{prefix}/{prefix}",
-            f"      rsem_index_dir: {workflow_base}/{prefix}/",
-            f"      bed12: {workflow_base}/{prefix}.bed12",
-            f"      go_annotation: {rel(input.go)}",
-            f"      ref_all: {workflow_base}/{prefix}_ref_all.txt",
-            "",
-            "# 4. Append to 'deg_enrich_wrapper:' section",
-            "deg_enrich_wrapper:",
-            f"  {name}:",
-            f"    gene_col: '{params.gene_col}'",
-            "",
-            "# 5. Append to 'ploidy_setting:' section",
-            "ploidy_setting:",
-            f"  {name}:",
-            f"    ploidy: {params.ploidy}  # genome ploidy",
+        header = (
+            "# ------------------------------------------------------------------------\n"
+            "# Paste the following sections into config/reference.yaml\n"
+            "# ------------------------------------------------------------------------\n"
+        )
+
+        # Build structured config as a list of (section_comment, dict) pairs,
+        # so we can emit section comments between blocks while keeping YAML
+        # values safe from quoting/escaping bugs.
+        sections = [
+            ("1. Append to 'can_use_genome_version:' list",
+             {"can_use_genome_version": [name]}),
+            ("2. Append to 'mcp_genome_version:' section",
+             {"mcp_genome_version": {
+                 name: {
+                     "name": name,
+                     "description": params.description,
+                 }}}),
+            ("3. Append to 'STAR_index:' section",
+             {"STAR_index": {
+                 name: {
+                     "index": f"{workflow_base}/{prefix}",
+                     "genome_fa": rel(input.genome_fa),
+                     "genome_gtf": rel(input.genome_gtf),
+                     "genome_gff": rel(input.genome_gff),
+                     "rsem_index": f"{workflow_base}/{prefix}/{prefix}",
+                     "rsem_index_dir": f"{workflow_base}/{prefix}/",
+                     "bed12": f"{workflow_base}/{prefix}.bed12",
+                     "go_annotation": rel(input.go),
+                     "ref_all": f"{workflow_base}/{prefix}_ref_all.txt",
+                 }}}),
+            ("4. Append to 'deg_enrich_wrapper:' section",
+             {"deg_enrich_wrapper": {
+                 name: {
+                     "gene_col": params.gene_col,
+                 }}}),
+            ("5. Append to 'ploidy_setting:' section",
+             {"ploidy_setting": {
+                 name: {
+                     "ploidy": params.ploidy,
+                 }}}),
         ]
 
         with open(output.ref_yaml, "w") as f:
-            f.write("\n".join(lines) + "\n")
+            f.write(header)
+            for comment, data in sections:
+                f.write(f"\n# {comment}\n")
+                yaml.safe_dump(
+                    data,
+                    f,
+                    default_flow_style=False,
+                    sort_keys=False,
+                    allow_unicode=True,
+                )

@@ -3,7 +3,7 @@
 
 rule build_bed12:
     input:
-        gtf = config["Reference"]["data_dir"]["gtf"],
+        gtf = rules.copy_reference_files.output.gtf,
     output:
         bed12 = f"{config['Reference']['info']['prefix']}.bed12",
     conda:
@@ -24,7 +24,7 @@ rule build_bed12:
 
 rule build_ref_all:
     input:
-        gtf = config["Reference"]["data_dir"]["gtf"],
+        gtf = rules.copy_reference_files.output.gtf,
     output:
         ref_all = f"{config['Reference']['info']['prefix']}_ref_all.txt",
     conda:
@@ -38,11 +38,12 @@ rule build_ref_all:
     shell:
         """
         {{
+            tmpfile=$(mktemp {output.ref_all}.tmp.XXXXXX) && \
             gtfToGenePred -genePredExt \
                           -ignoreGroupsWithoutExons \
-                          {input.gtf} ref_all.tmp && \
+                          {input.gtf} "$tmpfile" && \
             awk 'BEGIN{{OFS="\\t"}} {{print $12, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10}}' \
-                 ref_all.tmp > {output.ref_all} && \
-            rm -f ref_all.tmp
+                 "$tmpfile" > {output.ref_all} && \
+            rm -f "$tmpfile"
         }} > {log} 2>&1
         """
