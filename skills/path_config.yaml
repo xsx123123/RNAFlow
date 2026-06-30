@@ -1,8 +1,10 @@
 # RNAFlow Path Configuration
 # This file helps AI agents locate the RNAFlow installation
+# Note: Paths are relative to the directory containing this file
 
 # RNAFlow root directory (contains snakefile)
-RNAFLOW_ROOT: "/home/jzhang/pipeline/RNAFlow/"
+# If empty, will auto-detect relative to this file's location
+RNAFLOW_ROOT: ""
 
 # Conda environment configuration
 CONDA:
@@ -13,11 +15,11 @@ CONDA:
   # Path to conda (auto-detected if empty)
   CONDA_PATH: ""
 
-# Default config template paths
+# Default config template paths (relative to RNAFLOW_ROOT or absolute)
 CONFIG_TEMPLATES:
-  complete: "/home/jzhang/pipeline/RNAFlow//skills/examples/config_complete.yaml"
-  standard_deg: "/home/jzhang/pipeline/RNAFlow//skills/examples/config_standard_deg.yaml"
-  qc_only: "/home/jzhang/pipeline/RNAFlow//skills/examples/config_qc_only.yaml"
+  complete: "skills/examples/config_complete.yaml"
+  standard_deg: "skills/examples/config_standard_deg.yaml"
+  qc_only: "skills/examples/config_qc_only.yaml"
 
 # Snakemake default parameters
 SNAKEMAKE_DEFAULTS:
@@ -28,3 +30,4 @@ SNAKEMAKE_DEFAULTS:
 # Example usage:
 # cd $RNAFLOW_ROOT
 # snakemake --cores 60 --use-conda --config analysisyaml=/path/to/project_config.yaml
+

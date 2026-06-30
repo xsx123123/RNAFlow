@@ -66,11 +66,12 @@ cp "$RNAFLOW_SKILLS_DIR/examples/"*.sh "$TARGET_DIR/examples/" 2>/dev/null || tr
 chmod +x "$TARGET_DIR/start_rnaflow.sh"
 chmod +x "$TARGET_DIR/examples/run_rnaflow.sh" 2>/dev/null || true
 
-# Update paths in path_config.yaml
-echo "Updating paths in path_config.yaml..."
-RNAFLOW_PROJECT_ROOT=$(cd "$RNAFLOW_SKILLS_DIR/.." && pwd)
-# Use a different delimiter for sed since paths contain slashes
-sed -i "s|/home/zj/pipeline/RNAFlow|$RNAFLOW_PROJECT_ROOT|g" "$TARGET_DIR/path_config.yaml"
+# Update paths in path_config.yaml (set to auto-detect mode)
+echo "Configuring path_config.yaml for auto-detection..."
+# Set RNAFLOW_ROOT to empty string to enable auto-detection
+sed -i 's|^RNAFLOW_ROOT:.*|RNAFLOW_ROOT: ""|' "$TARGET_DIR/path_config.yaml"
+# Update config templates paths to be relative
+sed -i 's|/home/[^/]*/pipeline/RNAFlow//*skills/|skills/|g' "$TARGET_DIR/path_config.yaml"
 
 echo ""
 echo "=========================================="

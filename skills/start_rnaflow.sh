@@ -1,7 +1,7 @@
 #!/bin/bash
 # RNAFlow Enhanced Execution Script with Conda Environment Check
 # Usage: ./start_rnaflow.sh /path/to/config.yaml
-# Version: 1.0
+# Version: 2.0 (Dynamic Path Detection)
 
 set -e
 
@@ -10,8 +10,10 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PATH_CONFIG="${SCRIPT_DIR}/path_config.yaml"
 
-# Default values
-RNAFLOW_ROOT="/home/zj/pipeline/RNAFlow"
+# Default values - auto-detect RNAFlow root
+# RNAFlow root is one directory up from skills/
+DEFAULT_RNAFLOW_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
+RNAFLOW_ROOT="$DEFAULT_RNAFLOW_ROOT"
 DEFAULT_CONDA_ENV="rnaflow"
 AUTO_ACTIVATE=false
 
@@ -19,9 +21,17 @@ AUTO_ACTIVATE=false
 if [ -f "$PATH_CONFIG" ]; then
     echo "Loading configuration from $PATH_CONFIG"
     # Parse YAML (simple parsing, no external dependencies)
-    RNAFLOW_ROOT=$(grep '^RNAFLOW_ROOT:' "$PATH_CONFIG" | cut -d' ' -f2 | tr -d '"')
-    DEFAULT_CONDA_ENV=$(grep '^  DEFAULT_ENV_NAME:' "$PATH_CONFIG" | cut -d' ' -f4 | tr -d '"')
-    AUTO_ACTIVATE=$(grep '^  AUTO_ACTIVATE:' "$PATH_CONFIG" | cut -d' ' -f4)
+    CONFIG_RNAFLOW_ROOT=$(grep '^RNAFLOW_ROOT:' "$PATH_CONFIG" | cut -d' ' -f2 | tr -d '"' || true)
+    if [ -n "$CONFIG_RNAFLOW_ROOT" ]; then
+        # If path is relative, make it absolute relative to skills dir
+        if [[ "$CONFIG_RNAFLOW_ROOT" != /* ]]; then
+            RNAFLOW_ROOT=$(cd "$SCRIPT_DIR/$CONFIG_RNAFLOW_ROOT" && pwd)
+        else
+            RNAFLOW_ROOT="$CONFIG_RNAFLOW_ROOT"
+        fi
+    fi
+    DEFAULT_CONDA_ENV=$(grep '^  DEFAULT_ENV_NAME:' "$PATH_CONFIG" | cut -d' ' -f4 | tr -d '"' || echo "rnaflow")
+    AUTO_ACTIVATE=$(grep '^  AUTO_ACTIVATE:' "$PATH_CONFIG" | cut -d' ' -f4 || echo "false")
 fi
 
 # ==================== Usage Check ====================
