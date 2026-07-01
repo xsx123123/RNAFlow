@@ -533,11 +533,13 @@ For detailed installation and usage instructions, please refer to:
 
 ## 🧬 Reference Genome Builder
 
-RNAFlow now provides an independent sub-workflow for building reference genome indexes. This design decouples index construction from the main analysis pipeline, enabling:
+RNAFlow provides an independent sub-workflow for building reference genome indexes under `build_reference/`. It is also exposed as an AI agent skill in `skills/SKILL_build_reference.md`. This design decouples index construction from the main analysis pipeline, enabling:
 
 - **Simplified Migration**: Build indexes once and migrate the entire reference directory to other servers.
 - **Custom Genomes**: Easily build indexes for any species using your own reference FASTA and annotation files.
 - **Auto-Generated Config**: Automatically produces a `reference.yaml` snippet ready to paste into the main pipeline config.
+
+For detailed usage, see `build_reference/README.md` and `skills/SKILL_build_reference.md`.
 
 ### Directory Structure
 
@@ -578,7 +580,9 @@ Reference:
     name: GRCm39
     prefix: GRCm39_RNAFlow_Index          # Index directory name
     description: Mouse reference genome (GRCm39)
-    workflow: /path/to/reference/GRCm39   # Output directory for all reference files
+    # Base directory for reference outputs. Must match the main pipeline's
+    # reference_path. The workflow creates a subdirectory named after 'name'.
+    workflow: /path/to/reference
   data_dir:
     fa: /path/to/GRCm39.genome.fa
     gff: /path/to/gencode.vM38.annotation.gff3
@@ -600,10 +604,10 @@ snakemake --use-conda --cores 40
 
 ### Build Outputs
 
-After completion, the `workflow` directory contains everything needed for the main pipeline:
+`workflow` is the parent reference directory (e.g. `/home/user/reference/RNAFlow_reference`). The workflow creates a subdirectory named after `name` (e.g. `GRCm39/`) and places all outputs there:
 
 ```
-GRCm39/
+/home/user/reference/RNAFlow_reference/GRCm39/
 ├── GRCm39.genome.fa                    # Copied from data_dir
 ├── gencode.vM38.annotation.gtf         # Copied from data_dir
 ├── gencode.vM38.annotation.gff3        # Copied from data_dir
@@ -619,7 +623,7 @@ GRCm39/
 
 ### Integrating into the Main Pipeline
 
-1. Copy the entire `GRCm39/` directory to your `reference_path` (e.g., `/home/user/reference/RNAFlow_reference/`).
+1. Ensure `workflow` in `build_reference/config.yaml` matches `reference_path` in `config/reference.yaml`.
 2. Open `GRCm39_RNAFlow_Index_reference.yaml` and paste each section into the corresponding area of `config/reference.yaml`.
 3. Set `Genome_Version: GRCm39` in your project's `config.yaml`.
 4. **(If schema validation is enabled)** Add the new genome version to `schema/config.schema.yaml`:

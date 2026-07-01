@@ -6,15 +6,16 @@ This directory contains the bioSkills configuration for RNAFlow - a complete Sna
 
 ```
 skills/
-├── SKILL.md              # Main skill definition for AI agents
-├── usage-guide.md        # Detailed usage guide
-├── README.md             # This file
-├── install_skills.sh     # Generic installation script
-├── install_claude_skills.sh # Dedicated Claude Code installer
-├── install_codex_skills.sh  # Dedicated Codex installer
-├── start_rnaflow.sh      # Enhanced startup script
-├── path_config.yaml      # Path configuration
-└── examples/             # Example configuration files
+├── SKILL.md                    # Main skill definition for AI agents
+├── SKILL_build_reference.md    # Skill for building reference indexes
+├── usage-guide.md              # Detailed usage guide
+├── README.md                   # This file
+├── install_skills.sh           # Generic installation script
+├── install_claude_skills.sh    # Dedicated Claude Code installer
+├── install_codex_skills.sh     # Dedicated Codex installer
+├── start_rnaflow.sh            # Enhanced startup script
+├── path_config.yaml            # Path configuration
+└── examples/                   # Example configuration files
     ├── config_complete.yaml      # Complete analysis (all modules)
     ├── config_qc_only.yaml       # QC-only mode (fast screening)
     ├── config_standard_deg.yaml  # Standard DEG analysis
@@ -32,6 +33,12 @@ The main skill definition file that teaches AI agents how to use RNAFlow. Includ
 - Module switch documentation
 - Troubleshooting guide
 - Version compatibility information
+
+### SKILL_build_reference.md
+Skill for building RNA-seq reference indexes (STAR/RSEM, BED12, ref_all, GO annotation) and generating the `reference.yaml` snippet for `config/reference.yaml`. Use this when the user wants to:
+- Add a new genome version to RNAFlow
+- Build indexes from a custom FASTA/GTF/GFF
+- Prepare reference files for the main pipeline
 
 ### usage-guide.md
 A comprehensive guide for users covering:

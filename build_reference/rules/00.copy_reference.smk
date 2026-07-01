@@ -20,14 +20,12 @@ rule copy_reference_files:
         "Copying original reference files (fa, gtf, gff, go) to workflow directory",
     benchmark:
         "benchmarks/00.copy_reference_benchmark.txt",
-    params:
-        reference_dir = config["Reference"]["info"]["workflow"],
     shell:
         """
         {{
-            cp -r {input.fa} {params.reference_dir} && \
-            cp -r {input.gtf} {params.reference_dir} && \
-            cp -r {input.gff} {params.reference_dir} && \
-            cp -r {input.go} {params.reference_dir}
+            cp -r {input.fa} . && \
+            cp -r {input.gtf} . && \
+            cp -r {input.gff} . && \
+            cp -r {input.go} .
         }} > {log} 2>&1
         """

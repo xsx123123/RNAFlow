@@ -49,6 +49,7 @@ echo "Copying skills files..."
 
 # Essential skill files
 cp "$RNAFLOW_SKILLS_DIR/SKILL.md" "$TARGET_DIR/"
+cp "$RNAFLOW_SKILLS_DIR/SKILL_build_reference.md" "$TARGET_DIR/"
 cp "$RNAFLOW_SKILLS_DIR/path_config.yaml" "$TARGET_DIR/"
 cp "$RNAFLOW_SKILLS_DIR/start_rnaflow.sh" "$TARGET_DIR/"
 
@@ -83,6 +84,7 @@ echo "  $TARGET_DIR"
 echo ""
 echo "What's included:"
 echo "  - SKILL.md: Main skill definition"
+echo "  - SKILL_build_reference.md: Reference index builder skill"
 echo "  - path_config.yaml: Path configuration"
 echo "  - start_rnaflow.sh: Enhanced startup script"
 echo "  - examples/: Configuration templates"

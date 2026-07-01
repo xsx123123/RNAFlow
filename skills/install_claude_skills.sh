@@ -48,6 +48,7 @@ echo "Copying skills files..."
 
 # Essential skill files
 cp "$RNAFLOW_SKILLS_DIR/SKILL.md" "$TARGET_DIR/"
+cp "$RNAFLOW_SKILLS_DIR/SKILL_build_reference.md" "$TARGET_DIR/"
 cp "$RNAFLOW_SKILLS_DIR/path_config.yaml" "$TARGET_DIR/"
 cp "$RNAFLOW_SKILLS_DIR/start_rnaflow.sh" "$TARGET_DIR/"
 

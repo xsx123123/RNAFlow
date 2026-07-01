@@ -22,7 +22,10 @@ Reference:
     name: GRCm39
     prefix: GRCm39_RNAFlow_Index
     description: Mouse reference genome (GRCm39)
-    workflow: /home/zj/temp/RNAFlow_reference/GRCm39
+    # Base directory for reference outputs. This should match the main
+    # pipeline's reference_path (config/reference.yaml). The workflow will
+    # create a subdirectory named after 'name' (e.g. GRCm39) under this path.
+    workflow: /home/zj/reference/RNAFlow_reference
   data_dir:
     fa: /home/zj/temp/GRCm39/GRCm39.genome.fa
     gff: /home/zj/temp/GRCm39/gencode.vM38.annotation.gff3

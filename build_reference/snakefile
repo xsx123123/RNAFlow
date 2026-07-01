@@ -20,8 +20,11 @@ from snakemake_logger_plugin_rich_loguru import get_analysis_logger
 logger = get_analysis_logger()
 
 # --------- 2. Workspaces --------- #
-# Redirect workspace to config['workflow'] directory
-workflow_dir = config["Reference"]["info"]["workflow"]
+# workflow is the reference base directory (should match main reference_path).
+# The actual build outputs go into a genome-version subdirectory.
+workflow_base = config["Reference"]["info"]["workflow"]
+genome_name = config["Reference"]["info"]["name"]
+workflow_dir = os.path.join(workflow_base, genome_name)
 workdir: workflow_dir
 logger.info(f"Redirect workspaces to {workflow_dir}")
 

@@ -40,6 +40,7 @@ cd /home/zj/pipeline/RNAFlow/skills
 
 # 复制核心文件
 cp SKILL.md ~/.claude/skills/RNAFlow/
+cp SKILL_build_reference.md ~/.claude/skills/RNAFlow/
 cp path_config.yaml ~/.claude/skills/RNAFlow/
 cp start_rnaflow.sh ~/.claude/skills/RNAFlow/
 

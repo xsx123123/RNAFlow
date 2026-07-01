@@ -29,7 +29,10 @@ rule generate_reference_yaml:
 
         name = params.name
         prefix = params.prefix
-        workflow_base = os.path.basename(config["Reference"]["info"]["workflow"])
+        # YAML paths are relative to the main pipeline's reference_path.
+        # Because outputs live in workflow_dir = reference_base / name,
+        # the subdirectory prefix is the genome version name.
+        workflow_base = name
 
         def rel(path):
             return os.path.join(workflow_base, os.path.basename(path))

@@ -295,11 +295,13 @@ RNAFlow/
 
 ## 🧬 参考基因组构建
 
-RNAFlow 现在提供一个独立的子流程用于构建参考基因组索引。该设计将索引构建与主分析流程解耦，具有以下优势：
+RNAFlow 在 `build_reference/` 目录下提供了一个独立的子流程用于构建参考基因组索引，并在 `skills/SKILL_build_reference.md` 中提供了对应的 AI Skill。该设计将索引构建与主分析流程解耦，具有以下优势：
 
 - **简化迁移**：一次构建，即可将整个参考基因组目录迁移到其他服务器。
 - **支持自定义基因组**：可使用自己的参考 FASTA 和注释文件为任意物种构建索引。
 - **自动生成配置**：构建完成后自动生成 `reference.yaml` 配置片段，可直接粘贴到主流程配置中使用。
+
+详细用法请参考 `build_reference/README.md` 和 `skills/SKILL_build_reference.md`。
 
 ### 目录结构
 
@@ -340,7 +342,9 @@ Reference:
     name: GRCm39
     prefix: GRCm39_RNAFlow_Index          # 索引目录名称
     description: Mouse reference genome (GRCm39)
-    workflow: /path/to/reference/GRCm39   # 所有参考文件的输出目录
+    # 参考文件输出的根目录,需与主流程的 reference_path 保持一致。
+    # 流程会自动在该目录下创建以 name 命名的子目录(如 GRCm39)。
+    workflow: /path/to/reference
   data_dir:
     fa: /path/to/GRCm39.genome.fa
     gff: /path/to/gencode.vM38.annotation.gff3
@@ -362,10 +366,10 @@ snakemake --use-conda --cores 40
 
 ### 构建输出
 
-构建完成后，`workflow` 目录将包含主流程所需的全部参考文件：
+`workflow` 是参考文件输出的根目录（例如 `/home/user/reference/RNAFlow_reference`）。流程会自动在其下创建以 `name` 命名的子目录（例如 `GRCm39/`），所有产物都输出到该子目录中：
 
 ```
-GRCm39/
+/home/user/reference/RNAFlow_reference/GRCm39/
 ├── GRCm39.genome.fa                    # 从 data_dir 复制而来
 ├── gencode.vM38.annotation.gtf         # 从 data_dir 复制而来
 ├── gencode.vM38.annotation.gff3        # 从 data_dir 复制而来
@@ -381,7 +385,7 @@ GRCm39/
 
 ### 集成到主流程
 
-1. 将整个 `GRCm39/` 目录复制到你的 `reference_path` 下（例如 `/home/user/reference/RNAFlow_reference/`）。
+1. 确保 `build_reference/config.yaml` 中的 `workflow` 与 `config/reference.yaml` 中的 `reference_path` 指向同一根目录。
 2. 打开 `GRCm39_RNAFlow_Index_reference.yaml`，将其中的各个段落分别粘贴到 `config/reference.yaml` 的对应区域。
 3. 在项目 `config.yaml` 中设置 `Genome_Version: GRCm39`。
 4. **（如启用了 schema 校验）** 将新基因组版本同步添加到 `schema/config.schema.yaml`：
