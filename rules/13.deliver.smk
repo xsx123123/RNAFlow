@@ -51,7 +51,7 @@ rule delivery:
     - delivery_details.log: Detailed log of the delivery process
     """
     input:
-        DataDeliver(config)
+        ANALYSIS_TARGETS,
     output:
         manifest_json = os.path.join(config['data_deliver'],'delivery_manifest.json'),
         manifest_md5 = os.path.join(config['data_deliver'],'delivery_manifest.md5'),
@@ -104,7 +104,7 @@ rule delivery_report:
     assets.
     """
     input:
-        DataDeliver(config),
+        ANALYSIS_TARGETS,
         manifest_json = os.path.join(config['data_deliver'],'delivery_manifest.json'),
         manifest_md5 = os.path.join(config['data_deliver'],'delivery_manifest.md5'),
         manifest_log = os.path.join(config['data_deliver'],'delivery_details.log'),

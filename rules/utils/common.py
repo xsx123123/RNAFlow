@@ -7,15 +7,34 @@ RNAFlow Pipeline - Common Utility Functions Module
 import os
 import glob
 import sys
-import time
 from pathlib import Path
-from typing import Dict, Union, List, Callable
+from typing import Dict, Union, List
 from rich import print as rich_print
 
-from utils.datadeliver import qc_clean,mapping,count,Deg,call_variant,detect_novel_transcripts,rmats,gene_fusion
+from utils import datadeliver
 
-# Global flag for QC warning
-_qc_warning_logged = False
+
+MODULE_DEPENDENCIES = {
+    "qc_clean": [],
+    "mapping": ["qc_clean"],
+    "count": ["mapping"],
+    "deg": ["count"],
+    "call_variant": ["mapping"],
+    "detect_novel_transcripts": ["mapping"],
+    "rmats": ["mapping"],
+    "gene_fusion": ["mapping"],
+}
+
+MODULE_COLLECTORS = {
+    "qc_clean": datadeliver.qc_clean,
+    "mapping": datadeliver.mapping,
+    "count": datadeliver.count,
+    "deg": datadeliver.deg,
+    "call_variant": datadeliver.call_variant,
+    "detect_novel_transcripts": datadeliver.detect_novel_transcripts,
+    "rmats": datadeliver.rmats,
+    "gene_fusion": datadeliver.gene_fusion,
+}
 
 def get_docker_image(config:dict = None,
                      image_key:str = None,
@@ -43,173 +62,96 @@ def get_docker_image(config:dict = None,
         raise ValueError(f"\n[Hajimi Error]: Cannot find the image '{image_key}' in the configuration. Please check your spelling or verify the yaml file!\n")
 
 
-def DataDeliver(
-    config: Dict = None, samples: Dict = None, all_contrasts: Dict = None
-) -> List[str]:
-    """
-    Main data delivery orchestrator.
-    Controls the flow of the pipeline based on 'only_qc' and specific module flags.
-    """
-    # Initialize config/samples if None
-    config = config or {}
-    samples = samples or {}
-
-    # Initialize logger
-    from snakemake_logger_plugin_rich_loguru import get_analysis_logger
-
-    logger = get_analysis_logger()
-
-    # ---------------------------------------------------------
-    # 0. 初始化基础文件列表 (MD5 Check)
-    # ---------------------------------------------------------
-    convert_md5_path = config.get("convert_md5", "md5_check")
-    data_deliver = [
-        "01.qc/md5_check.tsv",
-        os.path.join("00.raw_data", convert_md5_path),
-        os.path.join("00.raw_data", convert_md5_path, "raw_data_md5.json"),
-    ]
-
-    # ---------------------------------------------------------
-    # 1. 定义模块类别
-    # ---------------------------------------------------------
-
-    # [A] 基础模块：无论如何必须运行，不需要用户在 yaml 配置
-    basic_modules = ["qc_clean", "mapping", "count"]
-
-    # [B] 深度质控标记：属于 Mapping 内部的参数，默认开启，only_qc=True 时也保留
-    deep_qc_flags = ["rseqc", "bamCoverage", "tin"]
-
-    # [C] 下游分析模块：只有当 only_qc=False 时才尝试运行
-    downstream_modules = [
-        "DEG",
-        "call_variant",
-        "detect_novel_transcripts",
-        "rmats",
-        "gene_fusion",
-    ]
-
-    # ---------------------------------------------------------
-    # 2. 定义执行包装器 (Wrappers)
-    # ---------------------------------------------------------
-    def execute_qc_clean(samples, data_deliver):
-        return qc_clean(samples, data_deliver)
-
-    def execute_mapping(samples, data_deliver,config):
-        return mapping(samples, data_deliver,config)
-
-    def execute_count(samples, data_deliver):
-        return count(samples, data_deliver)
-
-    def execute_deg(samples, data_deliver):
-        return Deg(samples, data_deliver)
-
-    def execute_call_variant(samples, data_deliver):
-        return call_variant(samples, data_deliver)
-
-    def execute_novel_transcripts(samples, data_deliver):
-        return detect_novel_transcripts(samples, data_deliver)
-
-    def execute_rmats(samples, data_deliver, all_contrasts):
-        contrasts = all_contrasts if all_contrasts else config.get("all_contrasts", [])
-        return rmats(samples, data_deliver, contrasts)
-
-    def execute_gene_fusion(samples, data_deliver):
-        return gene_fusion(samples, data_deliver)
-
-    # 模块函数映射表
-    module_functions: Dict[str, Callable] = {
-        "qc_clean": execute_qc_clean,
-        "mapping": execute_mapping,
-        "count": execute_count,
-        "DEG": execute_deg,
-        "call_variant": execute_call_variant,
-        "detect_novel_transcripts": execute_novel_transcripts,
-        "rmats": execute_rmats,
-        "gene_fusion": execute_gene_fusion,
+def _resolve_enabled_modules(config: Dict) -> List[str]:
+    """Resolve module switches without mutating the global Snakemake config."""
+    enabled = {
+        module for module in MODULE_DEPENDENCIES
+        if config.get(module) is not False
     }
 
-    # ---------------------------------------------------------
-    # 3. 核心逻辑控制 (配置参数修正)
-    # ---------------------------------------------------------
-    global _qc_warning_logged
-
-    # Step 3.1: 强制开启基础模块 (除非用户显式设为 False)
-    for module in basic_modules:
-        if config.get(module) is not False:
-            config[module] = True
-
-    # Step 3.2: 强制开启深度质控参数 (除非用户显式设为 False)
-    for flag in deep_qc_flags:
-        if config.get(flag) is not False:
-            config[flag] = True
-
-    # Step 3.3: 根据 only_qc 处理下游模块
     if config.get("only_qc"):
-        if not _qc_warning_logged:
-            logger.warning(
-                "**********************************************************************"
-            )
-            logger.warning(
-                "   [MODE] ONLY QC ENABLED                                            "
-            )
-            logger.warning(
-                "   - Running: Raw QC, Mapping, Counting, RSeQC, BamCoverage           "
-            )
-            logger.warning(
-                "   - Skipping: DEG, Variants, Novel Transcripts, rMATS                "
-            )
-            logger.warning(
-                "**********************************************************************"
-            )
-            time.sleep(1)
-            _qc_warning_logged = True
+        return ["qc_clean"] if "qc_clean" in enabled else []
 
-        for module in downstream_modules:
-            config[module] = False
+    changed = True
+    while changed:
+        changed = False
+        for module in tuple(enabled):
+            for dependency in MODULE_DEPENDENCIES[module]:
+                if dependency not in enabled:
+                    enabled.add(dependency)
+                    changed = True
 
-    else:
-        for module in downstream_modules:
-            if config.get(module) is not False:
-                config[module] = True
+    return [module for module in MODULE_DEPENDENCIES if module in enabled]
 
-    # ---------------------------------------------------------
-    # 4. 执行并收集输出文件
-    # ---------------------------------------------------------
-    for module, func in module_functions.items():
-        if config.get(module):
-            if module == "rmats":
-                data_deliver = func(samples, data_deliver, all_contrasts)
-            elif module == "mapping":
-                data_deliver = func(samples, data_deliver, config)
-            else:
-                data_deliver = func(samples, data_deliver)
+
+def AnalysisTargets(
+    config: Dict = None, samples: Dict = None, all_contrasts: List = None
+) -> List[str]:
+    """Collect analysis targets for the enabled modules as a pure function."""
+    config = config or {}
+    samples = samples or {}
+    all_contrasts = all_contrasts or []
+    convert_md5_path = config.get("convert_md5", "link_dir")
+    targets = [
+        os.path.join("00.raw_data", convert_md5_path, "raw_data_md5.json"),
+        "01.qc/md5_check.tsv",
+    ]
+
+    for module in _resolve_enabled_modules(config):
+        collector = MODULE_COLLECTORS[module]
+        if module == "mapping":
+            targets = collector(samples, targets, config)
+        elif module == "qc_clean":
+            targets = collector(samples, targets, config=config)
+        elif module == "rmats":
+            targets = collector(samples, targets, all_contrasts)
+        else:
+            targets = collector(samples, targets)
+    return targets
+
+
+def delivery_outputs(config: Dict) -> List[str]:
+    deliver_dir = config["data_deliver"]
+    return [
+        os.path.join(deliver_dir, "delivery_manifest.json"),
+        os.path.join(deliver_dir, "delivery_manifest.md5"),
+        os.path.join(deliver_dir, "delivery_details.log"),
+    ]
+
+
+def report_outputs(config: Dict) -> List[str]:
+    return [
+        os.path.join(config["data_deliver"], "report_data", "delivery_manifest.json"),
+        os.path.join(config["data_deliver"], "report_data", "delivery_manifest.md5"),
+        os.path.join(config["data_deliver"], "report_data", "delivery_details.log"),
+        os.path.join(config["data_deliver"], "report_data", "project_summary.json"),
+        os.path.join(config["data_deliver"], "Analysis_Report", "index.html"),
+    ]
+
+
+def DataDeliver(
+    config: Dict = None, samples: Dict = None, all_contrasts: List = None
+) -> List[str]:
+    """Collect analysis, delivery, and report targets exactly once."""
+    config = config or {}
+    targets = AnalysisTargets(config, samples, all_contrasts)
+    deliver_enabled = config.get("deliver", True) is not False
+    report_enabled = config.get("report", True) is not False
+
+    if deliver_enabled:
+        targets.extend(delivery_outputs(config))
+    if report_enabled:
+        targets.extend(report_outputs(config))
 
     if config.get("print_target"):
         rich_print("[bold green]Generated Target Files:[/bold green]")
-        rich_print(data_deliver)
-
-    return data_deliver
+        rich_print(targets)
+    return targets
 
 
 def ReportData(config: dict = None) -> List[str]:
-    """Collects all files required for generating the final report."""
-    if config.get("report"):
-        return [
-            os.path.join(config["data_deliver"], "delivery_manifest.json"),
-            os.path.join(config["data_deliver"], "delivery_manifest.md5"),
-            os.path.join(config["data_deliver"], "delivery_details.log"),
-            os.path.join(config["data_deliver"], "report_data/project_summary.json"),
-            os.path.join(
-                config["data_deliver"], "report_data", "delivery_manifest.json"
-            ),
-            os.path.join(
-                config["data_deliver"], "report_data", "delivery_manifest.md5"
-            ),
-            os.path.join(config["data_deliver"], "report_data", "delivery_details.log"),
-            os.path.join(config["data_deliver"], "Analysis_Report/index.html"),
-        ]
-    else:
-        return []
+    """Backward-compatible report target collector."""
+    return report_outputs(config or {}) if (config or {}).get("report", True) is not False else []
 
 
 def get_sample_data_dir(sample_id: str = None, config: dict = None) -> str:

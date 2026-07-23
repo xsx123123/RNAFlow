@@ -194,7 +194,7 @@ rule DEG:
         "benchmarks/06.DEG/deseq2_benchmark.txt",
     params:
         samples = config['sample_csv'],
-        paired = config['paired_csv'],
+        paired = config.get('paired_csv', ''),
         PATH = workflow.source_path(config['parameter']['DEG']['PATH']),
         LFC = config['parameter']['DEG']['LFC'],
         PVAL = config['parameter']['DEG']['PVAL'],

@@ -294,9 +294,9 @@ RNAFlow/
 3. The pipeline uses conda environments for dependencies, which will be automatically created during execution.
 
 4. **(Required for Monitoring) Install Enhanced Logger Plugin**:
-   To enable beautiful console output, structured logging, and monitoring capabilities (as seen in the Usage examples), install the `snakemake_logger_plugin_rich_loguru` plugin (version 0.1.4):
+   To enable beautiful console output, structured logging, and monitoring capabilities (as seen in the Usage examples), install `snakemake_logger_plugin_rich_loguru` 0.1.6 or newer:
    ```bash
-   pip install snakemake_logger_plugin_rich_loguru==0.1.4
+   pip install snakemake_logger_plugin_rich_loguru>=0.1.6
    ```
    > [!NOTE]
    > **Note**: The enhanced logger plugin is available via PyPI and will be automatically installed with the pipeline.
@@ -646,7 +646,9 @@ Starting from RNAFlow v0.1.9+, all configuration items uniformly use the **snake
 ```yaml
 # Basic Switches (all snake_case)
 only_qc: true                       # Run QC only
+deliver: true                       # Generate delivery manifests
 report: true                        # Generate HTML report
+report_engine: auto                 # auto/docker/apptainer/singularity
 deg: true                           # Differential expression analysis
 fastq_screen: true                  # FastQ Screen contamination check
 call_variant: true                 # Variant calling
@@ -659,7 +661,12 @@ rmats: true                         # Alternative splicing analysis
 2. Boolean configurations default to `false` (except for some core modules).
 3. Configuration names should be consistent with the full English name or common abbreviation of the corresponding analysis module.
 
-### 1. Configuration Example (config.yaml)
+### 1. Project Configuration Example
+
+Copy `examples/analysisyaml.example.yaml` into the project workflow directory and
+replace all placeholder paths. The repository root no longer stores a machine-specific
+project `config.yaml`.
+
 ```yaml
 project_name: 'PRJNA1224991'   # Project ID
 Genome_Version: "Lsat_Salinas_v11" # Genome version (Supports: Lsat_Salinas_v8, Lsat_Salinas_v11, ITAG4.1, GRCm39, etc.)
@@ -695,13 +702,15 @@ detect_novel_transcripts: true      # Whether to perform novel transcript assemb
 rmats: true                         # Whether to perform alternative splicing analysis (rMATS)
 deg: true                           # Whether to perform differential expression analysis (DESeq2)
 fastq_screen: true                  # Whether to perform contamination check (FastQ Screen)
+deliver: true                       # Whether to organize deliverables and create manifests
 report: true                        # Whether to generate HTML report
+report_engine: auto                 # Container engine for reporting
 
 # Optional Configuration
 only_qc: true                       # Run mode: qc_only (Only QC), if true skips all downstream analysis
 
 # Monitoring Configuration
-loki_url: "http://122.205.67.97:3100"  # Loki server address (for workflow monitoring)
+loki_url: "http://your-loki-server:3100"  # Loki server address (for workflow monitoring)
 ```
 
 ### 2. Sample Information Table (sample_csv)
@@ -765,7 +774,7 @@ RNAFlow supports real-time workflow monitoring via Loki + Grafana. All logs are 
 ![Grafana Monitoring Example](doc/grafana.png)
 
 > [!NOTE]
-> **Note**: This monitoring feature requires version 0.1.4 of the `snakemake_logger_plugin_rich_loguru` plugin.
+> **Note**: This monitoring feature requires `snakemake_logger_plugin_rich_loguru` 0.1.6 or newer.
 
 ### 6. Cluster Configuration (Optional)
 If `execution_mode` is set to `cluster`, ensure related cluster plugins are installed (e.g., `snakemake-executor-plugin-slurm`). Finer resource allocation (threads, memory) can be edited in `config/cluster_config.yaml`.
@@ -776,9 +785,9 @@ If `execution_mode` is set to `cluster`, ensure related cluster plugins are inst
 
 RNAFlow manages project parameters through external YAML configuration files, achieving decoupling between code and configuration.
 
-#### 1. Configuration Preparation (config.yaml)
+#### 1. Configuration Preparation
 
-Create a project configuration file and configure analysis module switches:
+Copy `examples/analysisyaml.example.yaml`, then configure project paths and module switches:
 
 ```yaml
 # === Basic Project Info ===
@@ -806,7 +815,9 @@ call_variant: true        # Variant calling
 detect_novel_transcripts: true  # Novel transcript detection (formerly noval_Transcripts)
 rmats: true                 # Alternative splicing analysis
 fastq_screen: true          # Contamination check
+deliver: true               # Generate delivery manifests
 report: true                # Generate HTML report
+report_engine: auto         # auto/docker/apptainer/singularity
 
 # Monitoring config (Optional)
 loki_url: "http://your-loki-server:3100"
@@ -840,7 +851,9 @@ snakemake \
 | `detect_novel_transcripts` | bool | false | Novel transcript detection (StringTie), formerly `noval_Transcripts` |
 | `rmats` | bool | true | Alternative splicing analysis (rMATS) |
 | `fastq_screen` | bool | true | Contamination check (FastQ Screen) |
+| `deliver` | bool | true | Organize outputs and generate delivery manifests |
 | `report` | bool | true | Generate interactive HTML report |
+| `report_engine` | string | auto | Select Docker, Apptainer, or Singularity for report rendering |
 
 ---
 
@@ -849,7 +862,9 @@ snakemake \
 Based on the settings in `config.yaml`, RNAFlow automatically decides which modules to run. Here are details for when items are enabled/disabled:
 
 #### 📊 Basic Analysis (Always Runs)
-Regardless of configuration, these modules **always execute**:
+In standard mode, mapping and quantification are enabled by default and can be pulled
+in automatically as dependencies. In `only_qc` mode, only the MD5 gate, raw-read QC,
+trimming, and merged QC reports are targeted.
 
 | Step | Tool | Output Content |
 |------|------|---------|
@@ -862,7 +877,7 @@ Regardless of configuration, these modules **always execute**:
 #### 🎛️ Optional Analysis Modules (Configuration Controlled)
 
 ##### 1️⃣ `only_qc: true` (QC Only Mode)
-- **Effect**: Runs only basic QC and mapping, **skipping all downstream analysis**.
+- **Effect**: Runs only MD5 validation, raw FastQC, trimming, and merged QC reports.
 - **Use Case**: Data screening, rapid quality assessment.
 - **Skipped Content**: DEG, variant calling, alternative splicing, novel transcripts, etc.
 

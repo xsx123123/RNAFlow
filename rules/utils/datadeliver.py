@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Dict, List, Union
 from snakemake.io import expand
 
-def qc_clean(samples: Dict = None, data_deliver: List = None) -> List:
+def qc_clean(samples: Dict = None, data_deliver: List = None, config: Dict = None, **kwargs) -> List:
     """
     Handle quality control and cleaning steps.
 
@@ -23,11 +23,12 @@ def qc_clean(samples: Dict = None, data_deliver: List = None) -> List:
     if data_deliver is None:
         data_deliver = []
 
-    # fastq-screen
-    data_deliver.extend(expand("01.qc/fastq_screen_r1/{sample}_R1_screen.txt", sample=samples.keys()))
-    data_deliver.extend(expand("01.qc/fastq_screen_r2/{sample}_R2_screen.txt", sample=samples.keys()))
-    data_deliver.append("01.qc/fastq_screen_multiqc_r1/multiqc_r1_fastq_screen_report.html")
-    data_deliver.append("01.qc/fastq_screen_multiqc_r2/multiqc_r2_fastq_screen_report.html")
+    config = config or {}
+    if config.get("fastq_screen", True) is not False:
+        data_deliver.extend(expand("01.qc/fastq_screen_r1/{sample}_R1_screen.txt", sample=samples.keys()))
+        data_deliver.extend(expand("01.qc/fastq_screen_r2/{sample}_R2_screen.txt", sample=samples.keys()))
+        data_deliver.append("01.qc/fastq_screen_multiqc_r1/multiqc_r1_fastq_screen_report.html")
+        data_deliver.append("01.qc/fastq_screen_multiqc_r2/multiqc_r2_fastq_screen_report.html")
     # fastqc & multiqc
     data_deliver.append("01.qc/short_read_r1_multiqc/multiqc_r1_raw-data_report.html")
     data_deliver.append("01.qc/short_read_r2_multiqc/multiqc_r2_raw-data_report.html")
@@ -127,7 +128,7 @@ def count(samples: Dict = None, data_deliver: List = None) -> List:
     return data_deliver
 
 
-def Deg(samples: Dict = None, data_deliver: List = None) -> List:
+def deg(samples: Dict = None, data_deliver: List = None, **kwargs) -> List:
     """
     Handle differential expression analysis.
 

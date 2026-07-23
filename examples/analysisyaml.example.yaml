@@ -1,0 +1,30 @@
+# Project-level configuration. Replace every path before running RNAFlow.
+project_name: "RNAFlow_example"
+Genome_Version: "GRCm39"
+species: "Mus musculus"
+client: "Internal"
+
+raw_data_path:
+  - "/absolute/path/to/project/00.raw_data"
+sample_csv: "/absolute/path/to/project/01.workflow/samples.csv"
+paired_csv: "/absolute/path/to/project/01.workflow/contrasts.csv"
+workflow: "/absolute/path/to/project/01.workflow"
+data_deliver: "/absolute/path/to/project/02.data_deliver"
+
+execution_mode: "local"
+Library_Types: "fr-firststrand"
+
+only_qc: false
+fastq_screen: true
+deg: true
+call_variant: false
+detect_novel_transcripts: false
+rmats: true
+gene_fusion: false
+deliver: true
+report: true
+
+# These roots are normally inherited from config/reference.yaml.
+# Set them here when running on another machine.
+reference_path: "/absolute/path/to/RNAFlow_reference"
+fastq_screen_db_path: "/absolute/path/to/fastq_screen_database"

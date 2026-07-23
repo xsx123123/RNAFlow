@@ -133,7 +133,7 @@ rule Report:
     web servers for remote access.
     """
     input:
-        DataDeliver(config),
+        ANALYSIS_TARGETS,
         json_file = os.path.join(config['data_deliver'], "report_data/project_summary.json"),
         manifest_json = os.path.join(config['data_deliver'],'report_data','delivery_manifest.json'),
         manifest_md5 = os.path.join(config['data_deliver'],'report_data','delivery_manifest.md5'),
@@ -148,6 +148,7 @@ rule Report:
         data_dir = os.path.join(config['data_deliver'],'report_data','data'),
         Report_dir = os.path.join(config['data_deliver'], "Analysis_Report"),
         docker_version = config['parameter']['Report']['docker_version'],
+        report_engine = config.get('report_engine', 'auto'),
     log:
         "logs/Report.log",
     benchmark:
@@ -158,21 +159,45 @@ rule Report:
         """
         (
         IMAGE_NAME={params.docker_version}
+        ENGINE={params.report_engine}
+        mkdir -p {params.Report_dir}
 
-        # 1. CHECK IF DOCKER IMAGE EXISTS
-        if [ -z "$(docker images -q $IMAGE_NAME)" ]; then
-            echo "错误: 镜像 $IMAGE_NAME 不存在！请先拉取或构建该镜像。"
-            exit 1
-        else
-            echo "找到镜像: $IMAGE_NAME"
+        if [ "$ENGINE" = "auto" ]; then
+            if command -v docker >/dev/null 2>&1; then
+                ENGINE=docker
+            elif command -v apptainer >/dev/null 2>&1; then
+                ENGINE=apptainer
+            elif command -v singularity >/dev/null 2>&1; then
+                ENGINE=singularity
+            else
+                echo "No supported report container engine found (docker/apptainer/singularity)."
+                exit 1
+            fi
         fi
 
-        # 2. RUN DOCKER CONTAINER WITH CORRECT MOUNTING AND USER PERMISSIO
-        mkdir -p {params.Report_dir} 
-        docker run --rm --user $(id -u):$(id -g) \
-                   -v {params.data_dir}:/data:rw \
-                   -v {params.Report_dir}:/workspace:rw \
-                   -v {input.json_file}:/app/project_summary.json:rw \
-                   {params.docker_version} 
+        case "$ENGINE" in
+            docker)
+                if ! docker image inspect "$IMAGE_NAME" >/dev/null 2>&1; then
+                    echo "Report image not found: $IMAGE_NAME"
+                    exit 1
+                fi
+                docker run --rm --user $(id -u):$(id -g) \
+                    -v {params.data_dir}:/data:rw \
+                    -v {params.Report_dir}:/workspace:rw \
+                    -v {input.json_file}:/app/project_summary.json:ro \
+                    "$IMAGE_NAME"
+                ;;
+            apptainer|singularity)
+                "$ENGINE" run --containall \
+                    --bind {params.data_dir}:/data \
+                    --bind {params.Report_dir}:/workspace \
+                    --bind {input.json_file}:/app/project_summary.json:ro \
+                    "docker://$IMAGE_NAME"
+                ;;
+            *)
+                echo "Unsupported report_engine: $ENGINE"
+                exit 1
+                ;;
+        esac
         ) &> {log}
         """

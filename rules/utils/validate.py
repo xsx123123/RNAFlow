@@ -13,7 +13,7 @@ from rich import box
 from rich.align import Align
 from rich.padding import Padding
 
-def check_reference_paths(ref_dict):
+def check_reference_paths(ref_dict, genome_version=None):
     """
     Rich-styled (modern minimalist): Check reference genome file paths.
     """
@@ -25,14 +25,24 @@ def check_reference_paths(ref_dict):
         console.print(Align.center(msg))
         return
 
-    keys_to_check = ["index", "genome_fa", "genome_gtf", "genome_gff", "rsem_index_dir"]
+    keys_to_check = [
+        "index", "genome_fa", "genome_gtf", "genome_gff", "rsem_index_dir",
+        "go_annotation", "obo",
+    ]
     missing_entries = []
+    checked_entries = 0
 
     # Keep status bar concise
     with console.status("[bold cyan]Scanning reference configuration...", spinner="dots2"):
-        for genome_name, params in ref_dict.items():
+        entries = ref_dict.items()
+        if genome_version and genome_version in ref_dict:
+            entries = [(genome_version, ref_dict[genome_version])]
+            if isinstance(ref_dict.get("GO"), dict):
+                entries = [*entries, ("GO", ref_dict["GO"])]
+        for genome_name, params in entries:
             if not isinstance(params, dict):
                 continue
+            checked_entries += 1
             for key, path in params.items():
                 if key in keys_to_check and path and not os.path.exists(path):
                     missing_entries.append((genome_name, key, path))
@@ -81,7 +91,7 @@ def check_reference_paths(ref_dict):
         console.print(Align.center("#####   --------------- Validation Complete  ---------------   #####"),style="yellow")
         console.print()
         console.print(Align.center("[bold green]✔ System Check Passed[/]"), style="green")
-        console.print(Align.center(f"[dim]Verified references for {len(ref_dict)} genomes[/]"))
+        console.print(Align.center(f"[dim]Verified {checked_entries} reference sections[/]"))
         console.print()
         console.print(Align.center("#####   --------------- Validation Complete  ---------------   #####"),style="yellow")
 

@@ -83,7 +83,12 @@ def rule_resource(config, profile_name, skip_queue_on_local=False, logger=None):
             if logger:
                 logger.debug(f"Mapped queue_type '{queue_key}' -> '{profile['queue']}'")
         else:
+            error_msg = (
+                f"Queue type '{queue_key}' is not defined in cluster "
+                f"'{current_cluster_name or 'default'}'."
+            )
             if logger:
-                logger.warning(f"Queue type '{queue_key}' not defined in cluster '{current_cluster_name}'. Job submits without explicit queue.")
+                logger.error(error_msg)
+            raise ValueError(error_msg)
 
     return profile

@@ -18,44 +18,27 @@ robust error handling for common scenarios like missing files, invalid
 configurations, and path resolution issues.
 """
 
-import os
-import glob
-import sys
-import time
-from pathlib import Path
-from typing import Dict, Union, List, Callable
-from rich import print as rich_print
-from utils.datadeliver import qc_clean,mapping,count,Deg,call_variant,detect_novel_transcripts,rmats,gene_fusion
+from utils.common import (
+    AnalysisTargets,
+    DataDeliver,
+    ReportData,
+    get_sample_data_dir,
+    get_all_input_dirs,
+    judge_bwa_index,
+    judge_star_index,
+    check_gene_version,
+    get_docker_image,
+)
 
-
-# Import logger with fallback chain
 try:
-    # 1. 优先尝试导入 Snakemake 自定义插件
     from snakemake_logger_plugin_rich_loguru import get_analysis_logger
     logger = get_analysis_logger()
-    logger_type = "Custom Plugin"
-
 except ImportError:
     try:
         from loguru import logger
-        logger_type = "Standard Loguru"
-        logger.warning("Custom logger plugin not found. Falling back to standard loguru.")
-        
     except ImportError:
-        import logging 
+        import logging
         logging.basicConfig(level=logging.INFO)
         logger = logging.getLogger("Fallback")
-        logger.warning("Neither custom plugin nor loguru found. Using built-in logging.")
-        logger_type = "Built-in Logging"
-
-# Flag to track if the QC warning has already been displayed
-_qc_warning_logged = False
-
-from utils.common import (
-    DataDeliver, ReportData, get_sample_data_dir, 
-    get_all_input_dirs, judge_bwa_index, 
-    judge_star_index, check_gene_version,
-    get_docker_image
-)
 
 # ---------------------

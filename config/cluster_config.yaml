@@ -20,6 +20,11 @@
 # and typical job requirements for your specific use cases.
 
 cluster_config:
+  clusters:
+    default:
+      queues:
+        default_queue: "default_queue"
+        high_mem_queue: "high_mem_queue"
   resource_profiles:
     low_resource:
       threads: 2
