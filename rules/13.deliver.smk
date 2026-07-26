@@ -133,3 +133,93 @@ rule delivery_report:
                     -o {params.out_dir} \
                     -c {params.config_path}  ) &>{log}
         """
+
+# ---------------------------------------------------------------------------
+# OmicHub ARDP result manifest (Protocol/分析流程结果交付协议_v1.md)
+#
+# Terminal-state delivery contract for the OmicHub report center. The rule
+# below always runs (it is a rule-all target) and always writes
+# {data_deliver}/result_manifest.json, whether or not the HTML report module
+# is enabled. Assembly logic lives in rules/utils/result_manifest.py.
+# ---------------------------------------------------------------------------
+from utils.result_manifest import (
+    MANIFEST_FILENAME,
+    build_success_manifest,
+    write_manifest_atomic,
+)
+
+
+def _result_manifest_inputs(wildcards):
+    """Gate the manifest so it is the last artifact of the whole run
+    (FlowFrame §6.6 / ARDP §3.3):
+
+    - always gate on the full DataDeliver target set (analysis complete);
+    - report: true additionally gates on the HTML report, project_summary.json
+      and the delivery manifest (delivery complete);
+    - report: false → manifest still produced (run.status=completed_no_report).
+    """
+    deliver_dir = config['data_deliver']
+    inputs = {
+        "sample_sheet": config['sample_csv'],
+        "analysis_targets": DataDeliver(config=config, samples=samples,
+                                        all_contrasts=ALL_CONTRASTS),
+    }
+    if config.get('report'):
+        inputs["report_html"] = os.path.join(deliver_dir, 'Analysis_Report', 'index.html')
+        inputs["summary_json"] = os.path.join(deliver_dir, 'report_data', 'project_summary.json')
+        inputs["delivery_manifest"] = os.path.join(deliver_dir, 'delivery_manifest.json')
+    if ALL_CONTRASTS:
+        inputs["contrasts_csv"] = config['paired_csv']
+    return inputs
+
+
+rule generate_result_manifest:
+    """
+    Generate the OmicHub ARDP result delivery manifest.
+
+    Writes {data_deliver}/result_manifest.json describing samples, contrasts,
+    modules, the HTML report entry and the delivered file inventory. The
+    platform report center parses it to register the report and its files
+    (ARDP §6-7); in standalone runs the manifest is still produced (platform
+    block empty) so artifacts can be imported into the platform losslessly
+    afterwards (FlowFrame §17 dual-mode).
+
+    Outputs:
+    - result_manifest.json: ARDP v1.0 terminal-state manifest (atomic write)
+    """
+    input:
+        unpack(_result_manifest_inputs),
+    output:
+        manifest = os.path.join(config['data_deliver'], MANIFEST_FILENAME),
+    resources:
+        **rule_resource(config, 'low_resource',  skip_queue_on_local=True,logger = logger),
+    conda:
+        workflow.source_path("../envs/py3.12.yaml"),
+    params:
+        out_dir = config['data_deliver'],
+        report_enabled = config.get('report'),
+    log:
+        "logs/generate_result_manifest.log",
+    benchmark:
+        "benchmark/generate_result_manifest.txt",
+    run:
+        df = pd.read_csv(input.sample_sheet, dtype=str).fillna("")
+        df.columns = [c.strip() for c in df.columns]
+        samples_records = [
+            {"sample": r.sample, "sample_name": r.sample_name, "group": r.group}
+            for r in df.itertuples()
+        ]
+        manifest = build_success_manifest(
+            config=config,
+            samples_records=samples_records,
+            all_contrasts=ALL_CONTRASTS,
+            deliver_dir=params.out_dir,
+            report_enabled=params.report_enabled,
+        )
+        target = write_manifest_atomic(manifest, params.out_dir)
+        logger.info(
+            f"[ARDP] result manifest written: {target} "
+            f"(status={manifest['run']['status']}, "
+            f"samples={manifest['stats']['sample_count']}, "
+            f"files={len(manifest['files'])})"
+        )

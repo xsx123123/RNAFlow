@@ -78,6 +78,13 @@ properties:
     type: "boolean"
     description: "Whether to generate HTML report for RNA-seq"
     default: true
+  platform:
+    type: "object"
+    description: "OmicHub platform context block (task_id/user_id/flow_id, ...), injected by the platform and echoed verbatim into result_manifest.json; absent in standalone runs (ARDP §4.2, FlowFrame §17). Never required."
+    additionalProperties: true
+  monitor_conf:
+    type: "string"
+    description: "Workflow monitor config path (FlowFrame §13.5), injected by the platform; optional in standalone runs"
   loki_url:
     type: "string"
     description: "URL for Loki logging server (optional)"

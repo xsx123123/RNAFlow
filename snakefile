@@ -12,6 +12,11 @@ from rules.utils.id_convert import load_samples,load_contrasts
 from rules.utils.validate import check_reference_paths,load_user_config,validate_genome_version
 from rules.utils.reference_update import resolve_reference_paths
 from rules.utils.resource_manager import rule_resource
+from rules.utils.result_manifest import (
+    MANIFEST_FILENAME,
+    build_failure_manifest,
+    write_manifest_atomic,
+)
 
 # Lock Snakemake Version
 min_version("9.9.0")
@@ -81,3 +86,19 @@ rule all:
     input:
         data_deliver,
         ReportData(config=config),
+        # ARDP terminal-state manifest: always delivered, platform or standalone
+        os.path.join(config['data_deliver'], MANIFEST_FILENAME),
+
+# --------- 6. Failure Fallback (ARDP §3.3 / FlowFrame §6.6) --------- #
+# Write a minimal failed-run manifest so the platform report center can show
+# structured failure info instead of a truncated log. Never re-raise here.
+onerror:
+    try:
+        _failed_rule = globals().get('rule')
+        _failure_target = write_manifest_atomic(
+            build_failure_manifest(config, message=str(exception), failed_rule=_failed_rule),
+            config.get('data_deliver') or '.',
+        )
+        logger.warning(f"[ARDP] failure manifest written: {_failure_target}")
+    except Exception as _exc:
+        print(f"[ARDP] failure manifest NOT written (ignored): {_exc}", file=sys.stderr)
