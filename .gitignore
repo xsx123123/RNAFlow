@@ -3,7 +3,6 @@
 *.RData
 *.h5ad
 *.fasta
-todo.md
 *.fq
 *.fastq
 *.gz
@@ -27,6 +26,7 @@ results
 data-deliver
 __pycache__
 *_trace.txt%
+.qoder
 
 # MCP Server
 mcp/.venv
