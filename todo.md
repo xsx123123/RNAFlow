@@ -125,6 +125,53 @@
 
 ---
 
+## 📋 报告命令溯源计划（2026-10-25 核对）
+
+> 目标：把流程每一步的实际命令（shell 模板）嵌入 `project_summary.json`，网页报告按模块展示每个分析步骤的命令，实现"结果 ↔ 命令"的可溯源交付。
+> 可行性已验证：Snakemake 9.19.0 下 `workflow.rules` 迭代的每个规则对象直接暴露 `.shellcmd`（原始模板，含 `{input}`/`{wildcards}` 占位符）与 `.log`，**无需手工维护命令副本，与 rule 定义零漂移**。
+
+### 方案要点
+
+- 命令来源：snakefile 层 include 完 01–12 后内省收集（不复制、不进 manifest 双份维护）：
+
+  ```python
+  WORKFLOW_STEPS = [
+      {"rule": r.name, "command": r.shellcmd,
+       "log": str(r.log[0]) if r.log else None}
+      for r in workflow.rules
+      if r.name not in ("all", "all_target") and r.shellcmd
+  ]
+  ```
+
+- 元数据来源：`rules/manifests/*.manifest.yaml` 已有每个 rule 的 `title/summary/wildcards/conda/resources_tier/ports`，按 rule name 与 shellcmd 合并成完整步骤描述。
+- 接线点：`generate_docker_json`（`rules/14.Report.smk:11-56`）与 snakefile 同进程，经 `params` 传入 run 块即可。
+
+### 待办清单
+
+- [ ] **schema 升 2.1.0**
+  - `schema/project_summary.schema.json` 顶层 `additionalProperties: false`，必须新增 `workflow` 定义并升 `schema_version`，否则校验直接失败
+- [ ] **snakefile 内省 + manifest 合并**
+  - 新增 `WORKFLOW_STEPS` 收集；`rules/utils/project_summary.py` 增加 `workflow` 段构建函数（与 manifest 元数据按 rule name 合并）
+- [ ] **模块开关过滤**
+  - 复用 `_resolve_enabled_modules()` 只嵌入本次启用的模块；`only_qc: true` 时如实只展示 QC 链路
+- [ ] **run 块规则回落处理**
+  - `Filter_Novel_Transcripts`、`generate_docker_json` 无 `shellcmd`，回落到 manifest summary 或标注 `python`；内置 `all` 规则过滤
+- [ ] **报告端展示**
+  - 报告容器端（`rnaflow_report.py` 为 `.get()` 宽松读取，加字段不会崩）新增"流程步骤"页签，按模块分组、代码块渲染命令模板
+- [ ] **端到端验证**
+  - dry-run 校验 schema；真实数据运行后确认 JSON 中命令与 `pipeline_version` 绑定、模块开关过滤正确
+
+### 二期可选（渲染级命令）
+
+- 真实样本名/路径的已渲染命令需要 job 级信息；当前 logger 插件是文本解析式（`__init__.py` 靠 `"Finished jobid:" in msg` 匹配），无结构化 job 对象
+- 前置：JZ_Tools 插件升级为事件式（`job_started` 事件含 `job.shellcmd`）；或在报告前端用 manifest 的 input/output pattern 做简单替换渲染
+
+### 附带收益
+
+- 交付 JSON 自带"这套结果用什么命令跑出来的"，与 `pipeline_version` 绑定，补全 delivery_manifest 审计链；一期只嵌模板命令，天然不含真实路径/密钥，体积约几十 KB
+
+---
+
 ## 今日计划：KEGG 双路径分析（2026-10-21）
 
 计划实施时间：今天下午或晚上。状态：核心代码已实现，背景与文档验收未完成。
@@ -300,5 +347,6 @@
 
 ## 📝 本次实际变更（2026-10-25）
 
+- 新增「📋 报告命令溯源计划（2026-10-25 核对）」章节：project_summary.json 嵌入流程命令（workflow.rules 内省 shellcmd + manifest 元数据合并）的方案、待办清单（schema 升 2.1.0、开关过滤、run 块回落、报告端展示）与二期渲染级命令的可选路线。
 - 新增「🦀 Rust 化计划（2026-10-25 核对）」章节：现有 Rust 工具接线盘点（seq_preprocessor / json_md5_verifier / data_deliver / filter_pe）+ 三梯队迁移候选（第一梯队：merge_rsem、merge_rmats_summary、Filter_Novel_Transcripts、annotation_to_enrichment；第二梯队：check_libtype、project_summary；第三梯队：GTF/GAF/OBO 工具族）+ 明确不 Rust 化清单 + 配套收敛项（rnaflow-cli fallback、双 crate、废弃 MD5 脚本、flow-deliver 更名）。
 - 更新头部「最近核对」日期至 2026-10-25。
