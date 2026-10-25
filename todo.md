@@ -1,7 +1,7 @@
 # RNAFlow 仓库优化清单
 
 > 生成时间: 2026-05-15
-> 最近核对: 2026-10-22
+> 最近核对: 2026-10-25
 > 状态说明: `[x]` 已根据当前仓库状态核实完成；`[ ]` 未完成或未验证；`[~]` 部分完成。
 
 ## 📊 核对结论（2026-10-22）
@@ -38,6 +38,90 @@
 - 编码声明未统一；主仓库仍无 `ruff`/`black` 配置。
 - `skills/INSTALL.md` 仍使用 `/home/zj/...` 真实路径示例。
 - P3 新功能（GSVA、TF 调控、解卷积、LncRNA、云原生参考管理）未落地；WGCNA 仅在 `src/skills/wgcna/` 提供独立 skill/脚本，尚未接入主流程。
+
+---
+
+## 🦀 Rust 化计划（2026-10-25 核对）
+
+> 依据 2026-10-25 全仓盘点（对照 FlowFrame v2.0 规范 + `src` 子模块工具调研）。
+> 取舍原则：只 Rust 化**重 IO/重解析、逻辑确定、不依赖 R/Python 生态库**的步骤；DESeq2/edgeR/clusterProfiler/ggplot2/sklearn 等生态依赖一律保留 R/Python。
+> 涉及 `src` 子模块的条目需先在 JZ_Tools 提交，再更新主仓库子模块指针。
+
+### 现有 Rust 工具与接线状态
+
+| 工具 | 版本 | 接线 | 备注 |
+|------|------|------|------|
+| `seq_preprocessor` | 0.2.0 | ✅ rules/02 | FASTQ 标准化重命名；流程未传 `--library-type`，工具按默认 `auto` 猜测命名模式 |
+| `json_md5_verifier` | 0.2.0 | ✅ rules/02 | MD5 校验（rayon 并行），输出 `01.qc/md5_check.tsv` |
+| `data_deliver` | 0.6.0 | ✅ rules/13 | pyo3 + maturin 打包为 pip 包 `rnaflow-cli`，本地交付 + TOS 云上传 |
+| `filter_pe` | 0.3.0 | ❌ 未消费 | ATAC 专用（rust-htslib BAM 过滤），与 RNAFlow 主流程无关 |
+
+配套收敛项：
+
+- [ ] **去掉 `rnaflow-cli` 的 Python fallback 或改为 fail-fast**
+  - 现状: `src/src/data-deliver/RNAFlow_Deliver_Tool/python/RNAFlow_Deliver/modules/deliver.py:18-34`，`data_deliver_rs` import 失败时静默退化为纯 Python 拷贝 + Python MD5，性能塌陷且无告警
+  - 依据: FlowFrame 规范 §4.2「唯一实现，不保留 Python fallback」
+
+- [ ] **data_deliver 双 crate 收敛为一个**
+  - 现状: `src/src/data-deliver/data_deliver/`（纯 lib）与 `src/src/data-deliver/RNAFlow_Deliver_Tool/`（bin + pyo3 + maturin，超集）同名同版本 0.6.0，双拷贝维护
+  - 建议: 保留 RNAFlow_Deliver_Tool 超集，删除独立 lib 目录
+
+- [ ] **删除废弃 Python MD5 实现**
+  - 现状: `src/src/md5/check_md5.py`（133 行，主流程未接线）、`src/skills/md5/scripts/verify_manifest.py`（47 行）
+  - 功能已被 `json_md5_verifier` 覆盖，直接删除
+
+- [ ] **交付工具更名 `flow-deliver`**（规范 §6.4 / §13.3）
+  - 现状: pip 包与 console script 均为 `rnaflow-cli`，RNAFlow 品牌耦合；跨流程复用语义不符
+
+### 第一梯队 — 每次全量运行都跑，IO/解析密集（优先做）
+
+- [ ] **merge_rsem → Rust**
+  - 现状: `src/src/gene_matrix/merge_rsem.py`（206 行，pandas）。逐样本读 RSEM `genes/isoforms.results`，按 gene_id 对齐合并 counts/TPM/FPKM 三矩阵 TSV，是全流程最大的纯表格合并点
+  - 建议: 流式归并实现，crate 放 `src/src/gene_matrix/`，经 `Compile_release` 发布；接线点 `config/run_parameter.yaml` merge_rsem 路径 + `rules/07.rsem.smk` merge_rsem 规则
+  - 验收: 与 pandas 版在真实数据上输出 diff 为空，并记录耗时基线
+
+- [ ] **merge_rmats_summary → Rust**
+  - 现状: `src/src/rMATS/merge_rmats_summary.py`（118 行，pandas）。合并 12 类 JC/rMATS 事件表 + FDR/PSI/min_reads 阈值过滤
+  - 接线点: `run_parameter.yaml` merge_rmats + `rules/11.rMATS.smk` 两个 merge 规则
+
+- [ ] **Filter_Novel_Transcripts 抽成 Rust 工具**
+  - 现状: `rules/09.Assembly.smk:197-243` rule `run:` 块内嵌 Python，GTF 两遍扫描按 class_code `=`/`j` 拆分 annotated/novel；GTF 为 GB 级文件，单线程逐行处理
+  - 建议: 独立 crate（如 `gtf_filter`），rule 改 shell 调用，输入输出路径不变；顺带消掉 rule 内嵌代码
+
+- [ ] **annotation_to_enrichment → Rust**
+  - 现状: `src/src/Enrichments/annotation_to_enrichment.py`（175 行，纯标准库）。eggNOG 注释 → GO assoc + KEGG term2gene/term2name；eggNOG 注释文件 GB 级
+  - 备注: 唯一网络调用（KEGG pathway 命名）已有离线 TSV 路径，Rust 版直接走离线文件
+
+### 第二梯队 — 小而便宜，接线点现成
+
+- [ ] **check_libtype → Rust**
+  - 现状: `src/src/library_type/check_libtype.py`（82 行）。解析 RSeQC infer_experiment 汇总 → fr-firststrand/secondstrand/unstranded
+  - 接线点: `config/config.yaml` software 段已有条目，`rules/11.rMATS.smk` 两个规则调用；替换后可消掉 11 步的 `python3` 依赖
+
+- [ ] **project_summary 构建器 → Rust CLI**
+  - 现状: `rules/utils/project_summary.py`（210 行，纯标准库），在 14.Report 的 run 块内 import 调用，已有 `schema/project_summary.schema.json` 校验
+  - 收益: 主要是一致性与复用（报告容器 / MCP / 其他 Flow 直接调用同一二进制），性能其次；迁移时需保留 jsonschema 校验语义
+
+### 第三梯队 — 低频但大文件（参考数据准备，随参考构建脚本一并做）
+
+- [ ] **GTF/GFF 工具族统一为一个 Rust 工具**
+  - 现状: `src/src/DEG/gtf2tsv.py`、`src/src/GFFconvert/gff2tsv.py`、`src/src/ATACTools/tools/gtf2tss.py`、`src/src/ATACTools/gtf2tssbed.sh`（awk）四处重复实现
+
+- [ ] **GAF/OBO 解析族 → Rust**
+  - 现状: `src/src/GAF2GO/gaf2go.py`（247 行）、`obo2go.py`（148 行）、`src/src/GO_Annotation/MGI_gaf_parser.py`；GAF/OBO 为 GB 级逐行解析
+  - 备注: `uniprot_gaf_converter_v2.py` 含 REST ID 映射语义，先拆离线部分再迁
+
+### 明确不 Rust 化（生态依赖，保留现状）
+
+| 脚本 | 依赖 |
+|------|------|
+| `run_deseq2.r` / `run_edger.r` | DESeq2 / edgeR |
+| `go_enricher.r` / `kegg_enricher.r` | clusterProfiler + ontologyIndex |
+| `run_dist.r` / `run_pheatmap.r` / `qc_rsem_ultimate.py` | ggplot2 / pheatmap / plotnine + sklearn |
+| `run_deg_parallel.py` / `deg_enrich_wrapper.py` | 仅 R 进程调度器，Rust 化收益低 |
+| STAR/RSEM/fastp/GATK/rMATS/Arriba 等第三方工具本体 | — |
+
+实施顺序建议：先做「配套收敛项」（半天级），再按一 → 二 → 三梯队逐个迁移；每个工具迁移后先 dry-run 回归（规范 §12.2），真实数据输出 diff 一致后再切换接线。
 
 ---
 
@@ -213,3 +297,8 @@
 - 拆分 README：新增 `docs/architecture.md`、`installation.md`、`configuration.md`、`usage.md`、`container_builder.md`、`reference_builder.md`、`ai_skills.md`、`mcp_server.md`、`version_history.md`；README 保留概览、核心特性、分析流程、快速开始、文档索引和版本策略。
 - 修正拆分中发现的过期内容：规则编号（`03.short_read_qc`、`06.mapping`、`10.DEG_Enrichments`、`13.deliver`）和 logger 插件版本（`>=0.3.0`）。
 - 保留 `docs/README_zh.md` 为中文完整文档，尚未按英文结构拆分。
+
+## 📝 本次实际变更（2026-10-25）
+
+- 新增「🦀 Rust 化计划（2026-10-25 核对）」章节：现有 Rust 工具接线盘点（seq_preprocessor / json_md5_verifier / data_deliver / filter_pe）+ 三梯队迁移候选（第一梯队：merge_rsem、merge_rmats_summary、Filter_Novel_Transcripts、annotation_to_enrichment；第二梯队：check_libtype、project_summary；第三梯队：GTF/GAF/OBO 工具族）+ 明确不 Rust 化清单 + 配套收敛项（rnaflow-cli fallback、双 crate、废弃 MD5 脚本、flow-deliver 更名）。
+- 更新头部「最近核对」日期至 2026-10-25。
