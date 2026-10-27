@@ -4,13 +4,14 @@ module:
   snakefile: "rules/14.Report.smk"
   stage: "report"
   summary: >
-    独立生成 v2 project_summary.json(项目元信息/样本统计/相对路径/GO 与 KEGG 分组结果),
-    用于外部报告仓库。旧容器化 HTML 渲染入口保留但默认关闭。
+    独立生成 v2.1.0 project_summary.json(项目元信息/平台任务绑定/结果文件语义索引/
+    样本统计/相对路径/GO 与 KEGG 分组结果),用于外部报告仓库。
+    旧容器化 HTML 渲染入口保留但默认关闭。
   requires_helpers: ["utils.common"]
 
 rules:
   - name: generate_docker_json
-    summary: "读取交付数据,导出区分 GO/KEGG、比较组与方向的 v2 项目结果 JSON"
+    summary: "读取交付数据,导出 BioReport 2.1.0 契约 JSON(平台绑定 + files 索引 + GO/KEGG 分组方向结果)"
     wildcards: []
     dynamic: false
     per_sample: false
@@ -62,6 +63,12 @@ rules:
         type: "string"
         default: "0.2.0"
         description: "流程版本号,写入报告项目元信息"
+      - key: "platform.user_id"
+        type: "string"
+        description: "平台用户 ID(2.1.0 必填,须由真实任务上下文注入,不得用占位值)"
+      - key: "platform.task_id"
+        type: "string"
+        description: "平台任务 ID(2.1.0 必填,须由真实任务上下文注入,不得用占位值)"
     conda: "envs/py3.12.yaml"
     resources_tier: "low_resource"
 

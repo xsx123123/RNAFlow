@@ -25,6 +25,18 @@ deliver: true
 project_summary: true
 report: false
 
+# Platform task context, required for the BioReport 2.1.0 project_summary.json
+# delivery (project.user_id / platform.task_id). These must be the real IDs of
+# the submitting task context; do not ship example placeholders.
+platform:
+  user_id: "platform-user-id"
+  task_id: "platform-task-id"
+  # Optional overrides (sensible defaults are derived from the run):
+  # title: "RNA-seq 差异表达分析报告 2026-10-24"
+  # status: "completed"
+  # expire_at: "2026-11-23T15:30:12+08:00"   # ISO 8601 with timezone, or null
+  # html_entry: "report.html"
+
 # These roots are normally inherited from config/reference.yaml.
 # Set them here when running on another machine.
 reference_path: "/absolute/path/to/RNAFlow_reference"

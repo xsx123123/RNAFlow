@@ -31,9 +31,11 @@ report: false
 
 | 字段 | 含义 |
 | --- | --- |
-| `schema_version` | 固定为 `2.0.0`，外部消费者据此识别新契约 |
+| `schema_version` | 固定为 `2.1.0`，外部消费者据此识别新契约 |
 | `path_base` | 固定为 `.`，路径相对 JSON 所在目录解析 |
-| `project` | 项目 ID、客户、物种、参考版本、流程版本和分析日期 |
+| `project` | 项目 ID、平台用户 ID、客户、物种、参考版本、流程版本和分析日期 |
+| `platform` | 报告与任务平台元信息，全部字段必填（见下两节） |
+| `files` | 结果文件语义索引，覆盖 `input_files` 文件、DEG CSV 与富集 `table` / `full_table` |
 | `software_versions` | 内嵌的真实软件版本记录，至少一条 |
 | `stats` | 样本数和分组数 |
 | `input_files` | QC、表达矩阵、样本表、比较表、DEG 等交付文件的约定路径 |
@@ -41,6 +43,35 @@ report: false
 | `enrichment.kegg` | KEGG 方法、参数、按比较组和方向组织的实际结果 |
 
 不再提供含混的 `input_files.enrichment_dir`。各富集结果通过独立的 `table` / `full_table` 定位。所有路径使用 `data/...` 相对路径，不写死宿主机路径或容器 `/data` 路径。将 JSON 和相邻 `data/` 一起移动后仍可解析。`input_files` 是交付布局约定，不保证所有可选模块的文件均存在；富集表则会实际检查文件。
+
+## 平台与任务绑定（2.1.0 新增）
+
+`schema_version` 为 `2.1.0` 时，`project` 与 `platform` 的字段全部必填且非空：
+
+- `project.user_id`：平台用户 ID，必须由实际发起任务的上下文写入，用作报告归属与权限绑定键；不得使用示例占位值。
+- `platform.task_id`：平台任务 ID，同样来自真实任务上下文。
+- `platform.report_id`：由导出规则按 `<project_id>_<yyyymmdd-hhmmss>` 自动生成，与平台登记的报告目录名一致。
+- `platform.flow_type` 固定 `rna_seq`，`flow_version` 取配置中的 `pipeline_version`；`title` 默认按生成日期自动命名，`status` 默认为 `completed`（导出仅在交付完成后执行），`generated_at` 为带时区的 ISO 8601 时间，`expire_at` 可为 `null`，这四项可在配置中覆盖；`html_entry` 默认为 `report.html`。
+
+任务上下文通过分析 yaml 或 `--config` 注入：
+
+```yaml
+platform:
+  user_id: "平台用户 ID"
+  task_id: "平台任务 ID"
+  # 可选覆盖：title / status / expire_at / html_entry
+```
+
+缺少 `platform.user_id` 或 `platform.task_id` 时导出直接报错，不会输出带占位值的交付。
+
+## 结果文件语义索引（2.1.0 新增）
+
+`files` 数组为平台检索与 AI 上下文提供语义化文件索引，每条包含 `path`、`role`、`description`、`format`：
+
+- `path` 相对 JSON 所在目录，只收录实际存在的文件；目录型 `input_files`（如 `fastp_report_dir`、`qualimap_dir`）不进入索引。
+- `role` 取自固定词表：`expression_matrix_tpm`、`expression_matrix_count`、`sample_metadata`、`contrast_definition`、`deg_table`、`enrichment_table`、`qc_stats`、`qc_report`、`figure`、`log`、`other`。
+- `deg_table` 必须附带 `contrast`；`enrichment_table` 必须附带 `contrast`、`direction`（UP/DOWN）与 `ontology`（GO/KEGG）。
+- 索引覆盖：`input_files` 中的全部文件路径、`data/res/DEG/*_DEG.csv` 每个差异结果 CSV，以及每个启用的富集 `table` / `full_table`。
 
 ## 富集结果
 

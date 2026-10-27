@@ -1,27 +1,71 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "RNAFlow BioReport delivery v2",
+  "title": "RNAFlow BioReport delivery v2.1",
   "type": "object",
-  "required": ["schema_version", "path_base", "project", "input_files", "software_versions", "enrichment"],
+  "required": ["schema_version", "path_base", "project", "input_files", "platform", "files", "software_versions", "enrichment"],
   "additionalProperties": false,
   "properties": {
-    "schema_version": {"const": "2.0.0"},
+    "schema_version": {"const": "2.1.0"},
     "path_base": {"const": "."},
     "project": {
       "type": "object",
-      "required": ["project_id", "analysis_date"],
+      "required": ["project_id", "user_id", "client", "species", "genome_version", "pipeline_version", "analysis_date"],
       "additionalProperties": false,
       "properties": {
         "project_id": {"type": "string", "minLength": 1},
-        "client": {"type": ["string", "null"]},
-        "species": {"type": ["string", "null"]},
-        "genome_version": {"type": ["string", "null"]},
-        "pipeline_version": {"type": ["string", "null"]},
+        "user_id": {"type": "string", "minLength": 1},
+        "client": {"type": "string", "minLength": 1},
+        "species": {"type": "string", "minLength": 1},
+        "genome_version": {"type": "string", "minLength": 1},
+        "pipeline_version": {"type": "string", "minLength": 1},
         "analysis_date": {"type": "string", "format": "date"},
         "report_date": {"type": "string", "format": "date"}
       }
     },
+    "platform": {
+      "type": "object",
+      "required": ["report_id", "task_id", "flow_type", "flow_version", "title", "status", "generated_at", "expire_at", "html_entry"],
+      "additionalProperties": false,
+      "properties": {
+        "report_id": {"type": "string", "pattern": "^.+_\\d{8}-\\d{6}$"},
+        "task_id": {"type": "string", "minLength": 1},
+        "flow_type": {"type": "string", "minLength": 1},
+        "flow_version": {"type": "string", "minLength": 1},
+        "title": {"type": "string", "minLength": 1},
+        "status": {"type": "string", "minLength": 1},
+        "generated_at": {"type": "string", "format": "date-time"},
+        "expire_at": {"type": ["string", "null"], "format": "date-time"},
+        "html_entry": {"type": "string", "minLength": 1}
+      }
+    },
     "input_files": {"type": "object", "additionalProperties": {"$ref": "#/$defs/path"}},
+    "files": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["path", "role", "description", "format"],
+        "additionalProperties": false,
+        "properties": {
+          "path": {"$ref": "#/$defs/path"},
+          "role": {"enum": ["expression_matrix_tpm", "expression_matrix_count", "sample_metadata", "contrast_definition", "deg_table", "enrichment_table", "qc_stats", "qc_report", "figure", "log", "other"]},
+          "description": {"type": "string", "minLength": 1},
+          "format": {"type": "string", "minLength": 1},
+          "contrast": {"type": "string", "minLength": 1},
+          "direction": {"enum": ["UP", "DOWN"]},
+          "ontology": {"enum": ["GO", "KEGG"]}
+        },
+        "allOf": [
+          {
+            "if": {"properties": {"role": {"const": "deg_table"}}},
+            "then": {"required": ["contrast"]}
+          },
+          {
+            "if": {"properties": {"role": {"const": "enrichment_table"}}},
+            "then": {"required": ["contrast", "direction", "ontology"]}
+          }
+        ]
+      }
+    },
     "software_versions": {
       "type": "array", "minItems": 1,
       "items": {

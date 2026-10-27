@@ -12,9 +12,11 @@ rule generate_docker_json:
     """
     Export the versioned project result JSON independently of HTML rendering.
 
-    GO and KEGG tables are indexed separately by contrast and direction. Paths are
-    relative to this JSON file; complete result rows remain in CSV/TSV files.
-    The historical rule name is retained for explicit Snakemake target compatibility.
+    Emits the BioReport 2.1.0 delivery contract: project metadata with platform
+    user/task binding, a semantic file index, and GO/KEGG tables indexed by
+    contrast and direction. Paths are relative to this JSON file; complete
+    result rows remain in CSV/TSV files. The historical rule name is retained
+    for explicit Snakemake target compatibility.
     """
     input:
         manifest_json = os.path.join(config['data_deliver'],'report_data','delivery_manifest.json'),
@@ -34,7 +36,7 @@ rule generate_docker_json:
             key: config[key] for key in (
                 'project_id', 'project_name', 'client', 'species', 'Genome_Version',
                 'pipeline_version', 'parameter', 'deg_enrich_wrapper', 'deg', 'only_qc',
-                'analysis_date', 'report_date', 'software_versions', 'analysis',
+                'analysis_date', 'report_date', 'software_versions', 'analysis', 'platform',
             ) if key in config
         },
         contrasts = ALL_CONTRASTS,
